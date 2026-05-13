@@ -76,3 +76,12 @@ npm run dist:installer
 ## 🏷️ Repository Description (Suggested)
 
 GarageLedger — Offline inventory & finance tracker (Electron + React). Multi-language, multi-currency, local DB, dashboard, and auto-update via GitHub Releases.
+
+## 🧷 GitHub Repo (CLI Notes)
+
+If you want to set the repository description from terminal (optional):
+
+```bash
+"C:\Program Files\GitHub CLI\gh.exe" auth login --web
+"C:\Program Files\GitHub CLI\gh.exe" repo edit RealMrNovember/GarageLedger --description "GarageLedger — Offline inventory & finance tracker (Electron + React). Multi-language, multi-currency, local DB, dashboard, and auto-update via GitHub Releases."
+```
