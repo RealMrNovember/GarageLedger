@@ -15,9 +15,10 @@
     "electron:dev": "wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
     "icons": "node tools/generate-icon.mjs",
     "build": "tsc -b && vite build",
-    "dist": "npm run icons && npm run build && electron-builder --win nsis",
-    "publish": "npm run icons && npm run build && electron-builder --win nsis --publish always",
-    "release": "npm version minor && git push --follow-tags && npm run publish",
+    "dist": "npm run icons && npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis",
+    "publish": "npm run icons && npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis --publish always",
+    "release": "git push && npm run publish",
+    "release:minor": "npm version minor && git push --follow-tags && npm run publish",
     "lint": "eslint .",
     "preview": "vite preview"
   },
