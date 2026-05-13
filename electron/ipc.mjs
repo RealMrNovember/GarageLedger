@@ -1,8 +1,12 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import { autoUpdater } from 'electron-updater'
+import { createBackup, ensureDailyBackup, listBackups, openBackupFolder, restoreBackup } from './backups.mjs'
 import { getDb } from './db.mjs'
 
+let lastUpdateStatus = { state: 'idle' }
+
 function broadcastUpdateStatus(payload) {
+  lastUpdateStatus = payload
   for (const win of BrowserWindow.getAllWindows()) {
     win.webContents.send('garageledger:update:status', payload)
   }
@@ -37,6 +41,10 @@ function registerUpdaterIpc({ isDev }) {
     broadcastUpdateStatus({ state: 'error', message: err?.message ?? String(err) })
   })
 
+  ipcMain.handle('garageledger:update:getStatus', async () => {
+    return lastUpdateStatus
+  })
+
   ipcMain.handle('garageledger:update:check', async () => {
     if (isDev) {
       broadcastUpdateStatus({ state: 'dev' })
@@ -61,10 +69,56 @@ function registerUpdaterIpc({ isDev }) {
       return { ok: false }
     }
   })
+
+  if (!isDev) {
+    setTimeout(() => {
+      void autoUpdater.checkForUpdates()
+    }, 250)
+  }
 }
 
 export function registerIpc({ isDev } = { isDev: false }) {
   registerUpdaterIpc({ isDev })
+
+  ipcMain.handle('garageledger:backup:ensureDaily', async () => {
+    try {
+      const out = await ensureDailyBackup()
+      return { ok: true, created: out }
+    } catch (e) {
+      return { ok: false, message: e?.message ?? String(e) }
+    }
+  })
+  ipcMain.handle('garageledger:backup:create', async () => {
+    try {
+      const out = await createBackup({ reason: 'manual' })
+      return { ok: true, created: out }
+    } catch (e) {
+      return { ok: false, message: e?.message ?? String(e) }
+    }
+  })
+  ipcMain.handle('garageledger:backup:list', async () => {
+    try {
+      return { ok: true, items: listBackups() }
+    } catch (e) {
+      return { ok: false, message: e?.message ?? String(e), items: [] }
+    }
+  })
+  ipcMain.handle('garageledger:backup:openFolder', async () => {
+    try {
+      await openBackupFolder()
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, message: e?.message ?? String(e) }
+    }
+  })
+  ipcMain.handle('garageledger:backup:restore', async (_evt, fileName) => {
+    try {
+      const out = await restoreBackup(String(fileName))
+      return { ok: true, result: out }
+    } catch (e) {
+      return { ok: false, message: e?.message ?? String(e) }
+    }
+  })
 
   ipcMain.handle('garageledger:items:list', async () => {
     const db = await getDb()

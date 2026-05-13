@@ -15,6 +15,11 @@ function createSplashWindow() {
     backgroundColor: '#FAFAFA',
     show: true,
     alwaysOnTop: true,
+    webPreferences: {
+      preload: path.join(app.getAppPath(), 'electron', 'preload.mjs'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
   })
 
   win.loadFile(path.join(app.getAppPath(), 'electron', 'splash.html'))
@@ -60,11 +65,17 @@ async function createMainWindow() {
 app.whenReady().then(async () => {
   registerIpc({ isDev })
 
+  const startedAt = Date.now()
   const splash = createSplashWindow()
+
   const main = await createMainWindow()
 
   main.once('ready-to-show', () => {
-    if (!splash.isDestroyed()) splash.close()
+    const elapsed = Date.now() - startedAt
+    const remaining = Math.max(0, 3000 - elapsed)
+    setTimeout(() => {
+      if (!splash.isDestroyed()) splash.close()
+    }, remaining)
   })
 
   app.on('activate', async () => {

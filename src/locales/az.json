@@ -111,5 +111,18 @@
     "upToDate": "Siz ən son versiyanı{{version}} istifadə edirsiniz.",
     "error": "Yeniləmə xətası: {{message}}",
     "dev": "Develop modunda auto-update deaktivdir."
+  },
+  "backups": {
+    "title": "Yedəkləmə",
+    "subtitle": "Məlumatlarınız gündəlik avtomatik yedəklənir. İstəsəniz manual yedək alıb geri yükləyə bilərsiniz.",
+    "create": "Yedək Al",
+    "refresh": "Yenilə",
+    "openFolder": "Qovluğu Aç",
+    "last": "Son yedək: {{value}}",
+    "never": "Yoxdur",
+    "count": "{{count}} fayl",
+    "empty": "Hələ yedək yoxdur.",
+    "restore": "Geri Yüklə",
+    "restoreConfirm": "Seçilmiş yedeği geri yükləmək istəyirsiniz? (Əvvəl təhlükəsizlik yedeği alınacaq)"
   }
 }

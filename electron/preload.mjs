@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('GarageLedger', {
     setCurrency: (currency) => ipcRenderer.invoke('garageledger:settings:setCurrency', currency),
   },
   updates: {
+    getStatus: () => ipcRenderer.invoke('garageledger:update:getStatus'),
     check: () => ipcRenderer.invoke('garageledger:update:check'),
     install: () => ipcRenderer.invoke('garageledger:update:install'),
     onStatus: (handler) => {
@@ -18,5 +19,12 @@ contextBridge.exposeInMainWorld('GarageLedger', {
       ipcRenderer.on('garageledger:update:status', wrapped)
       return () => ipcRenderer.removeListener('garageledger:update:status', wrapped)
     },
+  },
+  backups: {
+    ensureDaily: () => ipcRenderer.invoke('garageledger:backup:ensureDaily'),
+    create: () => ipcRenderer.invoke('garageledger:backup:create'),
+    list: () => ipcRenderer.invoke('garageledger:backup:list'),
+    openFolder: () => ipcRenderer.invoke('garageledger:backup:openFolder'),
+    restore: (fileName) => ipcRenderer.invoke('garageledger:backup:restore', fileName),
   },
 })

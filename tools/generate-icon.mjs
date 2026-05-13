@@ -4,7 +4,7 @@ import sharp from 'sharp'
 import pngToIco from 'png-to-ico'
 
 const projectDir = process.cwd()
-const svgPath = path.resolve(projectDir, '..', 'GarageLedger.svg')
+const svgPath = path.resolve(projectDir, 'GarageLedger.svg')
 const outDir = path.resolve(projectDir, 'build')
 const outPng = path.resolve(outDir, 'icon.png')
 const outIco = path.resolve(outDir, 'icon.ico')

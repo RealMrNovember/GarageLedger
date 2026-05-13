@@ -12,4 +12,5 @@ export type TradeItem = {
 
 export type GarageLedgerSettings = {
   currency: CurrencyCode
+  lastBackupAt?: string | null
 }

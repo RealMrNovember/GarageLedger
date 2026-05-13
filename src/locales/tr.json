@@ -111,5 +111,18 @@
     "upToDate": "Şu an en güncel sürümü{{version}} kullanıyorsunuz.",
     "error": "Güncelleme hatası: {{message}}",
     "dev": "Geliştirme modunda otomatik güncelleme devre dışı."
+  },
+  "backups": {
+    "title": "Yedekleme",
+    "subtitle": "Verileriniz otomatik olarak günlük yedeklenir. İsterseniz manuel yedek alabilir ve geri yükleyebilirsiniz.",
+    "create": "Yedek Al",
+    "refresh": "Yenile",
+    "openFolder": "Klasörü Aç",
+    "last": "Son yedek: {{value}}",
+    "never": "Yok",
+    "count": "{{count}} dosya",
+    "empty": "Henüz yedek bulunmuyor.",
+    "restore": "Geri Yükle",
+    "restoreConfirm": "Seçili yedeği geri yüklemek istiyor musunuz? (Önce güvenlik yedeği alınır)"
   }
 }

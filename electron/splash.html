@@ -48,6 +48,25 @@
         color: var(--muted);
         margin-top: 2px;
       }
+      .status {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 10px;
+      }
+      .pbar {
+        height: 6px;
+        margin-top: 10px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+      }
+      .pbar > div {
+        height: 100%;
+        width: 0%;
+        background: rgba(17, 24, 39, 0.6);
+        border-radius: 999px;
+        transition: width 160ms ease;
+      }
       .bar {
         height: 3px;
         margin-top: 16px;
@@ -79,9 +98,75 @@
         <div>
           <div class="title">GarageLedger</div>
           <div class="sub">Cicibyte Corp</div>
-          <div class="bar"><div></div></div>
+          <div id="status" class="status">Başlatılıyor…</div>
+          <div class="pbar"><div id="pbar"></div></div>
         </div>
       </div>
     </div>
+    <script>
+      const statusEl = document.getElementById('status')
+      const pbarEl = document.getElementById('pbar')
+
+      function setStatus(text) {
+        statusEl.textContent = text
+      }
+      function setProgress(p) {
+        const clamped = Math.max(0, Math.min(100, Number(p) || 0))
+        pbarEl.style.width = `${clamped}%`
+      }
+
+      function render(payload) {
+        if (!payload || !payload.state) return
+        switch (payload.state) {
+          case 'checking':
+            setStatus('Güncelleme kontrol ediliyor…')
+            setProgress(8)
+            break
+          case 'available':
+            setStatus('Güncelleme bulundu. İndiriliyor…')
+            setProgress(12)
+            break
+          case 'downloading':
+            setStatus(`Güncelleme indiriliyor… %${payload.percent ?? 0}`)
+            setProgress(payload.percent ?? 0)
+            break
+          case 'downloaded':
+            setStatus('Güncelleme hazır. Uygulama açılıyor…')
+            setProgress(100)
+            break
+          case 'upToDate':
+            setStatus('Uygulama güncel. Açılıyor…')
+            setProgress(100)
+            break
+          case 'dev':
+            setStatus('Geliştirme modu. Açılıyor…')
+            setProgress(100)
+            break
+          case 'error':
+            setStatus('Güncelleme hatası. Açılıyor…')
+            setProgress(100)
+            break
+          default:
+            break
+        }
+      }
+
+      async function boot() {
+        try {
+          const api = window.GarageLedger
+          if (api?.updates?.getStatus) {
+            const s = await api.updates.getStatus()
+            render(s)
+          }
+          api?.updates?.onStatus?.((p) => render(p))
+          api?.updates?.check?.()
+          api?.backups?.ensureDaily?.()
+        } catch {
+          setStatus('Açılıyor…')
+        }
+      }
+
+      boot()
+    </script>
   </body>
 </html>

@@ -17,22 +17,42 @@ type UpdateStatus =
   | { state: 'error'; message?: string }
   | { state: 'dev' }
 
+type BackupItem = { fileName: string; fullPath: string; size: number; mtimeMs: number }
+
 export function SettingsPage() {
   const { t } = useTranslation()
   const current = (i18n.language as Lang) || 'az'
   const [status, setStatus] = useState<UpdateStatus>({ state: 'idle' })
+  const [backupItems, setBackupItems] = useState<BackupItem[]>([])
+  const [backupBusy, setBackupBusy] = useState(false)
+  const [lastBackupAt, setLastBackupAt] = useState<string | null>(null)
 
   useEffect(() => {
     const api = window.GarageLedger
     if (!api?.updates?.onStatus) return
     const off = api.updates.onStatus((payload) => {
-      if (!payload?.state) return
-      setStatus(payload)
+      if (typeof payload !== 'object' || payload == null) return
+      if (!('state' in payload)) return
+      setStatus(payload as UpdateStatus)
     })
     return () => off()
   }, [])
 
+  useEffect(() => {
+    const api = window.GarageLedger
+    if (!api?.backups?.list) return
+
+    const load = async () => {
+      const [settings, list] = await Promise.all([api.settings.get(), api.backups.list()])
+      setLastBackupAt(settings.lastBackupAt ?? null)
+      if (list.ok) setBackupItems(list.items)
+    }
+
+    void load()
+  }, [])
+
   const canUpdate = Boolean(window.GarageLedger?.updates)
+  const canBackup = Boolean(window.GarageLedger?.backups)
   const progress = useMemo(() => {
     if (status.state !== 'downloading') return null
     const p = Number(status.percent)
@@ -46,6 +66,12 @@ export function SettingsPage() {
         : undefined
     return version ? ` (v${version})` : ''
   }, [status])
+  const lastBackupLabel = useMemo(() => {
+    if (!lastBackupAt) return t('backups.never')
+    const d = new Date(lastBackupAt)
+    if (Number.isNaN(d.getTime())) return t('backups.never')
+    return d.toLocaleString()
+  }, [lastBackupAt, t])
 
   return (
     <div className="space-y-4">
@@ -120,6 +146,108 @@ export function SettingsPage() {
             </div>
           ) : (
             <div className="text-xs text-slate-500">{t('updates.idle')}</div>
+          )}
+        </div>
+      </Card>
+
+      <Card className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-sm font-semibold text-slate-900">{t('backups.title')}</div>
+            <div className="mt-1 text-xs text-slate-500">{t('backups.subtitle')}</div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              onClick={async () => {
+                setBackupBusy(true)
+                try {
+                  const api = window.GarageLedger
+                  if (!api?.backups) return
+                  const created = await api.backups.create()
+                  const list = await api.backups.list()
+                  const settings = await api.settings.get()
+                  setLastBackupAt(settings.lastBackupAt ?? null)
+                  if (list.ok) setBackupItems(list.items)
+                  if (!created.ok) setBackupBusy(false)
+                } finally {
+                  setBackupBusy(false)
+                }
+              }}
+              disabled={!canBackup || backupBusy}
+            >
+              {t('backups.create')}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={async () => {
+                setBackupBusy(true)
+                try {
+                  const api = window.GarageLedger
+                  if (!api?.backups) return
+                  const list = await api.backups.list()
+                  const settings = await api.settings.get()
+                  setLastBackupAt(settings.lastBackupAt ?? null)
+                  if (list.ok) setBackupItems(list.items)
+                } finally {
+                  setBackupBusy(false)
+                }
+              }}
+              disabled={!canBackup || backupBusy}
+            >
+              {t('backups.refresh')}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => void window.GarageLedger?.backups?.openFolder()}
+              disabled={!canBackup}
+            >
+              {t('backups.openFolder')}
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs text-slate-500">{t('backups.last', { value: lastBackupLabel })}</div>
+          <div className="text-xs text-slate-500">{t('backups.count', { count: backupItems.length })}</div>
+        </div>
+
+        <div className="mt-4 overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-white/40">
+          {backupItems.length === 0 ? (
+            <div className="px-4 py-4 text-sm text-slate-600">{t('backups.empty')}</div>
+          ) : (
+            <div className="divide-y divide-[var(--tf-border)]">
+              {backupItems.slice(0, 20).map((b) => (
+                <div key={b.fileName} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-slate-900">{b.fileName}</div>
+                    <div className="mt-1 text-xs text-slate-500">{new Date(b.mtimeMs).toLocaleString()}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={async () => {
+                        const ok = window.confirm(t('backups.restoreConfirm'))
+                        if (!ok) return
+                        setBackupBusy(true)
+                        try {
+                          const res = await window.GarageLedger?.backups?.restore(b.fileName)
+                          const list = await window.GarageLedger?.backups?.list()
+                          const settings = await window.GarageLedger?.settings?.get()
+                          if (settings) setLastBackupAt(settings.lastBackupAt ?? null)
+                          if (list?.ok) setBackupItems(list.items)
+                          if (!res?.ok) setBackupBusy(false)
+                        } finally {
+                          setBackupBusy(false)
+                        }
+                      }}
+                      disabled={!canBackup || backupBusy}
+                    >
+                      {t('backups.restore')}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </Card>

@@ -10,6 +10,7 @@
     "build": "tsc -b && vite build",
     "dist": "npm run build && electron-builder --win portable",
     "dist:installer": "npm run build && electron-builder --win nsis",
+    "publish": "npm run build && electron-builder --win nsis --publish always",
     "lint": "eslint .",
     "preview": "vite preview"
   },

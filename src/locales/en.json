@@ -111,5 +111,18 @@
     "upToDate": "You are on the latest version{{version}}.",
     "error": "Update error: {{message}}",
     "dev": "Auto-update is disabled in development mode."
+  },
+  "backups": {
+    "title": "Backups",
+    "subtitle": "Your data is backed up automatically daily. You can also create and restore backups manually.",
+    "create": "Create Backup",
+    "refresh": "Refresh",
+    "openFolder": "Open Folder",
+    "last": "Last backup: {{value}}",
+    "never": "Never",
+    "count": "{{count}} files",
+    "empty": "No backups yet.",
+    "restore": "Restore",
+    "restoreConfirm": "Restore the selected backup? (A safety backup will be created first)"
   }
 }
