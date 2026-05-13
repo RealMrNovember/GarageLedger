@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '../components/Button'
 import { Modal } from '../components/Modal'
 import { addDays, parseIsoDate, toIsoDateInputValue } from '../lib/dates'
-import type { TradeItem } from '../lib/types'
+import type { Contact, ContactRole, TradeItem } from '../lib/types'
 
 function newId(): string {
   if (crypto.randomUUID) return crypto.randomUUID()
@@ -14,14 +14,18 @@ export function TradeFormModal({
   open,
   onClose,
   categories,
+  contacts,
   initial,
   onSubmit,
+  onUpsertContact,
 }: {
   open: boolean
   onClose: () => void
   categories: string[]
+  contacts: Contact[]
   initial?: TradeItem
   onSubmit: (item: TradeItem) => void
+  onUpsertContact: (contact: Contact) => void
 }) {
   const { t } = useTranslation()
   const isEdit = Boolean(initial)
@@ -30,8 +34,10 @@ export function TradeFormModal({
   const [model, setModel] = useState('')
   const [year, setYear] = useState<number | ''>('')
   const [engine, setEngine] = useState('')
+  const [sellerContactId, setSellerContactId] = useState<string | null>(null)
   const [sellerName, setSellerName] = useState('')
   const [sellerPhone, setSellerPhone] = useState('')
+  const [buyerContactId, setBuyerContactId] = useState<string | null>(null)
   const [buyerName, setBuyerName] = useState('')
   const [buyerPhone, setBuyerPhone] = useState('')
   const [categoryMode, setCategoryMode] = useState<'select' | 'custom'>('select')
@@ -55,6 +61,17 @@ export function TradeFormModal({
   const [tradeInEngine, setTradeInEngine] = useState<string>('')
   const [tradeInValue, setTradeInValue] = useState<number>(0)
   const [expenses, setExpenses] = useState<{ id: string; date: string; description: string; amount: number }[]>([])
+  const [contactModalOpen, setContactModalOpen] = useState(false)
+  const [contactModalTarget, setContactModalTarget] = useState<'seller' | 'buyer'>('seller')
+  const [contactName, setContactName] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
+  const [contactEmail, setContactEmail] = useState('')
+  const [contactRole, setContactRole] = useState<ContactRole>('both')
+  const [contactNotes, setContactNotes] = useState('')
+  const [sellerQuery, setSellerQuery] = useState('')
+  const [buyerQuery, setBuyerQuery] = useState('')
+  const [sellerPickerOpen, setSellerPickerOpen] = useState(false)
+  const [buyerPickerOpen, setBuyerPickerOpen] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -63,10 +80,23 @@ export function TradeFormModal({
       setModel('')
       setYear('')
       setEngine('')
+      setSellerContactId(null)
       setSellerName('')
       setSellerPhone('')
+      setBuyerContactId(null)
       setBuyerName('')
       setBuyerPhone('')
+      setSellerQuery('')
+      setBuyerQuery('')
+      setSellerPickerOpen(false)
+      setBuyerPickerOpen(false)
+      setContactModalOpen(false)
+      setContactModalTarget('seller')
+      setContactName('')
+      setContactPhone('')
+      setContactEmail('')
+      setContactRole('both')
+      setContactNotes('')
       setCategoryMode('select')
       setCategory('Otomobil')
       setCustomCategory('')
@@ -95,10 +125,17 @@ export function TradeFormModal({
     setModel(initial.model ?? '')
     setYear(initial.year ?? '')
     setEngine(initial.engine ?? '')
+    setSellerContactId(initial.sellerContactId ?? null)
     setSellerName(initial.sellerName ?? '')
     setSellerPhone(initial.sellerPhone ?? '')
+    setBuyerContactId(initial.buyerContactId ?? null)
     setBuyerName(initial.buyerName ?? '')
     setBuyerPhone(initial.buyerPhone ?? '')
+    setSellerQuery('')
+    setBuyerQuery('')
+    setSellerPickerOpen(false)
+    setBuyerPickerOpen(false)
+    setContactModalOpen(false)
     const hasCategoryInList = categories.includes(initial.category)
     setCategoryMode(hasCategoryInList ? 'select' : 'custom')
     setCategory(hasCategoryInList ? initial.category : 'Otomobil')
@@ -127,6 +164,50 @@ export function TradeFormModal({
     const v = categoryMode === 'custom' ? customCategory : category
     return v.trim() || 'Diğer'
   }, [categoryMode, customCategory, category])
+
+  const contactsById = useMemo(() => new Map(contacts.map((c) => [c.id, c])), [contacts])
+  const sellerSelected = useMemo(() => (sellerContactId ? contactsById.get(sellerContactId) ?? null : null), [contactsById, sellerContactId])
+  const buyerSelected = useMemo(() => (buyerContactId ? contactsById.get(buyerContactId) ?? null : null), [contactsById, buyerContactId])
+
+  useEffect(() => {
+    if (!open) return
+    if (!sellerSelected) return
+    setSellerName(sellerSelected.name)
+    setSellerPhone(sellerSelected.phone)
+  }, [open, sellerSelected])
+
+  useEffect(() => {
+    if (!open) return
+    if (!buyerSelected) return
+    setBuyerName(buyerSelected.name)
+    setBuyerPhone(buyerSelected.phone)
+  }, [open, buyerSelected])
+
+  const filteredSellerContacts = useMemo(() => {
+    const q = sellerQuery.trim().toLowerCase()
+    if (!q) return contacts.slice(0, 8)
+    return contacts
+      .filter((c) => {
+        const name = (c.name ?? '').toLowerCase()
+        const phone = (c.phone ?? '').toLowerCase()
+        const email = (c.email ?? '').toLowerCase()
+        return name.includes(q) || phone.includes(q) || email.includes(q)
+      })
+      .slice(0, 8)
+  }, [contacts, sellerQuery])
+
+  const filteredBuyerContacts = useMemo(() => {
+    const q = buyerQuery.trim().toLowerCase()
+    if (!q) return contacts.slice(0, 8)
+    return contacts
+      .filter((c) => {
+        const name = (c.name ?? '').toLowerCase()
+        const phone = (c.phone ?? '').toLowerCase()
+        const email = (c.email ?? '').toLowerCase()
+        return name.includes(q) || phone.includes(q) || email.includes(q)
+      })
+      .slice(0, 8)
+  }, [contacts, buyerQuery])
 
   const canSubmitBase = brand.trim().length > 0 && purchaseDate.trim().length > 0 && Number.isFinite(purchasePrice)
   const installmentRemaining = useMemo(() => Math.max(0, Number(sellPrice) - Number(downPayment || 0)), [sellPrice, downPayment])
@@ -158,18 +239,21 @@ export function TradeFormModal({
               Number.isFinite(tradeInValue) &&
               tradeInValue > 0)))
 
+  const canSaveContact = contactName.trim().length > 0 || contactPhone.trim().length > 0
+
   return (
-    <Modal
-      title={isEdit ? t('tradeForm.editTitle') : t('tradeForm.createTitle')}
-      open={open}
-      onClose={onClose}
-      footer={
-        <div className="flex items-center justify-end gap-2">
-          <Button variant="ghost" onClick={onClose}>
-            {t('tradeForm.cancel')}
-          </Button>
-          <Button
-            onClick={() => {
+    <>
+      <Modal
+        title={isEdit ? t('tradeForm.editTitle') : t('tradeForm.createTitle')}
+        open={open}
+        onClose={onClose}
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="ghost" onClick={onClose}>
+              {t('tradeForm.cancel')}
+            </Button>
+            <Button
+              onClick={() => {
               const normalizedExpenses = expenses
                 .map((e) => ({
                   id: e.id,
@@ -213,8 +297,10 @@ export function TradeFormModal({
                         value: Number(tradeInValue),
                       }
                     : null,
+                sellerContactId,
                 sellerName: sellerName.trim(),
                 sellerPhone: sellerPhone.trim(),
+                buyerContactId: status === 'in_stock' ? null : buyerContactId,
                 buyerName: status === 'in_stock' ? '' : buyerName.trim(),
                 buyerPhone: status === 'in_stock' ? '' : buyerPhone.trim(),
                 purchasePrice: Number(purchasePrice),
@@ -250,8 +336,10 @@ export function TradeFormModal({
                   nextPaymentDate: null,
                   barterCash: null,
                   tradeIn: null,
+                  sellerContactId: buyerContactId,
                   sellerName: buyerName.trim(),
                   sellerPhone: buyerPhone.trim(),
+                  buyerContactId: null,
                   buyerName: '',
                   buyerPhone: '',
                   sellDate: null,
@@ -262,14 +350,14 @@ export function TradeFormModal({
                 onSubmit(tradeInItem)
               }
               onClose()
-            }}
-            disabled={!canSubmit}
-          >
-            {t('tradeForm.save')}
-          </Button>
-        </div>
-      }
-    >
+              }}
+              disabled={!canSubmit}
+            >
+              {t('tradeForm.save')}
+            </Button>
+          </div>
+        }
+      >
       <div className="grid grid-cols-1 gap-4">
         <div>
           <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.brand')}</div>
@@ -316,13 +404,79 @@ export function TradeFormModal({
           <div className="text-xs font-semibold text-slate-700">{t('tradeForm.sections.parties')}</div>
           <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.sellerName')}</div>
-              <input
-                value={sellerName}
-                onChange={(e) => setSellerName(e.target.value)}
-                placeholder={t('tradeForm.fields.sellerNamePlaceholder')}
-                className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
-              />
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.seller')}</div>
+                <Button
+                  variant="ghost"
+                  className="px-3 py-1 text-xs"
+                  onClick={() => {
+                    setContactModalTarget('seller')
+                    setContactRole('seller')
+                    setContactName(sellerQuery || sellerName)
+                    setContactPhone(sellerPhone)
+                    setContactEmail('')
+                    setContactNotes('')
+                    setContactModalOpen(true)
+                  }}
+                >
+                  {t('tradeForm.actions.addContact')}
+                </Button>
+              </div>
+              <div className="relative mt-2">
+                <input
+                  value={
+                    sellerSelected
+                      ? [sellerSelected.name, sellerSelected.phone].filter(Boolean).join(' · ')
+                      : sellerQuery
+                  }
+                  onChange={(e) => {
+                    setSellerContactId(null)
+                    setSellerQuery(e.target.value)
+                    setSellerPickerOpen(true)
+                  }}
+                  onFocus={() => setSellerPickerOpen(true)}
+                  onBlur={() => setTimeout(() => setSellerPickerOpen(false), 120)}
+                  placeholder={t('tradeForm.fields.contactSearchPlaceholder')}
+                  className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+                />
+                {sellerSelected ? (
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-900"
+                    onClick={() => {
+                      setSellerContactId(null)
+                      setSellerQuery('')
+                    }}
+                  >
+                    {t('tradeForm.actions.clearContact')}
+                  </button>
+                ) : null}
+                {sellerPickerOpen && !sellerSelected ? (
+                  <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-white/90 shadow-[var(--tf-shadow)]">
+                    {filteredSellerContacts.length === 0 ? (
+                      <div className="px-4 py-3 text-sm text-slate-600">{t('tradeForm.emptyContacts')}</div>
+                    ) : (
+                      <div className="divide-y divide-[var(--tf-border)]">
+                        {filteredSellerContacts.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            className="w-full px-4 py-3 text-left text-sm text-slate-800 hover:bg-black/5"
+                            onClick={() => {
+                              setSellerContactId(c.id)
+                              setSellerQuery('')
+                              setSellerPickerOpen(false)
+                            }}
+                          >
+                            <div className="font-semibold text-slate-900">{c.name || '—'}</div>
+                            <div className="mt-1 text-xs text-slate-500">{[c.phone, c.email].filter(Boolean).join(' · ') || '—'}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </div>
             </div>
             <div>
               <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.sellerPhone')}</div>
@@ -338,13 +492,75 @@ export function TradeFormModal({
           {status === 'in_stock' ? null : (
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.buyerName')}</div>
-                <input
-                  value={buyerName}
-                  onChange={(e) => setBuyerName(e.target.value)}
-                  placeholder={t('tradeForm.fields.buyerNamePlaceholder')}
-                  className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
-                />
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.buyer')}</div>
+                  <Button
+                    variant="ghost"
+                    className="px-3 py-1 text-xs"
+                    onClick={() => {
+                      setContactModalTarget('buyer')
+                      setContactRole('buyer')
+                      setContactName(buyerQuery || buyerName)
+                      setContactPhone(buyerPhone)
+                      setContactEmail('')
+                      setContactNotes('')
+                      setContactModalOpen(true)
+                    }}
+                  >
+                    {t('tradeForm.actions.addContact')}
+                  </Button>
+                </div>
+                <div className="relative mt-2">
+                  <input
+                    value={buyerSelected ? [buyerSelected.name, buyerSelected.phone].filter(Boolean).join(' · ') : buyerQuery}
+                    onChange={(e) => {
+                      setBuyerContactId(null)
+                      setBuyerQuery(e.target.value)
+                      setBuyerPickerOpen(true)
+                    }}
+                    onFocus={() => setBuyerPickerOpen(true)}
+                    onBlur={() => setTimeout(() => setBuyerPickerOpen(false), 120)}
+                    placeholder={t('tradeForm.fields.contactSearchPlaceholder')}
+                    className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+                  />
+                  {buyerSelected ? (
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-900"
+                      onClick={() => {
+                        setBuyerContactId(null)
+                        setBuyerQuery('')
+                      }}
+                    >
+                      {t('tradeForm.actions.clearContact')}
+                    </button>
+                  ) : null}
+                  {buyerPickerOpen && !buyerSelected ? (
+                    <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-white/90 shadow-[var(--tf-shadow)]">
+                      {filteredBuyerContacts.length === 0 ? (
+                        <div className="px-4 py-3 text-sm text-slate-600">{t('tradeForm.emptyContacts')}</div>
+                      ) : (
+                        <div className="divide-y divide-[var(--tf-border)]">
+                          {filteredBuyerContacts.map((c) => (
+                            <button
+                              key={c.id}
+                              type="button"
+                              className="w-full px-4 py-3 text-left text-sm text-slate-800 hover:bg-black/5"
+                              onClick={() => {
+                                setBuyerContactId(c.id)
+                                setBuyerQuery('')
+                                setBuyerPickerOpen(false)
+                              }}
+                            >
+                              <div className="font-semibold text-slate-900">{c.name || '—'}</div>
+                              <div className="mt-1 text-xs text-slate-500">{[c.phone, c.email].filter(Boolean).join(' · ') || '—'}</div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
               </div>
               <div>
                 <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.buyerPhone')}</div>
@@ -714,5 +930,94 @@ export function TradeFormModal({
         </div>
       </div>
     </Modal>
+
+    <Modal
+      title={t('tradeForm.addContactTitle')}
+      open={contactModalOpen}
+      onClose={() => setContactModalOpen(false)}
+      footer={
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="ghost" onClick={() => setContactModalOpen(false)}>
+            {t('tradeForm.cancel')}
+          </Button>
+          <Button
+            onClick={() => {
+              const now = new Date().toISOString()
+              const contact: Contact = {
+                id: newId(),
+                name: contactName.trim(),
+                phone: contactPhone.trim(),
+                email: contactEmail.trim(),
+                role: contactRole,
+                notes: contactNotes.trim(),
+                createdAt: now,
+                updatedAt: now,
+              }
+              onUpsertContact(contact)
+              if (contactModalTarget === 'seller') setSellerContactId(contact.id)
+              else setBuyerContactId(contact.id)
+              setContactModalOpen(false)
+            }}
+            disabled={!canSaveContact}
+          >
+            {t('tradeForm.save')}
+          </Button>
+        </div>
+      }
+    >
+      <div className="grid grid-cols-1 gap-4">
+        <div>
+          <div className="text-xs font-medium text-slate-600">{t('tradeForm.contact.fields.name')}</div>
+          <input
+            value={contactName}
+            onChange={(e) => setContactName(e.target.value)}
+            className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+          />
+        </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <div className="text-xs font-medium text-slate-600">{t('tradeForm.contact.fields.phone')}</div>
+            <input
+              value={contactPhone}
+              onChange={(e) => setContactPhone(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-slate-600">{t('tradeForm.contact.fields.email')}</div>
+            <input
+              value={contactEmail}
+              onChange={(e) => setContactEmail(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+            />
+          </div>
+        </div>
+        <div>
+          <div className="text-xs font-medium text-slate-600">{t('tradeForm.contact.fields.role')}</div>
+          <select
+            value={contactRole}
+            onChange={(e) => {
+              const v = e.target.value
+              if (v === 'buyer' || v === 'seller' || v === 'both') setContactRole(v)
+            }}
+            className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
+          >
+            <option value="buyer">{t('customers.roles.buyer')}</option>
+            <option value="seller">{t('customers.roles.seller')}</option>
+            <option value="both">{t('customers.roles.both')}</option>
+          </select>
+        </div>
+        <div>
+          <div className="text-xs font-medium text-slate-600">{t('tradeForm.contact.fields.notes')}</div>
+          <textarea
+            value={contactNotes}
+            onChange={(e) => setContactNotes(e.target.value)}
+            rows={4}
+            className="mt-2 w-full resize-none rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+          />
+        </div>
+      </div>
+    </Modal>
+    </>
   )
 }

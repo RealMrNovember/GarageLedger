@@ -6,6 +6,11 @@ contextBridge.exposeInMainWorld('GarageLedger', {
     upsert: (item) => ipcRenderer.invoke('garageledger:items:upsert', item),
     remove: (id) => ipcRenderer.invoke('garageledger:items:remove', id),
   },
+  contacts: {
+    list: () => ipcRenderer.invoke('garageledger:contacts:list'),
+    upsert: (contact) => ipcRenderer.invoke('garageledger:contacts:upsert', contact),
+    remove: (id) => ipcRenderer.invoke('garageledger:contacts:remove', id),
+  },
   settings: {
     get: () => ipcRenderer.invoke('garageledger:settings:get'),
     setCurrency: (currency) => ipcRenderer.invoke('garageledger:settings:setCurrency', currency),

@@ -28,8 +28,10 @@ type TradeItem = {
         value: number
       }
     | null
+  sellerContactId: string | null
   sellerName: string
   sellerPhone: string
+  buyerContactId: string | null
   buyerName: string
   buyerPhone: string
   sellDate: string | null
@@ -43,6 +45,19 @@ type TradeItem = {
   }[]
 }
 
+type ContactRole = 'buyer' | 'seller' | 'both'
+
+type Contact = {
+  id: string
+  name: string
+  phone: string
+  email: string
+  role: ContactRole
+  notes: string
+  createdAt: string
+  updatedAt: string
+}
+
 type GarageLedgerSettings = {
   currency: CurrencyCode
   lastBackupAt?: string | null
@@ -54,6 +69,11 @@ type GarageLedgerApi = {
     list: () => Promise<TradeItem[]>
     upsert: (item: TradeItem) => Promise<TradeItem[]>
     remove: (id: string) => Promise<TradeItem[]>
+  }
+  contacts: {
+    list: () => Promise<Contact[]>
+    upsert: (contact: Contact) => Promise<Contact[]>
+    remove: (id: string) => Promise<Contact[]>
   }
   settings: {
     get: () => Promise<GarageLedgerSettings>

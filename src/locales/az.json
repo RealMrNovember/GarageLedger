@@ -133,16 +133,37 @@
   },
   "customers": {
     "title": "Müştərilər",
-    "subtitle": "Satıcı və alıcı rehberi və əməliyyat tarixçəsi.",
+    "subtitle": "Müstəqil CRM rehberi, cari profil və əməliyyat tarixçəsi.",
     "searchPlaceholder": "Ad və ya telefon ilə axtar…",
     "listTitle": "Rehber",
     "listCount": "{{count}} şəxs",
     "dealCount": "{{count}} əməliyyat",
     "empty": "Uyğun qeyd tapılmadı.",
     "selectHint": "Detallara baxmaq üçün siyahıdan bir şəxs seçin.",
+    "profileTitle": "Cari: {{name}}",
     "roles": {
       "seller": "Satıcı",
-      "buyer": "Alıcı"
+      "buyer": "Alıcı",
+      "both": "Alıcı & Satıcı"
+    },
+    "actions": {
+      "new": "Yeni Şəxs Əlavə Et",
+      "edit": "Dəyiş",
+      "save": "Yadda saxla",
+      "cancel": "İmtina"
+    },
+    "profile": {
+      "volume": "Toplam Həcm",
+      "remaining": "Qalan Alacaq",
+      "dealCount": "Əməliyyat Sayı",
+      "noDeals": "Əməliyyat tapılmadı."
+    },
+    "form": {
+      "name": "Ad Soyad",
+      "phone": "Telefon",
+      "email": "E-poçt",
+      "role": "Rol",
+      "notes": "Qeydlər"
     },
     "summary": {
       "investment": "Alış",
@@ -156,7 +177,8 @@
       "purchase": "Alış",
       "sale": "Satış",
       "expenses": "Masraf",
-      "profit": "Kâr"
+      "profit": "Kâr",
+      "remaining": "Qalan"
     }
   },
   "help": {
@@ -201,9 +223,22 @@
     },
     "actions": {
       "addExpense": "Masraf Əlavə Et",
-      "remove": "Sil"
+      "remove": "Sil",
+      "addContact": "Şəxs Əlavə Et",
+      "clearContact": "Təmizlə"
     },
+    "addContactTitle": "Şəxs Əlavə Et",
     "emptyExpenses": "Hələ masraf əlavə edilməyib.",
+    "emptyContacts": "Uyğun şəxs yoxdur.",
+    "contact": {
+      "fields": {
+        "name": "Ad Soyad",
+        "phone": "Telefon",
+        "email": "E-poçt",
+        "role": "Rol",
+        "notes": "Qeydlər"
+      }
+    },
     "status": {
       "inStock": "Stokda",
       "reserved": "Rezerve",
@@ -238,14 +273,17 @@
       "tradeInYear": "Takas İl",
       "tradeInEngine": "Takas Motor",
       "tradeInValue": "Takas Bedeli",
+      "seller": "Satıcı",
       "sellerName": "Satıcı Adı",
       "sellerNamePlaceholder": "Məs: Əhməd",
       "sellerPhone": "Satıcı Telefon",
       "sellerPhonePlaceholder": "Məs: +90 5xx xxx xx xx",
+      "buyer": "Alıcı",
       "buyerName": "Alıcı Adı",
       "buyerNamePlaceholder": "Məs: Məmməd",
       "buyerPhone": "Alıcı Telefon",
       "buyerPhonePlaceholder": "Məs: +90 5xx xxx xx xx",
+      "contactSearchPlaceholder": "Axtar / seç…",
       "category": "Kateqoriya",
       "categorySelect": "Seç",
       "categoryCustom": "Yaz",
@@ -276,6 +314,13 @@
   "settings": {
     "title": "Ayarlar",
     "language": "Dil",
+    "theme": {
+      "title": "Tema",
+      "subtitle": "Açıq və qaranlıq mod arasında keçid edin.",
+      "toggle": "Tema dəyişdir",
+      "light": "Açıq",
+      "dark": "Qaranlıq"
+    },
     "languages": {
       "az": "AZ — Azərbaycan",
       "tr": "TR — Türkçe",

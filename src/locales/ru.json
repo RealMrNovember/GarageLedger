@@ -133,16 +133,37 @@
   },
   "customers": {
     "title": "Клиенты",
-    "subtitle": "Справочник продавцов/покупателей и история сделок.",
+    "subtitle": "Независимый CRM-справочник с профилями и историей сделок.",
     "searchPlaceholder": "Поиск по имени или телефону…",
     "listTitle": "Справочник",
     "listCount": "{{count}} человек",
     "dealCount": "{{count}} сделок",
     "empty": "Нет совпадений.",
     "selectHint": "Выберите человека в списке, чтобы увидеть детали.",
+    "profileTitle": "Профиль: {{name}}",
     "roles": {
       "seller": "Продавец",
-      "buyer": "Покупатель"
+      "buyer": "Покупатель",
+      "both": "Покупатель и продавец"
+    },
+    "actions": {
+      "new": "Добавить человека",
+      "edit": "Редактировать",
+      "save": "Сохранить",
+      "cancel": "Отмена"
+    },
+    "profile": {
+      "volume": "Общий объём",
+      "remaining": "Остаток к получению",
+      "dealCount": "Кол-во сделок",
+      "noDeals": "Сделок не найдено."
+    },
+    "form": {
+      "name": "ФИО",
+      "phone": "Телефон",
+      "email": "Email",
+      "role": "Роль",
+      "notes": "Заметки"
     },
     "summary": {
       "investment": "Покупки",
@@ -156,7 +177,8 @@
       "purchase": "Покупка",
       "sale": "Продажа",
       "expenses": "Расходы",
-      "profit": "Прибыль"
+      "profit": "Прибыль",
+      "remaining": "Остаток"
     }
   },
   "help": {
@@ -211,9 +233,22 @@
     },
     "actions": {
       "addExpense": "Добавить расход",
-      "remove": "Удалить"
+      "remove": "Удалить",
+      "addContact": "Добавить человека",
+      "clearContact": "Очистить"
     },
+    "addContactTitle": "Добавить человека",
     "emptyExpenses": "Расходов пока нет.",
+    "emptyContacts": "Нет совпадений.",
+    "contact": {
+      "fields": {
+        "name": "ФИО",
+        "phone": "Телефон",
+        "email": "Email",
+        "role": "Роль",
+        "notes": "Заметки"
+      }
+    },
     "status": {
       "inStock": "В наличии",
       "reserved": "Зарезервировано",
@@ -248,14 +283,17 @@
       "tradeInYear": "Год (трейд-ин)",
       "tradeInEngine": "Двигатель (трейд-ин)",
       "tradeInValue": "Оценка (трейд-ин)",
+      "seller": "Продавец",
       "sellerName": "Имя продавца",
       "sellerNamePlaceholder": "например: Иван",
       "sellerPhone": "Телефон продавца",
       "sellerPhonePlaceholder": "например: +90 5xx xxx xx xx",
+      "buyer": "Покупатель",
       "buyerName": "Имя покупателя",
       "buyerNamePlaceholder": "например: Алексей",
       "buyerPhone": "Телефон покупателя",
       "buyerPhonePlaceholder": "например: +90 5xx xxx xx xx",
+      "contactSearchPlaceholder": "Поиск / выбор…",
       "category": "Категория",
       "categorySelect": "Выбрать",
       "categoryCustom": "Ввести",
@@ -286,6 +324,13 @@
   "settings": {
     "title": "Настройки",
     "language": "Язык",
+    "theme": {
+      "title": "Тема",
+      "subtitle": "Переключайте светлый и тёмный режим.",
+      "toggle": "Переключить тему",
+      "light": "Светлая",
+      "dark": "Тёмная"
+    },
     "languages": {
       "az": "AZ — Azərbaycan",
       "tr": "TR — Türkçe",

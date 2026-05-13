@@ -29,12 +29,18 @@ function compareVersions(a: string, b: string): number {
 
 export default function App() {
   const { t } = useTranslation()
-  const { ready, items, currency, setCurrency, upsertItem, removeItem } = useGarageLedger()
+  const { ready, items, contacts, currency, setCurrency, upsertItem, upsertContact, removeItem } = useGarageLedger()
   const categories = useMemo(() => uniqueCategories(items), [items])
   const [nav, setNav] = useState<NavKey>('dashboard')
   const [aboutOpen, setAboutOpen] = useState(false)
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
   const [whatsNewVersion, setWhatsNewVersion] = useState<string>('')
+
+  useEffect(() => {
+    const saved = localStorage.getItem('garageledger.theme')
+    const isDark = saved === 'dark'
+    document.documentElement.classList.toggle('dark', isDark)
+  }, [])
 
   useEffect(() => {
     const api = window.GarageLedger
@@ -87,15 +93,22 @@ export default function App() {
                 ) : nav === 'inventory' ? (
                   <InventoryPage
                     items={items}
+                    contacts={contacts}
                     categories={categories}
                     currency={currency}
                     onUpsert={(item) => void upsertItem(item)}
                     onRemove={(id) => void removeItem(id)}
+                    onUpsertContact={(contact) => void upsertContact(contact)}
                   />
                 ) : nav === 'reports' ? (
                   <ReportsPage items={items} currency={currency} />
                 ) : nav === 'customers' ? (
-                  <CustomersPage items={items} currency={currency} />
+                  <CustomersPage
+                    items={items}
+                    contacts={contacts}
+                    currency={currency}
+                    onUpsertContact={(contact) => void upsertContact(contact)}
+                  />
                 ) : nav === 'help' ? (
                   <HelpPage />
                 ) : (

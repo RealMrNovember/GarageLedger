@@ -13,16 +13,16 @@ export function Sidebar({
   const { t } = useTranslation()
   const itemBase =
     'w-full rounded-2xl px-3 py-2 text-left text-sm font-medium transition duration-200 hover:bg-black/5 active:translate-y-[0.5px]'
-  const activeClass = 'bg-black/6 text-slate-900'
-  const idleClass = 'text-slate-700'
+  const activeClass = 'bg-black/6 text-[var(--tf-ink)]'
+  const idleClass = 'text-[var(--tf-ink-muted)]'
 
   return (
     <aside className="flex w-72 flex-col gap-4 border-r border-[var(--tf-border)] bg-[var(--tf-bg)] p-5">
       <div className="flex items-center gap-3">
         <Logo size={34} />
         <div className="leading-tight">
-          <div className="text-sm font-semibold text-slate-900">GarageLedger</div>
-          <div className="text-xs text-slate-500">Cicibyte Corp</div>
+          <div className="text-sm font-semibold text-[var(--tf-ink)]">GarageLedger</div>
+          <div className="text-xs text-[var(--tf-ink-muted)]">Cicibyte Corp</div>
         </div>
       </div>
 

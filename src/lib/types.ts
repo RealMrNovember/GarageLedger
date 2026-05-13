@@ -1,5 +1,18 @@
 import type { CurrencyCode } from './currency'
 
+export type ContactRole = 'buyer' | 'seller' | 'both'
+
+export type Contact = {
+  id: string
+  name: string
+  phone: string
+  email: string
+  role: ContactRole
+  notes: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type TradeItem = {
   id: string
   brand: string
@@ -26,8 +39,10 @@ export type TradeItem = {
         value: number
       }
     | null
+  sellerContactId: string | null
   sellerName: string
   sellerPhone: string
+  buyerContactId: string | null
   buyerName: string
   buyerPhone: string
   sellDate: string | null

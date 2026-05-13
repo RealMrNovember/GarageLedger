@@ -1,11 +1,31 @@
 import path from 'node:path'
+import crypto from 'node:crypto'
 import { app } from 'electron'
 import { Low } from 'lowdb'
 import { JSONFile } from 'lowdb/node'
 
-const defaultData = { items: [], settings: { currency: 'AZN', lastBackupAt: null, lastUpdateCheckAt: null } }
+const defaultData = { items: [], contacts: [], settings: { currency: 'AZN', lastBackupAt: null, lastUpdateCheckAt: null } }
 
 let dbPromise
+
+function newId() {
+  if (crypto.randomUUID) return crypto.randomUUID()
+  return String(Date.now())
+}
+
+function normalizePartyKey(name, phone) {
+  const p = String(phone ?? '').trim()
+  if (p) return `p:${p}`
+  const n = String(name ?? '').trim().toLowerCase()
+  return n ? `n:${n}` : ''
+}
+
+function mergeRole(a, b) {
+  if (!a) return b
+  if (!b) return a
+  if (a === b) return a
+  return 'both'
+}
 
 function migrateItem(raw) {
   if (!raw || typeof raw !== 'object') return null
@@ -66,6 +86,8 @@ function migrateItem(raw) {
   const sellerPhone = anyItem.sellerPhone ?? ''
   const buyerName = anyItem.buyerName ?? ''
   const buyerPhone = anyItem.buyerPhone ?? ''
+  const sellerContactId = anyItem.sellerContactId ?? null
+  const buyerContactId = anyItem.buyerContactId ?? null
 
   return {
     id: String(anyItem.id ?? ''),
@@ -89,13 +111,97 @@ function migrateItem(raw) {
       tradeIn && Number.isFinite(tradeIn.value)
         ? { ...tradeIn, year: Number.isFinite(tradeIn.year) ? tradeIn.year : null, value: tradeIn.value }
         : null,
+    sellerContactId: sellerContactId ? String(sellerContactId) : null,
     sellerName: String(sellerName ?? ''),
     sellerPhone: String(sellerPhone ?? ''),
+    buyerContactId: buyerContactId ? String(buyerContactId) : null,
     buyerName: String(buyerName ?? ''),
     buyerPhone: String(buyerPhone ?? ''),
     sellDate: sellDate ? String(sellDate) : null,
     sellPrice: sellPrice == null ? null : Number(sellPrice),
     expenses: normalizedExpenses,
+  }
+}
+
+function migrateContact(raw) {
+  if (!raw || typeof raw !== 'object') return null
+  const c = raw
+  const id = String(c.id ?? '')
+  if (!id) return null
+  const createdAt = String(c.createdAt ?? new Date().toISOString())
+  const updatedAt = String(c.updatedAt ?? createdAt)
+  const roleRaw = c.role
+  const role = roleRaw === 'buyer' || roleRaw === 'seller' || roleRaw === 'both' ? roleRaw : 'both'
+
+  return {
+    id,
+    name: String(c.name ?? ''),
+    phone: String(c.phone ?? ''),
+    email: String(c.email ?? ''),
+    role,
+    notes: String(c.notes ?? ''),
+    createdAt,
+    updatedAt,
+  }
+}
+
+function ensureContactsFromItems({ items, contacts }) {
+  const map = new Map()
+  for (const c of contacts) {
+    const key = normalizePartyKey(c.name, c.phone)
+    if (key) map.set(key, c)
+  }
+
+  for (const item of items) {
+    const sellerKey = normalizePartyKey(item.sellerName, item.sellerPhone)
+    if (sellerKey) {
+      const existing = map.get(sellerKey)
+      if (existing) {
+        existing.role = mergeRole(existing.role, 'seller')
+        item.sellerContactId ||= existing.id
+      } else {
+        const now = new Date().toISOString()
+        const created = {
+          id: newId(),
+          name: item.sellerName ?? '',
+          phone: item.sellerPhone ?? '',
+          email: '',
+          role: 'seller',
+          notes: '',
+          createdAt: now,
+          updatedAt: now,
+        }
+        contacts.push(created)
+        map.set(sellerKey, created)
+        item.sellerContactId ||= created.id
+      }
+    }
+
+    if (item.status !== 'in_stock') {
+      const buyerKey = normalizePartyKey(item.buyerName, item.buyerPhone)
+      if (buyerKey) {
+        const existing = map.get(buyerKey)
+        if (existing) {
+          existing.role = mergeRole(existing.role, 'buyer')
+          item.buyerContactId ||= existing.id
+        } else {
+          const now = new Date().toISOString()
+          const created = {
+            id: newId(),
+            name: item.buyerName ?? '',
+            phone: item.buyerPhone ?? '',
+            email: '',
+            role: 'buyer',
+            notes: '',
+            createdAt: now,
+            updatedAt: now,
+          }
+          contacts.push(created)
+          map.set(buyerKey, created)
+          item.buyerContactId ||= created.id
+        }
+      }
+    }
   }
 }
 
@@ -109,11 +215,14 @@ export async function getDb() {
     await db.read()
     db.data ||= structuredClone(defaultData)
     db.data.items ||= []
+    db.data.contacts ||= []
     db.data.settings ||= { currency: 'AZN', lastBackupAt: null, lastUpdateCheckAt: null }
     if (!db.data.settings.currency) db.data.settings.currency = 'AZN'
     if (!('lastBackupAt' in db.data.settings)) db.data.settings.lastBackupAt = null
     if (!('lastUpdateCheckAt' in db.data.settings)) db.data.settings.lastUpdateCheckAt = null
     db.data.items = db.data.items.map(migrateItem).filter(Boolean)
+    db.data.contacts = db.data.contacts.map(migrateContact).filter(Boolean)
+    ensureContactsFromItems({ items: db.data.items, contacts: db.data.contacts })
     await db.write()
     return db
   })()

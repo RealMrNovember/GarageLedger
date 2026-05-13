@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { CurrencyCode } from './currency'
 import { api } from './api'
-import type { TradeItem } from './types'
+import type { Contact, TradeItem } from './types'
 
 export function useGarageLedger() {
   const [items, setItems] = useState<TradeItem[]>([])
+  const [contacts, setContacts] = useState<Contact[]>([])
   const [currency, setCurrencyState] = useState<CurrencyCode>('AZN')
   const [ready, setReady] = useState(false)
 
   const refresh = useCallback(async () => {
-    const [nextItems, settings] = await Promise.all([api.listItems(), api.getSettings()])
+    const [nextItems, nextContacts, settings] = await Promise.all([api.listItems(), api.listContacts(), api.getSettings()])
     setItems(nextItems)
+    setContacts(nextContacts)
     setCurrencyState(settings.currency)
     setReady(true)
   }, [])
@@ -24,9 +26,19 @@ export function useGarageLedger() {
     setItems(next)
   }, [])
 
+  const upsertContact = useCallback(async (contact: Contact) => {
+    const next = await api.upsertContact(contact)
+    setContacts(next)
+  }, [])
+
   const removeItem = useCallback(async (id: string) => {
     const next = await api.removeItem(id)
     setItems(next)
+  }, [])
+
+  const removeContact = useCallback(async (id: string) => {
+    const next = await api.removeContact(id)
+    setContacts(next)
   }, [])
 
   const setCurrency = useCallback(async (next: CurrencyCode) => {
@@ -43,5 +55,5 @@ export function useGarageLedger() {
     return Array.from(set).sort((a, b) => a.localeCompare(b))
   }, [items])
 
-  return { ready, items, currency, categories, refresh, upsertItem, removeItem, setCurrency }
+  return { ready, items, contacts, currency, categories, refresh, upsertItem, upsertContact, removeItem, removeContact, setCurrency }
 }

@@ -133,16 +133,37 @@
   },
   "customers": {
     "title": "Customers",
-    "subtitle": "Directory of sellers and buyers with their deal history.",
+    "subtitle": "Independent CRM directory with profiles and deal history.",
     "searchPlaceholder": "Search by name or phone…",
     "listTitle": "Directory",
     "listCount": "{{count}} people",
     "dealCount": "{{count}} deals",
     "empty": "No matching records.",
     "selectHint": "Select a person from the list to view details.",
+    "profileTitle": "Profile: {{name}}",
     "roles": {
       "seller": "Seller",
-      "buyer": "Buyer"
+      "buyer": "Buyer",
+      "both": "Buyer & Seller"
+    },
+    "actions": {
+      "new": "New Person",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "profile": {
+      "volume": "Total Volume",
+      "remaining": "Remaining Receivable",
+      "dealCount": "Deal Count",
+      "noDeals": "No deals found."
+    },
+    "form": {
+      "name": "Full Name",
+      "phone": "Phone",
+      "email": "Email",
+      "role": "Role",
+      "notes": "Notes"
     },
     "summary": {
       "investment": "Purchased",
@@ -156,7 +177,8 @@
       "purchase": "Purchase",
       "sale": "Sale",
       "expenses": "Expenses",
-      "profit": "Profit"
+      "profit": "Profit",
+      "remaining": "Remaining"
     }
   },
   "help": {
@@ -201,9 +223,22 @@
     },
     "actions": {
       "addExpense": "Add Expense",
-      "remove": "Remove"
+      "remove": "Remove",
+      "addContact": "Add Person",
+      "clearContact": "Clear"
     },
+    "addContactTitle": "Add Person",
     "emptyExpenses": "No expenses added yet.",
+    "emptyContacts": "No matching people.",
+    "contact": {
+      "fields": {
+        "name": "Full Name",
+        "phone": "Phone",
+        "email": "Email",
+        "role": "Role",
+        "notes": "Notes"
+      }
+    },
     "status": {
       "inStock": "In stock",
       "reserved": "Reserved",
@@ -238,14 +273,17 @@
       "tradeInYear": "Trade-in Year",
       "tradeInEngine": "Trade-in Engine",
       "tradeInValue": "Trade-in Value",
+      "seller": "Seller",
       "sellerName": "Seller Name",
       "sellerNamePlaceholder": "e.g. John",
       "sellerPhone": "Seller Phone",
       "sellerPhonePlaceholder": "e.g. +90 5xx xxx xx xx",
+      "buyer": "Buyer",
       "buyerName": "Buyer Name",
       "buyerNamePlaceholder": "e.g. Alex",
       "buyerPhone": "Buyer Phone",
       "buyerPhonePlaceholder": "e.g. +90 5xx xxx xx xx",
+      "contactSearchPlaceholder": "Search / select…",
       "category": "Category",
       "categorySelect": "Select",
       "categoryCustom": "Custom",
@@ -276,6 +314,13 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
+    "theme": {
+      "title": "Theme",
+      "subtitle": "Switch between light and dark mode.",
+      "toggle": "Toggle theme",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "languages": {
       "az": "AZ — Azərbaycan",
       "tr": "TR — Türkçe",

@@ -241,8 +241,8 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-sm font-semibold text-slate-900">{t('reports.title')}</div>
-          <div className="mt-1 text-xs text-slate-500">{t('reports.subtitle')}</div>
+          <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('reports.title')}</div>
+          <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('reports.subtitle')}</div>
         </div>
         <Button onClick={exportPdf}>{t('reports.export')}</Button>
       </div>
@@ -250,8 +250,8 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
       <Card className="p-5">
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-slate-900">{t('reports.filters.title')}</div>
-            <div className="text-xs text-slate-500">
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('reports.filters.title')}</div>
+            <div className="text-xs text-[var(--tf-ink-muted)]">
               {t('reports.filters.range', { from: resolvedRange.from, to: resolvedRange.to })}
             </div>
           </div>
@@ -283,7 +283,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
 
             <div className="lg:col-span-4">
               <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-white/60 px-4 py-3 text-sm">
-                <span className="text-slate-600">{t('reports.filters.from')}</span>
+                <span className="text-[var(--tf-ink-muted)]">{t('reports.filters.from')}</span>
                 <input
                   type="date"
                   value={from}
@@ -291,14 +291,14 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
                     setPreset('custom')
                     setFrom(e.target.value)
                   }}
-                  className="bg-transparent text-sm text-slate-900 outline-none"
+                  className="bg-transparent text-sm text-[var(--tf-ink)] outline-none"
                 />
               </label>
             </div>
 
             <div className="lg:col-span-4">
               <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-white/60 px-4 py-3 text-sm">
-                <span className="text-slate-600">{t('reports.filters.to')}</span>
+                <span className="text-[var(--tf-ink-muted)]">{t('reports.filters.to')}</span>
                 <input
                   type="date"
                   value={to}
@@ -306,7 +306,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
                     setPreset('custom')
                     setTo(e.target.value)
                   }}
-                  className="bg-transparent text-sm text-slate-900 outline-none"
+                  className="bg-transparent text-sm text-[var(--tf-ink)] outline-none"
                 />
               </label>
             </div>
@@ -324,7 +324,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
         <div className="overflow-x-auto">
           <table className="w-full min-w-[980px] text-left text-sm">
             <thead className="bg-white/45">
-              <tr className="text-xs font-semibold tracking-wide text-slate-600">
+              <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">
                 <th className="px-5 py-4">{t('reports.table.date')}</th>
                 <th className="px-5 py-4">{t('reports.table.type')}</th>
                 <th className="px-5 py-4">{t('reports.table.vehicle')}</th>
@@ -343,30 +343,33 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
                 </tr>
               ) : (
                 rows.map((r) => (
-                  <tr key={`${r.type}:${r.date}:${r.vehicle}`} className="bg-[var(--tf-surface)]/40">
-                    <td className="px-5 py-4 text-slate-700">{r.date}</td>
-                    <td className="px-5 py-4 text-slate-700">{movementTypeLabel(r.type, t)}</td>
+                  <tr
+                    key={`${r.type}:${r.date}:${r.vehicle}`}
+                    className="bg-[var(--tf-surface)]/40 transition duration-200 hover:bg-black/3 dark:hover:bg-white/5"
+                  >
+                    <td className="px-5 py-4 text-[var(--tf-ink-muted)]">{r.date}</td>
+                    <td className="px-5 py-4 text-[var(--tf-ink-muted)]">{movementTypeLabel(r.type, t)}</td>
                     <td className="px-5 py-4">
-                      <div className="font-medium text-slate-900">{r.vehicle}</div>
+                      <div className="font-medium text-[var(--tf-ink)]">{r.vehicle}</div>
                       {r.type === 'reserved' ? (
-                        <div className="mt-1 text-xs text-slate-600">
+                        <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">
                           {t('reports.reservedLine', {
                             deposit: formatMoney(r.deposit ?? 0, currency),
                             party: r.buyer || '—',
                           })}
                         </div>
                       ) : r.type === 'sold' ? (
-                        <div className="mt-1 text-xs text-slate-600">{r.buyer || '—'}</div>
+                        <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{r.buyer || '—'}</div>
                       ) : (
-                        <div className="mt-1 text-xs text-slate-600">{r.seller || '—'}</div>
+                        <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{r.seller || '—'}</div>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-slate-900">{formatMoney(r.purchasePrice, currency)}</td>
-                    <td className="px-5 py-4 text-slate-900">
+                    <td className="px-5 py-4 text-[var(--tf-ink)]">{formatMoney(r.purchasePrice, currency)}</td>
+                    <td className="px-5 py-4 text-[var(--tf-ink)]">
                       {r.sellPrice == null ? '—' : formatMoney(r.sellPrice, currency)}
                     </td>
-                    <td className="px-5 py-4 text-slate-900">{r.expenses ? formatMoney(r.expenses, currency) : '—'}</td>
-                    <td className="px-5 py-4 text-slate-900">{r.profit == null ? '—' : formatMoney(r.profit, currency)}</td>
+                    <td className="px-5 py-4 text-[var(--tf-ink)]">{r.expenses ? formatMoney(r.expenses, currency) : '—'}</td>
+                    <td className="px-5 py-4 text-[var(--tf-ink)]">{r.profit == null ? '—' : formatMoney(r.profit, currency)}</td>
                   </tr>
                 ))
               )}

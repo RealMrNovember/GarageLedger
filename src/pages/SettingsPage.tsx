@@ -29,6 +29,7 @@ export function SettingsPage() {
   const [lastUpdateCheckAt, setLastUpdateCheckAt] = useState<string | null>(null)
   const [appVersion, setAppVersion] = useState<string | null>(null)
   const [apiAvailable, setApiAvailable] = useState(false)
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('garageledger.theme') === 'dark' ? 'dark' : 'light'))
 
   useEffect(() => {
     const api = window.GarageLedger
@@ -40,6 +41,12 @@ export function SettingsPage() {
     })
     return () => off()
   }, [])
+
+  useEffect(() => {
+    const isDark = theme === 'dark'
+    document.documentElement.classList.toggle('dark', isDark)
+    localStorage.setItem('garageledger.theme', isDark ? 'dark' : 'light')
+  }, [theme])
 
   useEffect(() => {
     const api = window.GarageLedger
@@ -110,6 +117,44 @@ export function SettingsPage() {
             </option>
           ))}
         </select>
+      </Card>
+
+      <Card className="p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-xs font-medium text-slate-600">{t('settings.theme.title')}</div>
+            <div className="mt-1 text-xs text-slate-500">{t('settings.theme.subtitle')}</div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setTheme((v) => (v === 'dark' ? 'light' : 'dark'))}
+            className="relative inline-flex h-10 w-20 items-center rounded-full border border-[var(--tf-border)] bg-white/60 px-1 transition duration-200 hover:bg-black/5"
+          >
+            <span className="sr-only">{t('settings.theme.toggle')}</span>
+            <span
+              className={[
+                'absolute left-4 text-[11px] font-semibold tracking-wide text-slate-600 transition duration-200',
+                theme === 'dark' ? 'opacity-0' : 'opacity-100',
+              ].join(' ')}
+            >
+              {t('settings.theme.light')}
+            </span>
+            <span
+              className={[
+                'absolute right-4 text-[11px] font-semibold tracking-wide text-slate-600 transition duration-200',
+                theme === 'dark' ? 'opacity-100' : 'opacity-0',
+              ].join(' ')}
+            >
+              {t('settings.theme.dark')}
+            </span>
+            <span
+              className={[
+                'inline-block h-8 w-8 rounded-full bg-[var(--tf-accent)] shadow-sm transition duration-200',
+                theme === 'dark' ? 'translate-x-10' : 'translate-x-0',
+              ].join(' ')}
+            />
+          </button>
+        </div>
       </Card>
 
       <Card className="p-5">

@@ -22,6 +22,7 @@ async function setLastUpdateCheckAt() {
 
 function registerUpdaterIpc({ isDev }) {
   autoUpdater.autoDownload = false
+  autoUpdater.requestHeaders = { 'Cache-Control': 'no-cache', Pragma: 'no-cache' }
 
   autoUpdater.on('checking-for-update', () => {
     broadcastUpdateStatus({ state: 'checking' })
@@ -152,6 +153,29 @@ export function registerIpc({ isDev } = { isDev: false }) {
     db.data.items = db.data.items.filter((x) => x.id !== id)
     await db.write()
     return db.data.items
+  })
+
+  ipcMain.handle('garageledger:contacts:list', async () => {
+    const db = await getDb()
+    return db.data.contacts ?? []
+  })
+
+  ipcMain.handle('garageledger:contacts:upsert', async (_evt, contact) => {
+    const db = await getDb()
+    db.data.contacts ||= []
+    const idx = db.data.contacts.findIndex((x) => x.id === contact.id)
+    if (idx >= 0) db.data.contacts[idx] = contact
+    else db.data.contacts.unshift(contact)
+    await db.write()
+    return db.data.contacts
+  })
+
+  ipcMain.handle('garageledger:contacts:remove', async (_evt, id) => {
+    const db = await getDb()
+    db.data.contacts ||= []
+    db.data.contacts = db.data.contacts.filter((x) => x.id !== id)
+    await db.write()
+    return db.data.contacts
   })
 
   ipcMain.handle('garageledger:settings:get', async () => {

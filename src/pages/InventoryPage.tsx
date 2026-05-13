@@ -7,6 +7,7 @@ import { formatMoney } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
 import { itemProfit, isInStock, reservedRemainingBalance } from '../lib/compute'
 import { parseIsoDate, startOfDay, toIsoDateInputValue } from '../lib/dates'
+import type { Contact } from '../lib/types'
 import type { TradeItem } from '../lib/types'
 import { TradeFormModal } from './TradeFormModal'
 
@@ -32,16 +33,20 @@ function formatVehicle(item: TradeItem): string {
 
 export function InventoryPage({
   items,
+  contacts,
   categories,
   currency,
   onUpsert,
   onRemove,
+  onUpsertContact,
 }: {
   items: TradeItem[]
+  contacts: Contact[]
   categories: string[]
   currency: CurrencyCode
   onUpsert: (item: TradeItem) => void
   onRemove: (id: string) => void
+  onUpsertContact: (contact: Contact) => void
 }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -92,8 +97,8 @@ export function InventoryPage({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-sm font-semibold text-slate-900">{t('inventory.title')}</div>
-          <div className="mt-1 text-xs text-slate-500">{t('inventory.subtitle')}</div>
+          <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('inventory.title')}</div>
+          <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('inventory.subtitle')}</div>
         </div>
         <Button
           onClick={() => {
@@ -108,9 +113,9 @@ export function InventoryPage({
       <Card className="p-5">
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-slate-900">{t('inventory.filters.title')}</div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('inventory.filters.title')}</div>
             <div className="flex items-center gap-2">
-              <div className="text-xs text-slate-500">{t('inventory.filters.results', { count: filtered.length })}</div>
+              <div className="text-xs text-[var(--tf-ink-muted)]">{t('inventory.filters.results', { count: filtered.length })}</div>
               <Button
                 variant="ghost"
                 onClick={() => {
@@ -215,7 +220,7 @@ export function InventoryPage({
         <div className="overflow-x-auto">
           <table className="w-full min-w-[980px] text-left text-sm">
             <thead className="bg-white/45">
-              <tr className="text-xs font-semibold tracking-wide text-slate-600">
+              <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">
                 <th className="px-5 py-4">{t('inventory.table.vehicle')}</th>
                 <th className="px-5 py-4">{t('inventory.table.category')}</th>
                 <th className="px-5 py-4">{t('inventory.table.purchaseDate')}</th>
@@ -242,9 +247,9 @@ export function InventoryPage({
                   const remaining = reservedRemainingBalance(item)
 
                   return (
-                    <tr key={item.id} className="bg-[var(--tf-surface)]/40">
+                    <tr key={item.id} className="bg-[var(--tf-surface)]/40 transition duration-200 hover:bg-black/3 dark:hover:bg-white/5">
                       <td className="px-5 py-4">
-                        <div className="font-medium text-slate-900">{formatVehicle(item)}</div>
+                        <div className="font-medium text-[var(--tf-ink)]">{formatVehicle(item)}</div>
                         {item.status === 'reserved' ? (
                           <div className="mt-2">
                             <Badge tone="neutral">{t('inventory.badge.reserved')}</Badge>
@@ -267,11 +272,11 @@ export function InventoryPage({
                           </div>
                         ) : null}
                       </td>
-                      <td className="px-5 py-4 text-slate-700">{item.category}</td>
-                      <td className="px-5 py-4 text-slate-700">{item.purchaseDate}</td>
-                      <td className="px-5 py-4 text-slate-700">{item.sellDate ?? '—'}</td>
-                      <td className="px-5 py-4 text-slate-900">{formatMoney(item.purchasePrice, currency)}</td>
-                      <td className="px-5 py-4 text-slate-900">
+                      <td className="px-5 py-4 text-[var(--tf-ink-muted)]">{item.category}</td>
+                      <td className="px-5 py-4 text-[var(--tf-ink-muted)]">{item.purchaseDate}</td>
+                      <td className="px-5 py-4 text-[var(--tf-ink-muted)]">{item.sellDate ?? '—'}</td>
+                      <td className="px-5 py-4 text-[var(--tf-ink)]">{formatMoney(item.purchasePrice, currency)}</td>
+                      <td className="px-5 py-4 text-[var(--tf-ink)]">
                         {item.sellPrice == null ? '—' : formatMoney(item.sellPrice, currency)}
                       </td>
                       <td className="px-5 py-4">
@@ -336,8 +341,10 @@ export function InventoryPage({
         open={open}
         onClose={() => setOpen(false)}
         categories={categories}
+        contacts={contacts}
         initial={editing}
         onSubmit={onUpsert}
+        onUpsertContact={onUpsertContact}
       />
     </div>
   )
