@@ -304,7 +304,35 @@
   },
   "whatsNew": {
     "title": "Nə Yenilik Var? ({{version}})",
+    "subtitle": "CRM axınları, ödəniş/tahsilat izləmə və Quiet Luxury UI yönümlü premium yeniləmə.",
     "cta": "Başa düşdüm",
+    "sections": [
+      {
+        "title": "Müstəqil CRM (Rehber & Cari Profil)",
+        "body": "Müştərilər artıq yalnız tarixçə deyil; müstəqil şəxs qeydiyyatı və cari profil ekranı olan real CRM moduludur.",
+        "bullets": ["Şəxsləri müstəqil əlavə et (ad, telefon, e-poçt, rol, qeydlər)", "Cari profildə ümumi həcm, qalan alacaq və əməliyyat siyahısı"]
+      },
+      {
+        "title": "Satış Ödənişləri + Ağıllı Xatırlatma",
+        "body": "Avto satışı müxtəlif ödəniş metodlarını dəstəkləyir və qalan balansı izləyir.",
+        "bullets": ["Peşin / Taksitli / Takas (Barter)", "Dashboard xatırlatma: Tahsil Et və Ertele (növbəti ödəniş tarixi)"]
+      },
+      {
+        "title": "Hesabatlar & Antetli PDF",
+        "body": "Tarix aralığına görə xülasə hesabat yaradın və şık PDF ixrac edin.",
+        "bullets": ["Hazır aralıqlar (Bu gün, Bu həftə, Bu ay, və s.)", "Footer imzası: Cicibyte Corp"]
+      },
+      {
+        "title": "Midnight Onyx (Dark Mode)",
+        "body": "Saf qara istifadə etmədən premium SaaS hissi verən qaranlıq tema əlavə edildi.",
+        "bullets": ["Tema seçimi LocalStorage-da saxlanır", "Qaranlıq səthlərdə şık qızılı vurğular"]
+      },
+      {
+        "title": "Quiet Luxury UI Dokunuşları",
+        "body": "Modallar, cədvəllər və mikro animasiyalar daha premium hiss üçün yeniləndi.",
+        "bullets": ["Cam effekti: backdrop-blur", "Yumşaq kölgələr, modern cədvəllər, xüsusi scrollbar"]
+      }
+    ],
     "items": {
       "vehicleSchema": "Avto qeyd ekranı Marka, Model, İl və Motor detallarına görə zənginləşdirildi.",
       "analytics": "Gelişmiş maliyyə analitikası və son 6 ay mənfəət/zərər qrafiki əlavə olundu.",

@@ -304,7 +304,35 @@
   },
   "whatsNew": {
     "title": "What's New? ({{version}})",
+    "subtitle": "A premium update focused on CRM workflows, payments, and a quieter luxury UI.",
     "cta": "Got it",
+    "sections": [
+      {
+        "title": "Independent CRM (Directory & Profiles)",
+        "body": "Customers is now a real CRM module with standalone people records and a profile view.",
+        "bullets": ["Add people independently (name, phone, email, role, notes)", "Open a profile to see total volume, remaining receivable and transactions"]
+      },
+      {
+        "title": "Sales Payments + Smart Reminders",
+        "body": "Selling a vehicle supports multiple payment methods and tracks remaining receivables.",
+        "bullets": ["Cash / Installment / Trade-in (Barter)", "Dashboard reminders: collect payments and snooze next payment date"]
+      },
+      {
+        "title": "Reports & Branded PDF Export",
+        "body": "Generate date-based summary reports and export an elegant PDF with a movements table.",
+        "bullets": ["Date presets (Today, This Week, This Month, etc.)", "Branded footer: Cicibyte Corp"]
+      },
+      {
+        "title": "Midnight Onyx (Dark Mode)",
+        "body": "A new dark theme brings a premium SaaS feel without using pure black.",
+        "bullets": ["Theme toggle stored in LocalStorage", "Soft gold accents on dark surfaces"]
+      },
+      {
+        "title": "Quiet Luxury UI Polish",
+        "body": "Modals, tables and micro-interactions were refined for a more premium experience.",
+        "bullets": ["Glassmorphism modal backdrop blur", "Softer shadows, refined tables and custom scrollbar"]
+      }
+    ],
     "items": {
       "vehicleSchema": "Vehicle entry form is enriched with Brand, Model, Year, and Engine details.",
       "analytics": "Advanced financial analytics and the 6-month profit/loss chart are added.",

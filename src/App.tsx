@@ -35,6 +35,21 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
   const [whatsNewVersion, setWhatsNewVersion] = useState<string>('')
+  const whatsNewSections = useMemo(() => {
+    const raw = t('whatsNew.sections', { returnObjects: true }) as unknown
+    if (!Array.isArray(raw)) return []
+    return raw
+      .filter((x) => x && typeof x === 'object')
+      .map((x) => {
+        const obj = x as Record<string, unknown>
+        return {
+          title: String(obj.title ?? ''),
+          body: String(obj.body ?? ''),
+          bullets: Array.isArray(obj.bullets) ? (obj.bullets as unknown[]).map((b) => String(b)) : [],
+        }
+      })
+      .filter((s) => s.title)
+  }, [t])
 
   useEffect(() => {
     const saved = localStorage.getItem('garageledger.theme')
@@ -144,7 +159,7 @@ export default function App() {
           <div className="flex justify-end">
             <button
               type="button"
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--tf-accent)] px-4 py-2 text-sm font-medium text-white shadow-sm transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/90 hover:shadow-md"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--tf-accent)] px-4 py-2 text-sm font-medium text-white shadow-sm transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/90 hover:shadow-md dark:text-black dark:hover:bg-[#b89145]"
               onClick={() => {
                 localStorage.setItem('garageledger.lastSeenVersion', whatsNewVersion)
                 setWhatsNewOpen(false)
@@ -155,11 +170,24 @@ export default function App() {
           </div>
         }
       >
-        <ul className="list-disc space-y-2 pl-5 text-sm text-slate-700">
-          <li>{t('whatsNew.items.vehicleSchema')}</li>
-          <li>{t('whatsNew.items.analytics')}</li>
-          <li>{t('whatsNew.items.notifications')}</li>
-        </ul>
+        <div className="space-y-4">
+          <div className="text-sm text-[var(--tf-ink-muted)]">{t('whatsNew.subtitle')}</div>
+          <div className="space-y-3">
+            {whatsNewSections.map((s) => (
+              <div key={s.title} className="rounded-2xl border border-[var(--tf-border)] bg-white/60 p-4 dark:bg-white/5">
+                <div className="text-sm font-semibold text-[var(--tf-ink)]">{s.title}</div>
+                <div className="mt-2 text-sm leading-relaxed text-[var(--tf-ink)]">{s.body}</div>
+                {s.bullets.length ? (
+                  <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[var(--tf-ink-muted)]">
+                    {s.bullets.map((b) => (
+                      <li key={b}>{b}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
       </Modal>
     </div>
   )
