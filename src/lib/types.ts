@@ -2,7 +2,10 @@ import type { CurrencyCode } from './currency'
 
 export type TradeItem = {
   id: string
-  title: string
+  brand: string
+  model: string
+  year: number | null
+  engine: string
   category: string
   purchaseDate: string
   status: 'in_stock' | 'sold'

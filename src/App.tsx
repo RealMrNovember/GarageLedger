@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Footer } from './components/Footer'
@@ -12,12 +12,46 @@ import { DashboardPage } from './pages/DashboardPage'
 import { InventoryPage } from './pages/InventoryPage'
 import { SettingsPage } from './pages/SettingsPage'
 
+function compareVersions(a: string, b: string): number {
+  const pa = a.split('.').map((x) => Number(x))
+  const pb = b.split('.').map((x) => Number(x))
+  for (let i = 0; i < Math.max(pa.length, pb.length); i += 1) {
+    const av = pa[i] ?? 0
+    const bv = pb[i] ?? 0
+    if (av > bv) return 1
+    if (av < bv) return -1
+  }
+  return 0
+}
+
 export default function App() {
   const { t } = useTranslation()
   const { ready, items, currency, setCurrency, upsertItem, removeItem } = useGarageLedger()
   const categories = useMemo(() => uniqueCategories(items), [items])
   const [nav, setNav] = useState<NavKey>('dashboard')
   const [aboutOpen, setAboutOpen] = useState(false)
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false)
+  const [whatsNewVersion, setWhatsNewVersion] = useState<string>('')
+
+  useEffect(() => {
+    const api = window.GarageLedger
+    if (!api?.app?.getInfo) return
+
+    const key = 'garageledger.lastSeenVersion'
+    const run = async () => {
+      const info = await api.app.getInfo()
+      const currentVersion = info?.version ?? ''
+      if (!currentVersion) return
+      const lastSeen = localStorage.getItem(key) ?? ''
+
+      if (!lastSeen || compareVersions(currentVersion, lastSeen) > 0) {
+        setWhatsNewVersion(currentVersion)
+        setWhatsNewOpen(true)
+      }
+    }
+
+    void run()
+  }, [])
 
   return (
     <div className="flex h-full">
@@ -75,6 +109,35 @@ export default function App() {
             <div className="text-xs text-slate-500">{t('about.logoPlaceholder')}</div>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        title={t('whatsNew.title', { version: `v${whatsNewVersion}` })}
+        open={whatsNewOpen}
+        onClose={() => {
+          localStorage.setItem('garageledger.lastSeenVersion', whatsNewVersion)
+          setWhatsNewOpen(false)
+        }}
+        footer={
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--tf-accent)] px-4 py-2 text-sm font-medium text-white shadow-sm transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/90 hover:shadow-md"
+              onClick={() => {
+                localStorage.setItem('garageledger.lastSeenVersion', whatsNewVersion)
+                setWhatsNewOpen(false)
+              }}
+            >
+              {t('whatsNew.cta')}
+            </button>
+          </div>
+        }
+      >
+        <ul className="list-disc space-y-2 pl-5 text-sm text-slate-700">
+          <li>{t('whatsNew.items.vehicleSchema')}</li>
+          <li>{t('whatsNew.items.analytics')}</li>
+          <li>{t('whatsNew.items.notifications')}</li>
+        </ul>
       </Modal>
     </div>
   )

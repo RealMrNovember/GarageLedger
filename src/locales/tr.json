@@ -38,7 +38,7 @@
     "empty": "Henüz kayıt yok.",
     "filters": {
       "title": "Filtreler",
-      "searchPlaceholder": "Ara: Başlık",
+      "searchPlaceholder": "Ara: Marka / Model",
       "categoryAll": "Tüm kategoriler",
       "statusAll": "Tüm durumlar",
       "statusInStock": "Stokta",
@@ -53,7 +53,7 @@
       "results": "{{count}} kayıt"
     },
     "table": {
-      "title": "Başlık",
+      "vehicle": "Araç Bilgisi",
       "category": "Kategori",
       "purchaseDate": "Alım Tarihi",
       "saleDate": "Satış Tarihi",
@@ -77,8 +77,14 @@
     "cancel": "Vazgeç",
     "save": "Kaydet",
     "fields": {
-      "title": "Başlık",
-      "titlePlaceholder": "Örn: 2016 Toyota Corolla",
+      "brand": "Marka",
+      "brandPlaceholder": "Örn: BMW",
+      "model": "Model",
+      "modelPlaceholder": "Örn: 520i",
+      "year": "Yıl",
+      "yearPlaceholder": "Örn: 2020",
+      "engine": "Motor",
+      "enginePlaceholder": "Örn: 2.0L",
       "category": "Kategori",
       "categorySelect": "Seç",
       "categoryCustom": "Yaz",
@@ -95,6 +101,15 @@
     "desc": "Çevrimdışı envanter ve finans takip uygulaması.",
     "logoPlaceholder": "Cicibyte Corp logo placeholder",
     "close": "Kapat"
+  },
+  "whatsNew": {
+    "title": "Neler Yeni? ({{version}})",
+    "cta": "Anladım",
+    "items": {
+      "vehicleSchema": "Araç kayıt ekranı Marka, Model, Yıl ve Motor detaylarıyla zenginleştirildi.",
+      "analytics": "Gelişmiş finansal analitik ve 6 aylık kâr/zarar grafiği eklendi.",
+      "notifications": "Otomatik güncelleme sonrası \"Neler Yeni?\" bildirim sistemi entegre edildi."
+    }
   },
   "settings": {
     "title": "Ayarlar",

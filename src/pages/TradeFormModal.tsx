@@ -26,7 +26,10 @@ export function TradeFormModal({
   const { t } = useTranslation()
   const isEdit = Boolean(initial)
 
-  const [title, setTitle] = useState('')
+  const [brand, setBrand] = useState('')
+  const [model, setModel] = useState('')
+  const [year, setYear] = useState<number | ''>('')
+  const [engine, setEngine] = useState('')
   const [categoryMode, setCategoryMode] = useState<'select' | 'custom'>('select')
   const [category, setCategory] = useState('Otomobil')
   const [customCategory, setCustomCategory] = useState('')
@@ -39,7 +42,10 @@ export function TradeFormModal({
   useEffect(() => {
     if (!open) return
     if (!initial) {
-      setTitle('')
+      setBrand('')
+      setModel('')
+      setYear('')
+      setEngine('')
       setCategoryMode('select')
       setCategory('Otomobil')
       setCustomCategory('')
@@ -51,7 +57,10 @@ export function TradeFormModal({
       return
     }
 
-    setTitle(initial.title)
+    setBrand(initial.brand ?? '')
+    setModel(initial.model ?? '')
+    setYear(initial.year ?? '')
+    setEngine(initial.engine ?? '')
     const hasCategoryInList = categories.includes(initial.category)
     setCategoryMode(hasCategoryInList ? 'select' : 'custom')
     setCategory(hasCategoryInList ? initial.category : 'Otomobil')
@@ -68,7 +77,7 @@ export function TradeFormModal({
     return v.trim() || 'Diğer'
   }, [categoryMode, customCategory, category])
 
-  const canSubmit = title.trim().length > 0 && purchaseDate.trim().length > 0 && Number.isFinite(purchasePrice)
+  const canSubmit = brand.trim().length > 0 && purchaseDate.trim().length > 0 && Number.isFinite(purchasePrice)
 
   return (
     <Modal
@@ -84,7 +93,10 @@ export function TradeFormModal({
             onClick={() => {
               const item: TradeItem = {
                 id: initial?.id ?? newId(),
-                title: title.trim(),
+                brand: brand.trim(),
+                model: model.trim(),
+                year: year === '' ? null : Number(year),
+                engine: engine.trim(),
                 category: resolvedCategory,
                 purchaseDate,
                 status: sold ? 'sold' : 'in_stock',
@@ -104,13 +116,44 @@ export function TradeFormModal({
     >
       <div className="grid grid-cols-1 gap-4">
         <div>
-          <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.title')}</div>
+          <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.brand')}</div>
           <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={t('tradeForm.fields.titlePlaceholder')}
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
+            placeholder={t('tradeForm.fields.brandPlaceholder')}
             className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
           />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div>
+            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.model')}</div>
+            <input
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder={t('tradeForm.fields.modelPlaceholder')}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.year')}</div>
+            <input
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder={t('tradeForm.fields.yearPlaceholder')}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.engine')}</div>
+            <input
+              value={engine}
+              onChange={(e) => setEngine(e.target.value)}
+              placeholder={t('tradeForm.fields.enginePlaceholder')}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

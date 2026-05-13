@@ -10,6 +10,26 @@ import { parseIsoDate, startOfDay, toIsoDateInputValue } from '../lib/dates'
 import type { TradeItem } from '../lib/types'
 import { TradeFormModal } from './TradeFormModal'
 
+function formatVehicle(item: TradeItem): string {
+  const parts: string[] = []
+  const brand = (item.brand ?? '').trim()
+  const model = (item.model ?? '').trim()
+  const engine = (item.engine ?? '').trim()
+  const year = item.year == null ? '' : String(item.year)
+
+  const head = [brand, model].filter(Boolean).join(' ')
+  if (head) parts.push(head)
+  if (year) parts.push(year)
+  if (engine) parts.push(engine)
+
+  if (parts.length >= 2) {
+    const [a, b, ...rest] = parts
+    const left = `${a} - ${b}`
+    return rest.length ? `${left}, ${rest.join(', ')}` : left
+  }
+  return parts.join(', ') || '—'
+}
+
 export function InventoryPage({
   items,
   categories,
@@ -41,7 +61,7 @@ export function InventoryPage({
 
     return items
       .filter((item) => {
-        if (query && !item.title.toLowerCase().includes(query)) return false
+        if (query && !formatVehicle(item).toLowerCase().includes(query)) return false
         if (category !== '__all__' && item.category !== category) return false
 
         const inStock = isInStock(item)
@@ -194,7 +214,7 @@ export function InventoryPage({
           <table className="w-full min-w-[980px] text-left text-sm">
             <thead className="bg-white/45">
               <tr className="text-xs font-semibold tracking-wide text-slate-600">
-                <th className="px-5 py-4">{t('inventory.table.title')}</th>
+                <th className="px-5 py-4">{t('inventory.table.vehicle')}</th>
                 <th className="px-5 py-4">{t('inventory.table.category')}</th>
                 <th className="px-5 py-4">{t('inventory.table.purchaseDate')}</th>
                 <th className="px-5 py-4">{t('inventory.table.saleDate')}</th>
@@ -221,7 +241,7 @@ export function InventoryPage({
                   return (
                     <tr key={item.id} className="bg-[var(--tf-surface)]/40">
                       <td className="px-5 py-4">
-                        <div className="font-medium text-slate-900">{item.title}</div>
+                        <div className="font-medium text-slate-900">{formatVehicle(item)}</div>
                         {inStock ? (
                           <div className="mt-2">
                             <Badge tone="info">{t('inventory.badge.inStock')}</Badge>

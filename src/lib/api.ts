@@ -13,14 +13,24 @@ function migrateItem(raw: unknown): TradeItem | null {
   if (!raw || typeof raw !== 'object') return null
   const anyItem = raw as Record<string, unknown>
 
+  const brand = (anyItem.brand ?? anyItem.title ?? anyItem.carModel) as string | undefined
+  const model = anyItem.model as string | undefined
+  const yearRaw = anyItem.year as number | string | undefined
+  const engine = anyItem.engine as string | undefined
+
   const sellDate = (anyItem.sellDate ?? anyItem.saleDate) as string | null | undefined
   const sellPrice = (anyItem.sellPrice ?? anyItem.salePrice) as number | null | undefined
   const statusRaw = anyItem.status as string | undefined
   const status = statusRaw === 'sold' || (sellDate && sellPrice != null) ? 'sold' : 'in_stock'
+  const year =
+    yearRaw == null ? null : Number.isFinite(Number(yearRaw)) ? Number(yearRaw) : null
 
   return {
     id: String(anyItem.id ?? ''),
-    title: String(anyItem.title ?? ''),
+    brand: String(brand ?? ''),
+    model: String(model ?? ''),
+    year,
+    engine: String(engine ?? ''),
     category: String(anyItem.category ?? 'Diğer'),
     purchaseDate: String(anyItem.purchaseDate ?? ''),
     purchasePrice: Number(anyItem.purchasePrice ?? 0),

@@ -11,13 +11,21 @@ function migrateItem(raw) {
   if (!raw || typeof raw !== 'object') return null
 
   const anyItem = raw
+  const brand = anyItem.brand ?? anyItem.title ?? anyItem.carModel ?? ''
+  const model = anyItem.model ?? ''
+  const year = anyItem.year == null ? null : Number(anyItem.year)
+  const engine = anyItem.engine ?? ''
+
   const sellDate = anyItem.sellDate ?? anyItem.saleDate ?? null
   const sellPrice = anyItem.sellPrice ?? anyItem.salePrice ?? null
   const status = anyItem.status ?? (sellDate && sellPrice != null ? 'sold' : 'in_stock')
 
   return {
     id: String(anyItem.id ?? ''),
-    title: String(anyItem.title ?? ''),
+    brand: String(brand ?? ''),
+    model: String(model ?? ''),
+    year: Number.isFinite(year) ? year : null,
+    engine: String(engine ?? ''),
     category: String(anyItem.category ?? 'Diğer'),
     purchaseDate: String(anyItem.purchaseDate ?? ''),
     purchasePrice: Number(anyItem.purchasePrice ?? 0),

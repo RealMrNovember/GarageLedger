@@ -38,7 +38,7 @@
     "empty": "Hələ qeyd yoxdur.",
     "filters": {
       "title": "Filtrlər",
-      "searchPlaceholder": "Axtar: Başlıq",
+      "searchPlaceholder": "Axtar: Marka / Model",
       "categoryAll": "Bütün kateqoriyalar",
       "statusAll": "Bütün statuslar",
       "statusInStock": "Stokda",
@@ -53,7 +53,7 @@
       "results": "{{count}} qeyd"
     },
     "table": {
-      "title": "Başlıq",
+      "vehicle": "Avto Məlumatı",
       "category": "Kateqoriya",
       "purchaseDate": "Alış Tarixi",
       "saleDate": "Satış Tarixi",
@@ -77,8 +77,14 @@
     "cancel": "İmtina",
     "save": "Yadda saxla",
     "fields": {
-      "title": "Başlıq",
-      "titlePlaceholder": "Məs: 2016 Toyota Corolla",
+      "brand": "Marka",
+      "brandPlaceholder": "Məs: BMW",
+      "model": "Model",
+      "modelPlaceholder": "Məs: 520i",
+      "year": "İl",
+      "yearPlaceholder": "Məs: 2020",
+      "engine": "Motor",
+      "enginePlaceholder": "Məs: 2.0L",
       "category": "Kateqoriya",
       "categorySelect": "Seç",
       "categoryCustom": "Yaz",
@@ -95,6 +101,15 @@
     "desc": "Çevrimdışı inventar və maliyyə izləmə tətbiqi.",
     "logoPlaceholder": "Cicibyte Corp logo placeholder",
     "close": "Bağla"
+  },
+  "whatsNew": {
+    "title": "Nə Yenilik Var? ({{version}})",
+    "cta": "Başa düşdüm",
+    "items": {
+      "vehicleSchema": "Avto qeyd ekranı Marka, Model, İl və Motor detallarına görə zənginləşdirildi.",
+      "analytics": "Gelişmiş maliyyə analitikası və son 6 ay mənfəət/zərər qrafiki əlavə olundu.",
+      "notifications": "Auto-update sonrası \"Nə Yenilik Var?\" bildiriş sistemi inteqrasiya edildi."
+    }
   },
   "settings": {
     "title": "Ayarlar",

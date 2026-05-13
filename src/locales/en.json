@@ -38,7 +38,7 @@
     "empty": "No records yet.",
     "filters": {
       "title": "Filters",
-      "searchPlaceholder": "Search: Title",
+      "searchPlaceholder": "Search: Brand / Model",
       "categoryAll": "All categories",
       "statusAll": "All statuses",
       "statusInStock": "In stock",
@@ -53,7 +53,7 @@
       "results": "{{count}} items"
     },
     "table": {
-      "title": "Title",
+      "vehicle": "Vehicle Info",
       "category": "Category",
       "purchaseDate": "Purchase Date",
       "saleDate": "Sale Date",
@@ -77,8 +77,14 @@
     "cancel": "Cancel",
     "save": "Save",
     "fields": {
-      "title": "Title",
-      "titlePlaceholder": "e.g. 2016 Toyota Corolla",
+      "brand": "Brand",
+      "brandPlaceholder": "e.g. BMW",
+      "model": "Model",
+      "modelPlaceholder": "e.g. 520i",
+      "year": "Year",
+      "yearPlaceholder": "e.g. 2020",
+      "engine": "Engine",
+      "enginePlaceholder": "e.g. 2.0L",
       "category": "Category",
       "categorySelect": "Select",
       "categoryCustom": "Custom",
@@ -95,6 +101,15 @@
     "desc": "Offline inventory and finance tracking app.",
     "logoPlaceholder": "Cicibyte Corp logo placeholder",
     "close": "Close"
+  },
+  "whatsNew": {
+    "title": "What's New? ({{version}})",
+    "cta": "Got it",
+    "items": {
+      "vehicleSchema": "Vehicle entry form is enriched with Brand, Model, Year, and Engine details.",
+      "analytics": "Advanced financial analytics and the 6-month profit/loss chart are added.",
+      "notifications": "\"What's New\" notification system is integrated after auto-updates."
+    }
   },
   "settings": {
     "title": "Settings",

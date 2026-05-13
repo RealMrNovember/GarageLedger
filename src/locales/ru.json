@@ -38,7 +38,7 @@
     "empty": "Записей пока нет.",
     "filters": {
       "title": "Фильтры",
-      "searchPlaceholder": "Поиск: название",
+      "searchPlaceholder": "Поиск: марка / модель",
       "categoryAll": "Все категории",
       "statusAll": "Все статусы",
       "statusInStock": "В наличии",
@@ -53,7 +53,7 @@
       "results": "{{count}} записей"
     },
     "table": {
-      "title": "Название",
+      "vehicle": "Данные авто",
       "category": "Категория",
       "purchaseDate": "Дата покупки",
       "saleDate": "Дата продажи",
@@ -77,8 +77,14 @@
     "cancel": "Отмена",
     "save": "Сохранить",
     "fields": {
-      "title": "Название",
-      "titlePlaceholder": "например: 2016 Toyota Corolla",
+      "brand": "Марка",
+      "brandPlaceholder": "например: BMW",
+      "model": "Модель",
+      "modelPlaceholder": "например: 520i",
+      "year": "Год",
+      "yearPlaceholder": "например: 2020",
+      "engine": "Двигатель",
+      "enginePlaceholder": "например: 2.0L",
       "category": "Категория",
       "categorySelect": "Выбрать",
       "categoryCustom": "Ввести",
@@ -95,6 +101,15 @@
     "desc": "Оффлайн-приложение для учёта инвентаря и финансов.",
     "logoPlaceholder": "Cicibyte Corp logo placeholder",
     "close": "Закрыть"
+  },
+  "whatsNew": {
+    "title": "Что нового? ({{version}})",
+    "cta": "Понятно",
+    "items": {
+      "vehicleSchema": "Форма записи авто расширена полями Марка, Модель, Год и Двигатель.",
+      "analytics": "Добавлена расширенная финансовая аналитика и график прибыли/убытка за 6 месяцев.",
+      "notifications": "Интегрирована система уведомления «Что нового?» после автообновлений."
+    }
   },
   "settings": {
     "title": "Настройки",
