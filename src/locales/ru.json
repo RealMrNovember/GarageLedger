@@ -19,11 +19,16 @@
     "stats": {
       "activeCount": "Активные авто",
       "investment": "Общие вложения",
-      "monthProfit": "Прибыль за месяц"
+      "monthProfit": "Прибыль за месяц",
+      "purchasedCount": "Куплено за месяц",
+      "monthInvestment": "Вложения (месяц)",
+      "monthRevenue": "Оборот (месяц)",
+      "monthNetProfit": "Чистая прибыль (месяц)"
     },
     "charts": {
       "weekly": "Прибыль/убыток за неделю",
-      "monthly": "Прибыль/убыток за месяц"
+      "monthly": "Прибыль/убыток за месяц",
+      "sixMonth": "Последние 6 месяцев: продажи и прибыль"
     }
   },
   "inventory": {
@@ -58,7 +63,9 @@
     },
     "actions": {
       "edit": "Изменить",
-      "delete": "Удалить"
+      "delete": "Удалить",
+      "markSold": "Продано",
+      "deleteConfirm": "Удалить запись навсегда?"
     },
     "badge": {
       "inStock": "В наличии"

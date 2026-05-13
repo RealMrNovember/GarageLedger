@@ -19,11 +19,16 @@
     "stats": {
       "activeCount": "Aktif Araç Sayısı",
       "investment": "Toplam Yatırım",
-      "monthProfit": "Bu Ayki Kâr"
+      "monthProfit": "Bu Ayın Kârı",
+      "purchasedCount": "Bu Ay Alınan Araç",
+      "monthInvestment": "Toplam Yatırım (Ödenen)",
+      "monthRevenue": "Ümumi Satış (Ciro)",
+      "monthNetProfit": "Net Kâr"
     },
     "charts": {
       "weekly": "Haftalık Kâr/Zarar",
-      "monthly": "Aylık Kâr/Zarar"
+      "monthly": "Aylık Kâr/Zarar",
+      "sixMonth": "Son 6 Ay: Satış Adedi & Kâr"
     }
   },
   "inventory": {
@@ -58,7 +63,9 @@
     },
     "actions": {
       "edit": "Düzenle",
-      "delete": "Sil"
+      "delete": "Sil",
+      "markSold": "Satıldı",
+      "deleteConfirm": "Bu kaydı kalıcı olarak silmek istiyor musunuz?"
     },
     "badge": {
       "inStock": "Stokta"

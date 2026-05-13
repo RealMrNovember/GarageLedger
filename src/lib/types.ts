@@ -5,12 +5,14 @@ export type TradeItem = {
   title: string
   category: string
   purchaseDate: string
-  saleDate: string | null
+  status: 'in_stock' | 'sold'
+  sellDate: string | null
   purchasePrice: number
-  salePrice: number | null
+  sellPrice: number | null
 }
 
 export type GarageLedgerSettings = {
   currency: CurrencyCode
   lastBackupAt?: string | null
+  lastUpdateCheckAt?: string | null
 }

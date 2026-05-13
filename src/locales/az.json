@@ -19,11 +19,16 @@
     "stats": {
       "activeCount": "Aktiv Nəqliyyat Sayı",
       "investment": "Ümumi İnvestisiya",
-      "monthProfit": "Bu Ayın Mənfəəti"
+      "monthProfit": "Bu Ayın Mənfəəti",
+      "purchasedCount": "Bu Ay Alınan Avto",
+      "monthInvestment": "Toplam Yatırım (Ödənən)",
+      "monthRevenue": "Ümumi Satış (Ciro)",
+      "monthNetProfit": "Net Kâr"
     },
     "charts": {
       "weekly": "Həftəlik Mənfəət/Zərər",
-      "monthly": "Aylıq Mənfəət/Zərər"
+      "monthly": "Aylıq Mənfəət/Zərər",
+      "sixMonth": "Son 6 Ay: Satış Adedi & Kâr"
     }
   },
   "inventory": {
@@ -58,7 +63,9 @@
     },
     "actions": {
       "edit": "Dəyiş",
-      "delete": "Sil"
+      "delete": "Sil",
+      "markSold": "Satıldı",
+      "deleteConfirm": "Bu qeydi qalıcı silmək istəyirsiniz?"
     },
     "badge": {
       "inStock": "Stokda"

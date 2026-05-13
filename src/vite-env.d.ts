@@ -7,9 +7,10 @@ type TradeItem = {
   title: string
   category: string
   purchaseDate: string
-  saleDate: string | null
+  status: 'in_stock' | 'sold'
+  sellDate: string | null
   purchasePrice: number
-  salePrice: number | null
+  sellPrice: number | null
 }
 
 type GarageLedgerSettings = {

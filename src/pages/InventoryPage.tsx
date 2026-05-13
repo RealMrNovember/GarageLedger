@@ -6,7 +6,7 @@ import { Card } from '../components/Card'
 import { formatMoney } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
 import { itemProfit, isInStock } from '../lib/compute'
-import { parseIsoDate, startOfDay } from '../lib/dates'
+import { parseIsoDate, startOfDay, toIsoDateInputValue } from '../lib/dates'
 import type { TradeItem } from '../lib/types'
 import { TradeFormModal } from './TradeFormModal'
 
@@ -230,10 +230,10 @@ export function InventoryPage({
                       </td>
                       <td className="px-5 py-4 text-slate-700">{item.category}</td>
                       <td className="px-5 py-4 text-slate-700">{item.purchaseDate}</td>
-                      <td className="px-5 py-4 text-slate-700">{item.saleDate ?? '—'}</td>
+                      <td className="px-5 py-4 text-slate-700">{item.sellDate ?? '—'}</td>
                       <td className="px-5 py-4 text-slate-900">{formatMoney(item.purchasePrice, currency)}</td>
                       <td className="px-5 py-4 text-slate-900">
-                        {item.salePrice == null ? '—' : formatMoney(item.salePrice, currency)}
+                        {item.sellPrice == null ? '—' : formatMoney(item.sellPrice, currency)}
                       </td>
                       <td className="px-5 py-4">
                         {profit == null ? (
@@ -253,14 +253,33 @@ export function InventoryPage({
                           >
                             {t('inventory.actions.edit')}
                           </Button>
-                          <Button
-                            variant="ghost"
-                            onClick={() => {
-                              onRemove(item.id)
-                            }}
-                          >
-                            {t('inventory.actions.delete')}
-                          </Button>
+                          {inStock ? (
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                setEditing({
+                                  ...item,
+                                  status: 'sold',
+                                  sellDate: item.sellDate ?? toIsoDateInputValue(new Date()),
+                                  sellPrice: item.sellPrice ?? 0,
+                                })
+                                setOpen(true)
+                              }}
+                            >
+                              {t('inventory.actions.markSold')}
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                const ok = window.confirm(t('inventory.actions.deleteConfirm'))
+                                if (!ok) return
+                                onRemove(item.id)
+                              }}
+                            >
+                              {t('inventory.actions.delete')}
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>

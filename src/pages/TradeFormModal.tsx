@@ -33,8 +33,8 @@ export function TradeFormModal({
   const [purchaseDate, setPurchaseDate] = useState(toIsoDateInputValue(new Date()))
   const [purchasePrice, setPurchasePrice] = useState<number>(0)
   const [sold, setSold] = useState(false)
-  const [saleDate, setSaleDate] = useState(toIsoDateInputValue(new Date()))
-  const [salePrice, setSalePrice] = useState<number>(0)
+  const [sellDate, setSellDate] = useState(toIsoDateInputValue(new Date()))
+  const [sellPrice, setSellPrice] = useState<number>(0)
 
   useEffect(() => {
     if (!open) return
@@ -46,8 +46,8 @@ export function TradeFormModal({
       setPurchaseDate(toIsoDateInputValue(new Date()))
       setPurchasePrice(0)
       setSold(false)
-      setSaleDate(toIsoDateInputValue(new Date()))
-      setSalePrice(0)
+      setSellDate(toIsoDateInputValue(new Date()))
+      setSellPrice(0)
       return
     }
 
@@ -58,9 +58,9 @@ export function TradeFormModal({
     setCustomCategory(hasCategoryInList ? '' : initial.category)
     setPurchaseDate(initial.purchaseDate)
     setPurchasePrice(initial.purchasePrice)
-    setSold(Boolean(initial.saleDate && initial.salePrice != null))
-    setSaleDate(initial.saleDate ?? toIsoDateInputValue(new Date()))
-    setSalePrice(initial.salePrice ?? 0)
+    setSold(initial.status === 'sold' && Boolean(initial.sellDate && initial.sellPrice != null))
+    setSellDate(initial.sellDate ?? toIsoDateInputValue(new Date()))
+    setSellPrice(initial.sellPrice ?? 0)
   }, [open, initial, categories])
 
   const resolvedCategory = useMemo(() => {
@@ -87,9 +87,10 @@ export function TradeFormModal({
                 title: title.trim(),
                 category: resolvedCategory,
                 purchaseDate,
+                status: sold ? 'sold' : 'in_stock',
                 purchasePrice: Number(purchasePrice),
-                saleDate: sold ? saleDate : null,
-                salePrice: sold ? Number(salePrice) : null,
+                sellDate: sold ? sellDate : null,
+                sellPrice: sold ? Number(sellPrice) : null,
               }
               onSubmit(item)
               onClose()
@@ -200,8 +201,8 @@ export function TradeFormModal({
               <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.saleDate')}</div>
               <input
                 type="date"
-                value={saleDate}
-                onChange={(e) => setSaleDate(e.target.value)}
+                value={sellDate}
+                onChange={(e) => setSellDate(e.target.value)}
                 className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
               />
             </div>
@@ -209,8 +210,8 @@ export function TradeFormModal({
               <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.salePrice')}</div>
               <input
                 type="number"
-                value={Number.isFinite(salePrice) ? salePrice : 0}
-                onChange={(e) => setSalePrice(Number(e.target.value))}
+                value={Number.isFinite(sellPrice) ? sellPrice : 0}
+                onChange={(e) => setSellPrice(Number(e.target.value))}
                 className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
               />
             </div>

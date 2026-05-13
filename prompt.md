@@ -45,3 +45,9 @@ Bu dosya projenin ana yol haritasıdır. Lütfen bu dosyayı ASLA silme veya yap
 - [x] Terminalde `git add .` ve `git commit -m "Initial commit: GarageLedger v1.0 with i18n, multi-currency & auto-update"` komutlarını hazırla/çalıştır.
 - [x] Benim için terminal üzerinden GitHub hesabımda "GarageLedger" adında public bir repo oluşturup kodu pushlamak için gerekli GitHub CLI (`gh repo create`) komutlarını adım adım bir metin dosyasına veya README'nin en altına not et.
 - [x] Git repo yapısını düzelt: Projenin kök dizini `C:\\Users\\Admin\\Cicibyte Projects\\GarageLedger\\GarageLedger` olacak şekilde repoya pushla (üst dizini değil).
+
+## 📊 Faz 10: Gelişmiş Finansal Raporlama ve Analitik
+- [x] Satılan araçların veritabanında "satıldı" olarak tutulması ve maliyet geçmişinin korunması sağlandı.
+- [x] Dashboard'a bu ayın: "Alınan Araç", "Toplam Yatırım", "Ümumi Satış (Ciro)" ve "Net Kâr" widget'ları eklendi.
+- [x] Son 6 ayın Satış Adedi ve Kâr performansını gösteren Recharts grafiği entegre edildi.
+- [x] Build sistemi NSIS setup ve otomatik GitHub release altyapısına geçirildi.
