@@ -1,7 +1,7 @@
 import { Logo } from './Logo'
 import { useTranslation } from 'react-i18next'
 
-export type NavKey = 'dashboard' | 'inventory' | 'settings'
+export type NavKey = 'dashboard' | 'inventory' | 'reports' | 'customers' | 'help' | 'settings'
 
 export function Sidebar({
   active,
@@ -40,6 +40,27 @@ export function Sidebar({
           onClick={() => onNavigate('inventory')}
         >
           {t('nav.inventory')}
+        </button>
+        <button
+          type="button"
+          className={[itemBase, active === 'reports' ? activeClass : idleClass].join(' ')}
+          onClick={() => onNavigate('reports')}
+        >
+          {t('nav.reports')}
+        </button>
+        <button
+          type="button"
+          className={[itemBase, active === 'customers' ? activeClass : idleClass].join(' ')}
+          onClick={() => onNavigate('customers')}
+        >
+          {t('nav.customers')}
+        </button>
+        <button
+          type="button"
+          className={[itemBase, active === 'help' ? activeClass : idleClass].join(' ')}
+          onClick={() => onNavigate('help')}
+        >
+          {t('nav.help')}
         </button>
         <button
           type="button"

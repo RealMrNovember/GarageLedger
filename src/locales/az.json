@@ -9,6 +9,9 @@
   "nav": {
     "dashboard": "Panel",
     "inventory": "İnventar",
+    "reports": "Hesabatlar",
+    "customers": "Müştərilər",
+    "help": "Yardım",
     "settings": "Ayarlar"
   },
   "topbar": {
@@ -36,12 +39,16 @@
     "subtitle": "Alış-satış əməliyyatlarını izləyin.",
     "new": "Yeni Əməliyyat",
     "empty": "Hələ qeyd yoxdur.",
+    "reserved": {
+      "line": "Kapora: {{deposit}} · Qalan: {{remaining}}"
+    },
     "filters": {
       "title": "Filtrlər",
       "searchPlaceholder": "Axtar: Marka / Model",
       "categoryAll": "Bütün kateqoriyalar",
       "statusAll": "Bütün statuslar",
       "statusInStock": "Stokda",
+      "statusReserved": "Rezerve",
       "statusSold": "Satıldı",
       "profitAll": "Hamısı (Mənfəət/Zərər)",
       "profitProfit": "Yalnız mənfəət",
@@ -68,7 +75,118 @@
       "deleteConfirm": "Bu qeydi qalıcı silmək istəyirsiniz?"
     },
     "badge": {
-      "inStock": "Stokda"
+      "inStock": "Stokda",
+      "reserved": "Rezerve",
+      "sold": "Satıldı"
+    }
+  },
+  "reports": {
+    "title": "Hesabatlar",
+    "subtitle": "Xülasə hesabat yaradın və antetli PDF ixrac edin.",
+    "export": "PDF İxrac",
+    "empty": "Seçilmiş tarix aralığında hərəkət tapılmadı.",
+    "reservedLine": "Kapora: {{deposit}} · Şəxs: {{party}}",
+    "filters": {
+      "title": "Tarix Aralığı",
+      "range": "Aralıq: {{from}} → {{to}}",
+      "from": "Başlanğıc",
+      "to": "Bitmə",
+      "presets": {
+        "today": "Bu gün",
+        "thisWeek": "Bu həftə",
+        "thisMonth": "Bu ay",
+        "last30": "Son 30 gün",
+        "custom": "Xüsusi"
+      }
+    },
+    "summary": {
+      "investment": "Toplam Yatırım",
+      "revenue": "Ciro",
+      "netProfit": "Net Kâr"
+    },
+    "types": {
+      "purchase": "Alış",
+      "reserved": "Rezerve",
+      "sold": "Satış"
+    },
+    "table": {
+      "date": "Tarix",
+      "type": "Növ",
+      "vehicle": "Avto",
+      "purchase": "Alış",
+      "sale": "Satış",
+      "expenses": "Masraf",
+      "profit": "Kâr"
+    }
+  },
+  "reminders": {
+    "title": "Yaxın Ödənişlər və Alacaqlar",
+    "subtitle": "Qalan balansı izləyin və ödənişi ertələyin.",
+    "count": "{{count}} qeyd",
+    "empty": "Yaxın ödəniş yoxdur.",
+    "line": "Qalan: {{remaining}} · Növbəti: {{nextDate}} · Şəxs: {{party}}",
+    "collect": "Tahsil Et",
+    "collectPrompt": "Tahsil ediləcək məbləği daxil edin (qalan: {{remaining}}):",
+    "snooze1d": "Ertele 1G",
+    "snooze3d": "Ertele 3G",
+    "snooze1w": "Ertele 1H"
+  },
+  "customers": {
+    "title": "Müştərilər",
+    "subtitle": "Satıcı və alıcı rehberi və əməliyyat tarixçəsi.",
+    "searchPlaceholder": "Ad və ya telefon ilə axtar…",
+    "listTitle": "Rehber",
+    "listCount": "{{count}} şəxs",
+    "dealCount": "{{count}} əməliyyat",
+    "empty": "Uyğun qeyd tapılmadı.",
+    "selectHint": "Detallara baxmaq üçün siyahıdan bir şəxs seçin.",
+    "roles": {
+      "seller": "Satıcı",
+      "buyer": "Alıcı"
+    },
+    "summary": {
+      "investment": "Alış",
+      "revenue": "Satış",
+      "netProfit": "Net Kâr"
+    },
+    "table": {
+      "date": "Tarix",
+      "role": "Rol",
+      "vehicle": "Avto",
+      "purchase": "Alış",
+      "sale": "Satış",
+      "expenses": "Masraf",
+      "profit": "Kâr"
+    }
+  },
+  "help": {
+    "title": "Yardım & Əlaqə",
+    "subtitle": "GarageLedger istifadəsi üçün qısa bələdçi və dəstək məlumatları.",
+    "booklet": {
+      "sections": [
+        {
+          "title": "Avto əlavə et",
+          "body": "İnventar → Yeni Əməliyyat bölməsindən avto məlumatlarını və alış detallarını daxil edib yadda saxlayın.",
+          "bullets": ["Marka/Model/İl/Motor", "Alış tarixi və alış qiyməti", "Satıcı adı və telefonu (opsional)"]
+        },
+        {
+          "title": "Masraf daxil et",
+          "body": "Əməliyyatı açıb Masraflar bölməsinə bir neçə masraf sətri əlavə edin.",
+          "bullets": ["Tarix, açıqlama, məbləğ", "Masraflar net kâr hesabına daxil edilir"]
+        },
+        {
+          "title": "Hesabat al",
+          "body": "Hesabatlar səhifəsində tarix aralığını seçib xülasə və hərəkət cədvəlini PDF kimi ixrac edin.",
+          "bullets": ["Bu gün / Bu həftə / Bu ay / Son 30 gün", "Footer’da Cicibyte Corp imzası"]
+        }
+      ]
+    },
+    "contact": {
+      "title": "Əlaqə & Dəstək",
+      "developer": "Geliştirici",
+      "github": "GitHub",
+      "email": "E-poçt",
+      "whatsapp": "WhatsApp"
     }
   },
   "tradeForm": {
@@ -76,6 +194,26 @@
     "editTitle": "Əməliyyatı Dəyiş",
     "cancel": "İmtina",
     "save": "Yadda saxla",
+    "sections": {
+      "parties": "Şəxslər",
+      "expenses": "Masraflar",
+      "tradeIn": "Takas Avto"
+    },
+    "actions": {
+      "addExpense": "Masraf Əlavə Et",
+      "remove": "Sil"
+    },
+    "emptyExpenses": "Hələ masraf əlavə edilməyib.",
+    "status": {
+      "inStock": "Stokda",
+      "reserved": "Rezerve",
+      "sold": "Satıldı"
+    },
+    "paymentMethods": {
+      "cash": "Peşin",
+      "installment": "Taksitli",
+      "barter": "Takas (Barter)"
+    },
     "fields": {
       "brand": "Marka",
       "brandPlaceholder": "Məs: BMW",
@@ -85,6 +223,29 @@
       "yearPlaceholder": "Məs: 2020",
       "engine": "Motor",
       "enginePlaceholder": "Məs: 2.0L",
+      "status": "Status",
+      "reserveDate": "Rezerve Tarixi",
+      "deposit": "Kapora",
+      "paymentMethod": "Ödəniş Metodu",
+      "downPayment": "Alınan Peşinat",
+      "installmentCount": "Taksit Sayı",
+      "remainingBalance": "Qalan Balans",
+      "monthlyAmount": "Aylıq Məbləğ",
+      "nextPaymentDate": "Növbəti Ödəniş Tarixi",
+      "barterCash": "Alınan Nəğd",
+      "tradeInBrand": "Takas Marka",
+      "tradeInModel": "Takas Model",
+      "tradeInYear": "Takas İl",
+      "tradeInEngine": "Takas Motor",
+      "tradeInValue": "Takas Bedeli",
+      "sellerName": "Satıcı Adı",
+      "sellerNamePlaceholder": "Məs: Əhməd",
+      "sellerPhone": "Satıcı Telefon",
+      "sellerPhonePlaceholder": "Məs: +90 5xx xxx xx xx",
+      "buyerName": "Alıcı Adı",
+      "buyerNamePlaceholder": "Məs: Məmməd",
+      "buyerPhone": "Alıcı Telefon",
+      "buyerPhonePlaceholder": "Məs: +90 5xx xxx xx xx",
       "category": "Kateqoriya",
       "categorySelect": "Seç",
       "categoryCustom": "Yaz",
@@ -93,7 +254,8 @@
       "purchasePrice": "Alış Qiyməti",
       "sold": "Satıldı",
       "saleDate": "Satış Tarixi",
-      "salePrice": "Satış Qiyməti"
+      "salePrice": "Satış Qiyməti",
+      "expenseDescPlaceholder": "Açıqlama (məs: boya, ekspertiza, servis)"
     }
   },
   "about": {

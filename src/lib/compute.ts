@@ -4,11 +4,28 @@ import { addDays, parseIsoDate, startOfDay } from './dates'
 export function itemProfit(item: TradeItem): number | null {
   if (item.status !== 'sold') return null
   if (!item.sellDate || item.sellPrice == null) return null
-  return item.sellPrice - item.purchasePrice
+  const expenseTotal = (item.expenses ?? []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
+  return item.sellPrice - (item.purchasePrice + expenseTotal)
 }
 
 export function isInStock(item: TradeItem): boolean {
   return item.status !== 'sold'
+}
+
+export function totalExpenses(item: TradeItem): number {
+  return (item.expenses ?? []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
+}
+
+export function reservedRemainingBalance(item: TradeItem): number | null {
+  if (item.status !== 'reserved') return null
+  if (item.sellPrice == null) return null
+  const deposit = item.deposit ?? 0
+  return item.sellPrice - deposit
+}
+
+export function paymentRemainingBalance(item: TradeItem): number {
+  const v = Number(item.remainingBalance ?? 0)
+  return Number.isFinite(v) ? v : 0
 }
 
 export function activeInvestment(items: TradeItem[]): number {
@@ -113,4 +130,3 @@ export function uniqueCategories(items: TradeItem[]): string[] {
   }
   return Array.from(set).sort((a, b) => a.localeCompare(b))
 }
-

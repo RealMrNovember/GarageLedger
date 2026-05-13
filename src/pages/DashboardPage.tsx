@@ -1,14 +1,33 @@
 import { ResponsiveContainer, Area, AreaChart, Bar, CartesianGrid, ComposedChart, Line, Tooltip, XAxis, YAxis } from 'recharts'
 import { useTranslation } from 'react-i18next'
+import { useMemo } from 'react'
 import { Card } from '../components/Card'
+import { Button } from '../components/Button'
 import { StatCard } from '../components/StatCard'
 import { formatMoney } from '../lib/currency'
 import { sixMonthSalesSeries, thisMonthInvestment, thisMonthNetProfit, thisMonthPurchasedCount, thisMonthRevenue, weeklyProfitSeries } from '../lib/compute'
 import type { CurrencyCode } from '../lib/currency'
 import type { TradeItem } from '../lib/types'
 import { i18n } from '../i18n'
+import { addDays, parseIsoDate, toIsoDateInputValue } from '../lib/dates'
 
-export function DashboardPage({ items, currency }: { items: TradeItem[]; currency: CurrencyCode }) {
+function formatVehicle(item: TradeItem): string {
+  const brand = (item.brand ?? '').trim()
+  const model = (item.model ?? '').trim()
+  const year = item.year == null ? '' : String(item.year)
+  const head = [brand, model].filter(Boolean).join(' ')
+  return [head, year].filter(Boolean).join(' · ') || '—'
+}
+
+export function DashboardPage({
+  items,
+  currency,
+  onUpsert,
+}: {
+  items: TradeItem[]
+  currency: CurrencyCode
+  onUpsert: (item: TradeItem) => void
+}) {
   const { t } = useTranslation()
   const purchasedCount = thisMonthPurchasedCount(items)
   const investment = thisMonthInvestment(items)
@@ -16,6 +35,16 @@ export function DashboardPage({ items, currency }: { items: TradeItem[]; currenc
   const netProfit = thisMonthNetProfit(items)
   const weekly = weeklyProfitSeries(items)
   const sixMonths = sixMonthSalesSeries(items, new Date(), i18n.language)
+  const pending = useMemo(() => {
+    return items
+      .filter((x) => x.status === 'sold' && (x.remainingBalance ?? 0) > 0)
+      .slice()
+      .sort((a, b) => {
+        const ad = a.nextPaymentDate ?? '9999-12-31'
+        const bd = b.nextPaymentDate ?? '9999-12-31'
+        return ad.localeCompare(bd)
+      })
+  }, [items])
 
   return (
     <div className="space-y-6">
@@ -25,6 +54,92 @@ export function DashboardPage({ items, currency }: { items: TradeItem[]; currenc
         <StatCard label={t('dashboard.stats.monthRevenue')} value={formatMoney(revenue, currency)} />
         <StatCard label={t('dashboard.stats.monthNetProfit')} value={formatMoney(netProfit, currency)} />
       </div>
+
+      <Card className="p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-sm font-semibold text-slate-900">{t('reminders.title')}</div>
+            <div className="mt-1 text-xs text-slate-500">{t('reminders.subtitle')}</div>
+          </div>
+          <div className="text-xs text-slate-500">{t('reminders.count', { count: pending.length })}</div>
+        </div>
+
+        {pending.length === 0 ? (
+          <div className="mt-4 text-sm text-slate-500">{t('reminders.empty')}</div>
+        ) : (
+          <div className="mt-4 space-y-3">
+            {pending.map((item) => {
+              const remaining = Number(item.remainingBalance ?? 0)
+              const buyer = [item.buyerName, item.buyerPhone].filter(Boolean).join(' · ')
+              return (
+                <div
+                  key={item.id}
+                  className="flex flex-col gap-3 rounded-2xl border border-[var(--tf-border)] bg-white/60 p-4 md:flex-row md:items-center md:justify-between"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-slate-900">{formatVehicle(item)}</div>
+                    <div className="mt-1 truncate text-xs text-slate-600">
+                      {t('reminders.line', {
+                        remaining: formatMoney(remaining, currency),
+                        nextDate: item.nextPaymentDate ?? '—',
+                        party: buyer || '—',
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        const raw = window.prompt(t('reminders.collectPrompt', { remaining: String(remaining) }))
+                        if (!raw) return
+                        const amount = Number(raw)
+                        if (!Number.isFinite(amount) || amount <= 0) return
+                        const nextRemaining = Math.max(0, remaining - amount)
+                        onUpsert({
+                          ...item,
+                          remainingBalance: nextRemaining,
+                          nextPaymentDate: nextRemaining > 0 ? item.nextPaymentDate : null,
+                        })
+                      }}
+                    >
+                      {t('reminders.collect')}
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        const base = item.nextPaymentDate ? parseIsoDate(item.nextPaymentDate) : new Date()
+                        onUpsert({ ...item, nextPaymentDate: toIsoDateInputValue(addDays(base, 1)) })
+                      }}
+                    >
+                      {t('reminders.snooze1d')}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        const base = item.nextPaymentDate ? parseIsoDate(item.nextPaymentDate) : new Date()
+                        onUpsert({ ...item, nextPaymentDate: toIsoDateInputValue(addDays(base, 3)) })
+                      }}
+                    >
+                      {t('reminders.snooze3d')}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        const base = item.nextPaymentDate ? parseIsoDate(item.nextPaymentDate) : new Date()
+                        onUpsert({ ...item, nextPaymentDate: toIsoDateInputValue(addDays(base, 7)) })
+                      }}
+                    >
+                      {t('reminders.snooze1w')}
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </Card>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card className="p-5">

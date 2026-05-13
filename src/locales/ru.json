@@ -9,6 +9,9 @@
   "nav": {
     "dashboard": "Панель",
     "inventory": "Инвентарь",
+    "reports": "Отчёты",
+    "customers": "Клиенты",
+    "help": "Помощь",
     "settings": "Настройки"
   },
   "topbar": {
@@ -36,12 +39,16 @@
     "subtitle": "Отслеживайте операции покупки/продажи.",
     "new": "Новая сделка",
     "empty": "Записей пока нет.",
+    "reserved": {
+      "line": "Задаток: {{deposit}} · Остаток: {{remaining}}"
+    },
     "filters": {
       "title": "Фильтры",
       "searchPlaceholder": "Поиск: марка / модель",
       "categoryAll": "Все категории",
       "statusAll": "Все статусы",
       "statusInStock": "В наличии",
+      "statusReserved": "Зарезервировано",
       "statusSold": "Продано",
       "profitAll": "Все (прибыль/убыток)",
       "profitProfit": "Только прибыль",
@@ -68,7 +75,128 @@
       "deleteConfirm": "Удалить запись навсегда?"
     },
     "badge": {
-      "inStock": "В наличии"
+      "inStock": "В наличии",
+      "reserved": "Зарезервировано",
+      "sold": "Продано"
+    }
+  },
+  "reports": {
+    "title": "Отчёты",
+    "subtitle": "Создавайте сводные отчёты и экспортируйте брендированный PDF.",
+    "export": "Экспорт PDF",
+    "empty": "Для выбранного диапазона дат нет операций.",
+    "reservedLine": "Задаток: {{deposit}} · Сторона: {{party}}",
+    "filters": {
+      "title": "Диапазон дат",
+      "range": "Диапазон: {{from}} → {{to}}",
+      "from": "С",
+      "to": "По",
+      "presets": {
+        "today": "Сегодня",
+        "thisWeek": "Эта неделя",
+        "thisMonth": "Этот месяц",
+        "last30": "Последние 30 дней",
+        "custom": "Свои даты"
+      }
+    },
+    "summary": {
+      "investment": "Общие вложения",
+      "revenue": "Оборот",
+      "netProfit": "Чистая прибыль"
+    },
+    "types": {
+      "purchase": "Покупка",
+      "reserved": "Резерв",
+      "sold": "Продажа"
+    },
+    "table": {
+      "date": "Дата",
+      "type": "Тип",
+      "vehicle": "Авто",
+      "purchase": "Покупка",
+      "sale": "Продажа",
+      "expenses": "Расходы",
+      "profit": "Прибыль"
+    }
+  },
+  "reminders": {
+    "title": "Ожидаемые платежи и напоминания",
+    "subtitle": "Отслеживайте остатки и переносите дату следующего платежа.",
+    "count": "{{count}} записей",
+    "empty": "Нет ожидаемых платежей.",
+    "line": "Остаток: {{remaining}} · След.: {{nextDate}} · Сторона: {{party}}",
+    "collect": "Получить",
+    "collectPrompt": "Введите сумму для получения (остаток: {{remaining}}):",
+    "snooze1d": "Отложить 1д",
+    "snooze3d": "Отложить 3д",
+    "snooze1w": "Отложить 1н"
+  },
+  "customers": {
+    "title": "Клиенты",
+    "subtitle": "Справочник продавцов/покупателей и история сделок.",
+    "searchPlaceholder": "Поиск по имени или телефону…",
+    "listTitle": "Справочник",
+    "listCount": "{{count}} человек",
+    "dealCount": "{{count}} сделок",
+    "empty": "Нет совпадений.",
+    "selectHint": "Выберите человека в списке, чтобы увидеть детали.",
+    "roles": {
+      "seller": "Продавец",
+      "buyer": "Покупатель"
+    },
+    "summary": {
+      "investment": "Покупки",
+      "revenue": "Продажи",
+      "netProfit": "Чистая прибыль"
+    },
+    "table": {
+      "date": "Дата",
+      "role": "Роль",
+      "vehicle": "Авто",
+      "purchase": "Покупка",
+      "sale": "Продажа",
+      "expenses": "Расходы",
+      "profit": "Прибыль"
+    }
+  },
+  "help": {
+    "title": "Помощь и контакты",
+    "subtitle": "Краткая инструкция по работе с GarageLedger и информация для связи.",
+    "booklet": {
+      "sections": [
+        {
+          "title": "Добавить авто",
+          "body": "Инвентарь → Новая сделка. Заполните данные авто и информацию о покупке, затем сохраните.",
+          "bullets": [
+            "Марка/Модель/Год/Двигатель",
+            "Дата и цена покупки",
+            "Продавец: имя и телефон (необязательно)"
+          ]
+        },
+        {
+          "title": "Внести расходы",
+          "body": "Откройте сделку и добавляйте строки в разделе «Расходы».",
+          "bullets": [
+            "Дата, описание, сумма",
+            "Расходы учитываются в расчёте чистой прибыли"
+          ]
+        },
+        {
+          "title": "Сформировать отчёт",
+          "body": "Перейдите в Отчёты, выберите диапазон дат и экспортируйте PDF с итогами и таблицей операций.",
+          "bullets": [
+            "Сегодня / Эта неделя / Этот месяц / Последние 30 дней",
+            "Футер с подписью Cicibyte Corp"
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "title": "Контакты и поддержка",
+      "developer": "Разработчик",
+      "github": "GitHub",
+      "email": "Email",
+      "whatsapp": "WhatsApp"
     }
   },
   "tradeForm": {
@@ -76,6 +204,26 @@
     "editTitle": "Редактировать сделку",
     "cancel": "Отмена",
     "save": "Сохранить",
+    "sections": {
+      "parties": "Стороны",
+      "expenses": "Расходы",
+      "tradeIn": "Авто по трейд-ин"
+    },
+    "actions": {
+      "addExpense": "Добавить расход",
+      "remove": "Удалить"
+    },
+    "emptyExpenses": "Расходов пока нет.",
+    "status": {
+      "inStock": "В наличии",
+      "reserved": "Зарезервировано",
+      "sold": "Продано"
+    },
+    "paymentMethods": {
+      "cash": "Наличными",
+      "installment": "Рассрочка",
+      "barter": "Трейд-ин (Barter)"
+    },
     "fields": {
       "brand": "Марка",
       "brandPlaceholder": "например: BMW",
@@ -85,6 +233,29 @@
       "yearPlaceholder": "например: 2020",
       "engine": "Двигатель",
       "enginePlaceholder": "например: 2.0L",
+      "status": "Статус",
+      "reserveDate": "Дата резерва",
+      "deposit": "Задаток",
+      "paymentMethod": "Способ оплаты",
+      "downPayment": "Первый взнос",
+      "installmentCount": "Кол-во платежей",
+      "remainingBalance": "Остаток",
+      "monthlyAmount": "Ежемесячно",
+      "nextPaymentDate": "След. платеж",
+      "barterCash": "Получено наличными",
+      "tradeInBrand": "Марка (трейд-ин)",
+      "tradeInModel": "Модель (трейд-ин)",
+      "tradeInYear": "Год (трейд-ин)",
+      "tradeInEngine": "Двигатель (трейд-ин)",
+      "tradeInValue": "Оценка (трейд-ин)",
+      "sellerName": "Имя продавца",
+      "sellerNamePlaceholder": "например: Иван",
+      "sellerPhone": "Телефон продавца",
+      "sellerPhonePlaceholder": "например: +90 5xx xxx xx xx",
+      "buyerName": "Имя покупателя",
+      "buyerNamePlaceholder": "например: Алексей",
+      "buyerPhone": "Телефон покупателя",
+      "buyerPhonePlaceholder": "например: +90 5xx xxx xx xx",
       "category": "Категория",
       "categorySelect": "Выбрать",
       "categoryCustom": "Ввести",
@@ -93,7 +264,8 @@
       "purchasePrice": "Цена покупки",
       "sold": "Продано",
       "saleDate": "Дата продажи",
-      "salePrice": "Цена продажи"
+      "salePrice": "Цена продажи",
+      "expenseDescPlaceholder": "Описание (например: покраска, осмотр, сервис)"
     }
   },
   "about": {

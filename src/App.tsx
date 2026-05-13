@@ -9,7 +9,10 @@ import { Topbar } from './components/Topbar'
 import { uniqueCategories } from './lib/compute'
 import { useGarageLedger } from './lib/useGarageLedger'
 import { DashboardPage } from './pages/DashboardPage'
+import { CustomersPage } from './pages/CustomersPage'
 import { InventoryPage } from './pages/InventoryPage'
+import { HelpPage } from './pages/HelpPage'
+import { ReportsPage } from './pages/ReportsPage'
 import { SettingsPage } from './pages/SettingsPage'
 
 function compareVersions(a: string, b: string): number {
@@ -80,7 +83,7 @@ export default function App() {
                 className="gl-animate-in"
               >
                 {nav === 'dashboard' ? (
-                  <DashboardPage items={items} currency={currency} />
+                  <DashboardPage items={items} currency={currency} onUpsert={(item) => void upsertItem(item)} />
                 ) : nav === 'inventory' ? (
                   <InventoryPage
                     items={items}
@@ -89,6 +92,12 @@ export default function App() {
                     onUpsert={(item) => void upsertItem(item)}
                     onRemove={(id) => void removeItem(id)}
                   />
+                ) : nav === 'reports' ? (
+                  <ReportsPage items={items} currency={currency} />
+                ) : nav === 'customers' ? (
+                  <CustomersPage items={items} currency={currency} />
+                ) : nav === 'help' ? (
+                  <HelpPage />
                 ) : (
                   <SettingsPage />
                 )}

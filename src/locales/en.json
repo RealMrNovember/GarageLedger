@@ -9,6 +9,9 @@
   "nav": {
     "dashboard": "Dashboard",
     "inventory": "Inventory",
+    "reports": "Reports",
+    "customers": "Customers",
+    "help": "Help",
     "settings": "Settings"
   },
   "topbar": {
@@ -31,17 +34,33 @@
       "sixMonth": "Last 6 Months: Sold Count & Profit"
     }
   },
+  "reminders": {
+    "title": "Pending Payments & Reminders",
+    "subtitle": "Track remaining balances and snooze upcoming collections.",
+    "count": "{{count}} items",
+    "empty": "No pending payments.",
+    "line": "Remaining: {{remaining}} · Next: {{nextDate}} · Party: {{party}}",
+    "collect": "Collect",
+    "collectPrompt": "Enter amount to collect (remaining: {{remaining}}):",
+    "snooze1d": "Snooze 1D",
+    "snooze3d": "Snooze 3D",
+    "snooze1w": "Snooze 1W"
+  },
   "inventory": {
     "title": "Inventory",
     "subtitle": "Track your buy/sell operations.",
     "new": "New Trade",
     "empty": "No records yet.",
+    "reserved": {
+      "line": "Deposit: {{deposit}} · Remaining: {{remaining}}"
+    },
     "filters": {
       "title": "Filters",
       "searchPlaceholder": "Search: Brand / Model",
       "categoryAll": "All categories",
       "statusAll": "All statuses",
       "statusInStock": "In stock",
+      "statusReserved": "Reserved",
       "statusSold": "Sold",
       "profitAll": "All (Profit/Loss)",
       "profitProfit": "Profit only",
@@ -68,7 +87,106 @@
       "deleteConfirm": "Do you want to permanently delete this record?"
     },
     "badge": {
-      "inStock": "In Stock"
+      "inStock": "In stock",
+      "reserved": "Reserved",
+      "sold": "Sold"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Generate summary reports and export a branded PDF.",
+    "export": "Export PDF",
+    "empty": "No movements found for the selected date range.",
+    "reservedLine": "Deposit: {{deposit}} · Party: {{party}}",
+    "filters": {
+      "title": "Date Range",
+      "range": "Range: {{from}} → {{to}}",
+      "from": "From",
+      "to": "To",
+      "presets": {
+        "today": "Today",
+        "thisWeek": "This Week",
+        "thisMonth": "This Month",
+        "last30": "Last 30 Days",
+        "custom": "Custom"
+      }
+    },
+    "summary": {
+      "investment": "Total Investment",
+      "revenue": "Gross Sales (Revenue)",
+      "netProfit": "Net Profit"
+    },
+    "types": {
+      "purchase": "Purchase",
+      "reserved": "Reserved",
+      "sold": "Sold"
+    },
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "vehicle": "Vehicle",
+      "purchase": "Purchase",
+      "sale": "Sale",
+      "expenses": "Expenses",
+      "profit": "Profit"
+    }
+  },
+  "customers": {
+    "title": "Customers",
+    "subtitle": "Directory of sellers and buyers with their deal history.",
+    "searchPlaceholder": "Search by name or phone…",
+    "listTitle": "Directory",
+    "listCount": "{{count}} people",
+    "dealCount": "{{count}} deals",
+    "empty": "No matching records.",
+    "selectHint": "Select a person from the list to view details.",
+    "roles": {
+      "seller": "Seller",
+      "buyer": "Buyer"
+    },
+    "summary": {
+      "investment": "Purchased",
+      "revenue": "Sold",
+      "netProfit": "Net Profit"
+    },
+    "table": {
+      "date": "Date",
+      "role": "Role",
+      "vehicle": "Vehicle",
+      "purchase": "Purchase",
+      "sale": "Sale",
+      "expenses": "Expenses",
+      "profit": "Profit"
+    }
+  },
+  "help": {
+    "title": "Help & Contact",
+    "subtitle": "Quick guide to using GarageLedger and support information.",
+    "booklet": {
+      "sections": [
+        {
+          "title": "Add a vehicle",
+          "body": "Go to Inventory → New Trade. Fill vehicle details and purchase information, then save.",
+          "bullets": ["Brand/Model/Year/Engine", "Purchase date & purchase price", "Seller name & phone (optional)"]
+        },
+        {
+          "title": "Enter expenses",
+          "body": "Open a trade and use the Expenses section to add multiple expense rows.",
+          "bullets": ["Date, description, amount", "Expenses are included in net profit calculations"]
+        },
+        {
+          "title": "Generate a report",
+          "body": "Go to Reports, choose a date range, and export a PDF that includes summary totals and a movements table.",
+          "bullets": ["Today / This Week / This Month / Last 30 Days", "Branded footer with Cicibyte Corp"]
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact & Support",
+      "developer": "Developer",
+      "github": "GitHub",
+      "email": "Email",
+      "whatsapp": "WhatsApp"
     }
   },
   "tradeForm": {
@@ -76,6 +194,26 @@
     "editTitle": "Edit Trade",
     "cancel": "Cancel",
     "save": "Save",
+    "sections": {
+      "parties": "Parties",
+      "expenses": "Expenses",
+      "tradeIn": "Trade-in Vehicle"
+    },
+    "actions": {
+      "addExpense": "Add Expense",
+      "remove": "Remove"
+    },
+    "emptyExpenses": "No expenses added yet.",
+    "status": {
+      "inStock": "In stock",
+      "reserved": "Reserved",
+      "sold": "Sold"
+    },
+    "paymentMethods": {
+      "cash": "Cash",
+      "installment": "Installment",
+      "barter": "Trade-in (Barter)"
+    },
     "fields": {
       "brand": "Brand",
       "brandPlaceholder": "e.g. BMW",
@@ -85,6 +223,29 @@
       "yearPlaceholder": "e.g. 2020",
       "engine": "Engine",
       "enginePlaceholder": "e.g. 2.0L",
+      "status": "Status",
+      "reserveDate": "Reserve Date",
+      "deposit": "Deposit",
+      "paymentMethod": "Payment Method",
+      "downPayment": "Down Payment",
+      "installmentCount": "Installment Count",
+      "remainingBalance": "Remaining Balance",
+      "monthlyAmount": "Monthly Amount",
+      "nextPaymentDate": "Next Payment Date",
+      "barterCash": "Cash Received",
+      "tradeInBrand": "Trade-in Brand",
+      "tradeInModel": "Trade-in Model",
+      "tradeInYear": "Trade-in Year",
+      "tradeInEngine": "Trade-in Engine",
+      "tradeInValue": "Trade-in Value",
+      "sellerName": "Seller Name",
+      "sellerNamePlaceholder": "e.g. John",
+      "sellerPhone": "Seller Phone",
+      "sellerPhonePlaceholder": "e.g. +90 5xx xxx xx xx",
+      "buyerName": "Buyer Name",
+      "buyerNamePlaceholder": "e.g. Alex",
+      "buyerPhone": "Buyer Phone",
+      "buyerPhonePlaceholder": "e.g. +90 5xx xxx xx xx",
       "category": "Category",
       "categorySelect": "Select",
       "categoryCustom": "Custom",
@@ -93,7 +254,8 @@
       "purchasePrice": "Purchase Price",
       "sold": "Sold",
       "saleDate": "Sale Date",
-      "salePrice": "Sale Price"
+      "salePrice": "Sale Price",
+      "expenseDescPlaceholder": "Description (e.g. paint, inspection, service)"
     }
   },
   "about": {

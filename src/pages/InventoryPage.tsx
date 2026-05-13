@@ -5,7 +5,7 @@ import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { formatMoney } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
-import { itemProfit, isInStock } from '../lib/compute'
+import { itemProfit, isInStock, reservedRemainingBalance } from '../lib/compute'
 import { parseIsoDate, startOfDay, toIsoDateInputValue } from '../lib/dates'
 import type { TradeItem } from '../lib/types'
 import { TradeFormModal } from './TradeFormModal'
@@ -49,7 +49,7 @@ export function InventoryPage({
 
   const [q, setQ] = useState('')
   const [category, setCategory] = useState<string>('__all__')
-  const [status, setStatus] = useState<'__all__' | 'inStock' | 'sold'>('__all__')
+  const [status, setStatus] = useState<'__all__' | 'active' | 'reserved' | 'sold'>('__all__')
   const [profitFilter, setProfitFilter] = useState<'__all__' | 'profit' | 'loss' | 'breakEven'>('__all__')
   const [purchaseFrom, setPurchaseFrom] = useState<string>('')
   const [purchaseTo, setPurchaseTo] = useState<string>('')
@@ -65,8 +65,9 @@ export function InventoryPage({
         if (category !== '__all__' && item.category !== category) return false
 
         const inStock = isInStock(item)
-        if (status === 'inStock' && !inStock) return false
+        if (status === 'active' && !inStock) return false
         if (status === 'sold' && inStock) return false
+        if (status === 'reserved' && item.status !== 'reserved') return false
 
         if (from || to) {
           const pd = startOfDay(parseIsoDate(item.purchaseDate))
@@ -156,12 +157,13 @@ export function InventoryPage({
                 value={status}
                 onChange={(e) => {
                   const v = e.target.value
-                  if (v === '__all__' || v === 'inStock' || v === 'sold') setStatus(v)
+                  if (v === '__all__' || v === 'active' || v === 'reserved' || v === 'sold') setStatus(v)
                 }}
                 className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
               >
                 <option value="__all__">{t('inventory.filters.statusAll')}</option>
-                <option value="inStock">{t('inventory.filters.statusInStock')}</option>
+                <option value="active">{t('inventory.filters.statusInStock')}</option>
+                <option value="reserved">{t('inventory.filters.statusReserved')}</option>
                 <option value="sold">{t('inventory.filters.statusSold')}</option>
               </select>
             </div>
@@ -237,14 +239,31 @@ export function InventoryPage({
                   const profit = itemProfit(item)
                   const profitTone: 'neutral' | 'good' | 'bad' | 'info' =
                     profit == null ? 'info' : profit > 0 ? 'good' : profit < 0 ? 'bad' : 'neutral'
+                  const remaining = reservedRemainingBalance(item)
 
                   return (
                     <tr key={item.id} className="bg-[var(--tf-surface)]/40">
                       <td className="px-5 py-4">
                         <div className="font-medium text-slate-900">{formatVehicle(item)}</div>
-                        {inStock ? (
+                        {item.status === 'reserved' ? (
+                          <div className="mt-2">
+                            <Badge tone="neutral">{t('inventory.badge.reserved')}</Badge>
+                          </div>
+                        ) : inStock ? (
                           <div className="mt-2">
                             <Badge tone="info">{t('inventory.badge.inStock')}</Badge>
+                          </div>
+                        ) : (
+                          <div className="mt-2">
+                            <Badge tone="good">{t('inventory.badge.sold')}</Badge>
+                          </div>
+                        )}
+                        {item.status === 'reserved' ? (
+                          <div className="mt-2 text-xs text-slate-600">
+                            {t('inventory.reserved.line', {
+                              deposit: formatMoney(item.deposit ?? 0, currency),
+                              remaining: remaining == null ? '—' : formatMoney(remaining, currency),
+                            })}
                           </div>
                         ) : null}
                       </td>
@@ -280,6 +299,8 @@ export function InventoryPage({
                                 setEditing({
                                   ...item,
                                   status: 'sold',
+                                  reserveDate: null,
+                                  deposit: null,
                                   sellDate: item.sellDate ?? toIsoDateInputValue(new Date()),
                                   sellPrice: item.sellPrice ?? 0,
                                 })
