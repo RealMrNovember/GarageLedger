@@ -36,7 +36,7 @@ Bu dosya projenin ana yol haritasıdır. Lütfen bu dosyayı ASLA silme veya yap
 
 ## 💎 Faz 5: Markalaşma (Branding)
 - [x] `GarageLedger.svg` dosyasını uygulama logosu ve Windows icon'u (.ico) olarak kullan.
-- [ ] Footer kısmında merkeze küçük ve zarif bir fontla **"Developed by Mikail | Cicibyte Corp"** yazdır. (Sadece Mikail kullanılacak, soyadı kesinlikle yer almayacak).
+- [x] Footer kısmında merkeze küçük ve zarif bir fontla **"Developed by Mikail | Cicibyte Corp"** yazdır. (Sadece Mikail kullanılacak, soyadı kesinlikle yer almayacak).
 
 ## 📦 Faz 6: GitHub Entegrasyonu ve Dökümantasyon
 - [x] Proje ana dizinine emojilerle süslenmiş, ekran görüntüsü (placeholder) içeren ve uygulamanın özelliklerini (Multi-language, Local DB, Offline, Multi-currency, Auto-Update) anlatan profesyonel bir İngilizce `README.md` oluştur.
@@ -44,4 +44,4 @@ Bu dosya projenin ana yol haritasıdır. Lütfen bu dosyayı ASLA silme veya yap
 - [x] Terminalde `git init` komutuyla Git'i başlat.
 - [x] Terminalde `git add .` ve `git commit -m "Initial commit: GarageLedger v1.0 with i18n, multi-currency & auto-update"` komutlarını hazırla/çalıştır.
 - [x] Benim için terminal üzerinden GitHub hesabımda "GarageLedger" adında public bir repo oluşturup kodu pushlamak için gerekli GitHub CLI (`gh repo create`) komutlarını adım adım bir metin dosyasına veya README'nin en altına not et.
-- [ ] Git repo yapısını düzelt: Projenin kök dizini `C:\\Users\\Admin\\Cicibyte Projects\\GarageLedger\\GarageLedger` olacak şekilde repoya pushla (üst dizini değil).
+- [x] Git repo yapısını düzelt: Projenin kök dizini `C:\\Users\\Admin\\Cicibyte Projects\\GarageLedger\\GarageLedger` olacak şekilde repoya pushla (üst dizini değil).
