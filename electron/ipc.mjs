@@ -1,7 +1,9 @@
 import { BrowserWindow, ipcMain } from 'electron'
-import { autoUpdater } from 'electron-updater'
+import updater from 'electron-updater'
 import { createBackup, ensureDailyBackup, listBackups, openBackupFolder, restoreBackup } from './backups.mjs'
 import { getDb } from './db.mjs'
+
+const { autoUpdater } = updater
 
 let lastUpdateStatus = { state: 'idle' }
 
