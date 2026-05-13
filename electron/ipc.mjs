@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, app, ipcMain } from 'electron'
 import updater from 'electron-updater'
 import { createBackup, ensureDailyBackup, listBackups, openBackupFolder, restoreBackup } from './backups.mjs'
 import { getDb } from './db.mjs'
@@ -12,6 +12,12 @@ function broadcastUpdateStatus(payload) {
   for (const win of BrowserWindow.getAllWindows()) {
     win.webContents.send('garageledger:update:status', payload)
   }
+}
+
+async function setLastUpdateCheckAt() {
+  const db = await getDb()
+  db.data.settings.lastUpdateCheckAt = new Date().toISOString()
+  await db.write()
 }
 
 function registerUpdaterIpc({ isDev }) {
@@ -53,6 +59,7 @@ function registerUpdaterIpc({ isDev }) {
       return { ok: false }
     }
     try {
+      await setLastUpdateCheckAt()
       await autoUpdater.checkForUpdates()
       return { ok: true }
     } catch (e) {
@@ -74,13 +81,17 @@ function registerUpdaterIpc({ isDev }) {
 
   if (!isDev) {
     setTimeout(() => {
-      void autoUpdater.checkForUpdates()
+      void setLastUpdateCheckAt().then(() => autoUpdater.checkForUpdates())
     }, 250)
   }
 }
 
 export function registerIpc({ isDev } = { isDev: false }) {
   registerUpdaterIpc({ isDev })
+
+  ipcMain.handle('garageledger:app:getInfo', async () => {
+    return { version: app.getVersion(), name: app.getName(), isPackaged: app.isPackaged }
+  })
 
   ipcMain.handle('garageledger:backup:ensureDaily', async () => {
     try {

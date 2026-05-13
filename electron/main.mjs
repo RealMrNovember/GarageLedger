@@ -16,7 +16,7 @@ function createSplashWindow() {
     show: true,
     alwaysOnTop: true,
     webPreferences: {
-      preload: path.join(app.getAppPath(), 'electron', 'preload.mjs'),
+      preload: path.join(app.getAppPath(), 'electron', 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -41,7 +41,7 @@ async function createMainWindow() {
       height: 42,
     },
     webPreferences: {
-      preload: path.join(app.getAppPath(), 'electron', 'preload.mjs'),
+      preload: path.join(app.getAppPath(), 'electron', 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
     },

@@ -102,6 +102,9 @@
   "updates": {
     "title": "Yeniləmələr",
     "subtitle": "Yeni versiyaları yoxlayın və endirin.",
+    "currentVersion": "Cari versiya: {{version}}",
+    "lastCheck": "Son yoxlama: {{value}}",
+    "neverChecked": "heç vaxt",
     "check": "Yeniləmələri Yoxla",
     "restart": "Yenidən Başlat",
     "idle": "Hazır.",

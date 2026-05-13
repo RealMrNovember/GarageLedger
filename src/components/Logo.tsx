@@ -1,7 +1,9 @@
+import logoUrl from '../assets/garageledger.svg'
+
 export function Logo({ size = 28 }: { size?: number }) {
   return (
     <img
-      src="/garageledger.svg"
+      src={logoUrl}
       width={size}
       height={size}
       alt="GarageLedger"

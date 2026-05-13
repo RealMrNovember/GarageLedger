@@ -15,6 +15,7 @@ type TradeItem = {
 type GarageLedgerSettings = {
   currency: CurrencyCode
   lastBackupAt?: string | null
+  lastUpdateCheckAt?: string | null
 }
 
 type GarageLedgerApi = {
@@ -26,6 +27,9 @@ type GarageLedgerApi = {
   settings: {
     get: () => Promise<GarageLedgerSettings>
     setCurrency: (currency: CurrencyCode) => Promise<GarageLedgerSettings>
+  }
+  app: {
+    getInfo: () => Promise<{ version: string; name: string; isPackaged: boolean }>
   }
   updates: {
     getStatus: () => Promise<unknown>

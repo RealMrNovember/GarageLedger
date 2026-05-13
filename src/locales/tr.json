@@ -102,6 +102,9 @@
   "updates": {
     "title": "Güncellemeler",
     "subtitle": "Yeni sürümleri kontrol edin ve indirin.",
+    "currentVersion": "Mevcut sürüm: {{version}}",
+    "lastCheck": "Son kontrol: {{value}}",
+    "neverChecked": "hiç",
     "check": "Güncellemeleri Kontrol Et",
     "restart": "Yeniden Başlat",
     "idle": "Hazır.",

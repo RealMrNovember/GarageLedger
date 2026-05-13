@@ -102,6 +102,9 @@
   "updates": {
     "title": "Updates",
     "subtitle": "Check and download new versions.",
+    "currentVersion": "Current version: {{version}}",
+    "lastCheck": "Last check: {{value}}",
+    "neverChecked": "never",
     "check": "Check for Updates",
     "restart": "Restart",
     "idle": "Ready.",

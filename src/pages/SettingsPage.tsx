@@ -26,6 +26,9 @@ export function SettingsPage() {
   const [backupItems, setBackupItems] = useState<BackupItem[]>([])
   const [backupBusy, setBackupBusy] = useState(false)
   const [lastBackupAt, setLastBackupAt] = useState<string | null>(null)
+  const [lastUpdateCheckAt, setLastUpdateCheckAt] = useState<string | null>(null)
+  const [appVersion, setAppVersion] = useState<string | null>(null)
+  const [apiAvailable, setApiAvailable] = useState(false)
 
   useEffect(() => {
     const api = window.GarageLedger
@@ -40,19 +43,28 @@ export function SettingsPage() {
 
   useEffect(() => {
     const api = window.GarageLedger
+    setApiAvailable(Boolean(api))
     if (!api?.backups?.list) return
 
     const load = async () => {
-      const [settings, list] = await Promise.all([api.settings.get(), api.backups.list()])
+      const [settings, list, info, s] = await Promise.all([
+        api.settings.get(),
+        api.backups.list(),
+        api.app?.getInfo?.(),
+        api.updates?.getStatus?.(),
+      ])
       setLastBackupAt(settings.lastBackupAt ?? null)
+      setLastUpdateCheckAt(settings.lastUpdateCheckAt ?? null)
+      setAppVersion(info?.version ?? null)
       if (list.ok) setBackupItems(list.items)
+      if (s && typeof s === 'object' && 'state' in s) setStatus(s as UpdateStatus)
     }
 
     void load()
   }, [])
 
-  const canUpdate = Boolean(window.GarageLedger?.updates)
-  const canBackup = Boolean(window.GarageLedger?.backups)
+  const canUpdate = apiAvailable && Boolean(window.GarageLedger?.updates)
+  const canBackup = apiAvailable && Boolean(window.GarageLedger?.backups)
   const progress = useMemo(() => {
     if (status.state !== 'downloading') return null
     const p = Number(status.percent)
@@ -72,6 +84,12 @@ export function SettingsPage() {
     if (Number.isNaN(d.getTime())) return t('backups.never')
     return d.toLocaleString()
   }, [lastBackupAt, t])
+  const lastUpdateCheckLabel = useMemo(() => {
+    if (!lastUpdateCheckAt) return t('updates.neverChecked')
+    const d = new Date(lastUpdateCheckAt)
+    if (Number.isNaN(d.getTime())) return t('updates.neverChecked')
+    return d.toLocaleString()
+  }, [lastUpdateCheckAt, t])
 
   return (
     <div className="space-y-4">
@@ -99,10 +117,18 @@ export function SettingsPage() {
           <div>
             <div className="text-sm font-semibold text-slate-900">{t('updates.title')}</div>
             <div className="mt-1 text-xs text-slate-500">{t('updates.subtitle')}</div>
+            <div className="mt-2 text-xs text-slate-500">
+              {t('updates.currentVersion', { version: appVersion ? `v${appVersion}` : '—' })}
+            </div>
+            <div className="mt-1 text-xs text-slate-500">{t('updates.lastCheck', { value: lastUpdateCheckLabel })}</div>
           </div>
           <div className="flex items-center gap-2">
             <Button
-              onClick={() => void window.GarageLedger?.updates?.check()}
+              onClick={async () => {
+                await window.GarageLedger?.updates?.check()
+                const settings = await window.GarageLedger?.settings?.get()
+                if (settings) setLastUpdateCheckAt(settings.lastUpdateCheckAt ?? null)
+              }}
               disabled={!canUpdate || status.state === 'checking' || status.state === 'downloading'}
             >
               {t('updates.check')}
