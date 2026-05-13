@@ -1,0 +1,115 @@
+{
+  "common": {
+    "close": "Kapat"
+  },
+  "app": {
+    "name": "GarageLedger",
+    "loading": "Yükleniyor…"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "inventory": "Envanter",
+    "settings": "Ayarlar"
+  },
+  "topbar": {
+    "currency": "Para",
+    "about": "Hakkında"
+  },
+  "dashboard": {
+    "stats": {
+      "activeCount": "Aktif Araç Sayısı",
+      "investment": "Toplam Yatırım",
+      "monthProfit": "Bu Ayki Kâr"
+    },
+    "charts": {
+      "weekly": "Haftalık Kâr/Zarar",
+      "monthly": "Aylık Kâr/Zarar"
+    }
+  },
+  "inventory": {
+    "title": "Envanter",
+    "subtitle": "Alım-satım hareketlerini takip edin.",
+    "new": "Yeni İşlem",
+    "empty": "Henüz kayıt yok.",
+    "filters": {
+      "title": "Filtreler",
+      "searchPlaceholder": "Ara: Başlık",
+      "categoryAll": "Tüm kategoriler",
+      "statusAll": "Tüm durumlar",
+      "statusInStock": "Stokta",
+      "statusSold": "Satıldı",
+      "profitAll": "Tümü (Kâr/Zarar)",
+      "profitProfit": "Sadece kâr",
+      "profitLoss": "Sadece zarar",
+      "profitBreakEven": "Başabaş",
+      "purchaseFrom": "Alım (başlangıç)",
+      "purchaseTo": "Alım (bitiş)",
+      "clear": "Temizle",
+      "results": "{{count}} kayıt"
+    },
+    "table": {
+      "title": "Başlık",
+      "category": "Kategori",
+      "purchaseDate": "Alım Tarihi",
+      "saleDate": "Satış Tarihi",
+      "purchasePrice": "Alış Fiyatı",
+      "salePrice": "Satış Fiyatı",
+      "profit": "Kâr/Zarar"
+    },
+    "actions": {
+      "edit": "Düzenle",
+      "delete": "Sil"
+    },
+    "badge": {
+      "inStock": "Stokta"
+    }
+  },
+  "tradeForm": {
+    "createTitle": "Yeni İşlem",
+    "editTitle": "İşlemi Düzenle",
+    "cancel": "Vazgeç",
+    "save": "Kaydet",
+    "fields": {
+      "title": "Başlık",
+      "titlePlaceholder": "Örn: 2016 Toyota Corolla",
+      "category": "Kategori",
+      "categorySelect": "Seç",
+      "categoryCustom": "Yaz",
+      "categoryPlaceholder": "Örn: Elektrikli",
+      "purchaseDate": "Alım Tarihi",
+      "purchasePrice": "Alış Fiyatı",
+      "sold": "Satıldı",
+      "saleDate": "Satış Tarihi",
+      "salePrice": "Satış Fiyatı"
+    }
+  },
+  "about": {
+    "title": "Hakkında",
+    "desc": "Çevrimdışı envanter ve finans takip uygulaması.",
+    "logoPlaceholder": "Cicibyte Corp logo placeholder",
+    "close": "Kapat"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "language": "Dil",
+    "languages": {
+      "az": "AZ — Azərbaycan",
+      "tr": "TR — Türkçe",
+      "en": "EN — English",
+      "ru": "RU — Русский"
+    }
+  },
+  "updates": {
+    "title": "Güncellemeler",
+    "subtitle": "Yeni sürümleri kontrol edin ve indirin.",
+    "check": "Güncellemeleri Kontrol Et",
+    "restart": "Yeniden Başlat",
+    "idle": "Hazır.",
+    "checking": "Kontrol ediliyor…",
+    "downloading": "Güncelleme indiriliyor… %{{percent}}",
+    "downloaded": "Güncelleme hazır{{version}}. Yeniden başlatmak için tıklayın.",
+    "upToDate": "Şu an en güncel sürümü{{version}} kullanıyorsunuz.",
+    "error": "Güncelleme hatası: {{message}}",
+    "dev": "Geliştirme modunda otomatik güncelleme devre dışı."
+  }
+}

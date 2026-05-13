@@ -1,0 +1,115 @@
+{
+  "common": {
+    "close": "Close"
+  },
+  "app": {
+    "name": "GarageLedger",
+    "loading": "Loading…"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "settings": "Settings"
+  },
+  "topbar": {
+    "currency": "Currency",
+    "about": "About"
+  },
+  "dashboard": {
+    "stats": {
+      "activeCount": "Active Vehicles",
+      "investment": "Total Investment",
+      "monthProfit": "This Month Profit"
+    },
+    "charts": {
+      "weekly": "Weekly Profit/Loss",
+      "monthly": "Monthly Profit/Loss"
+    }
+  },
+  "inventory": {
+    "title": "Inventory",
+    "subtitle": "Track your buy/sell operations.",
+    "new": "New Trade",
+    "empty": "No records yet.",
+    "filters": {
+      "title": "Filters",
+      "searchPlaceholder": "Search: Title",
+      "categoryAll": "All categories",
+      "statusAll": "All statuses",
+      "statusInStock": "In stock",
+      "statusSold": "Sold",
+      "profitAll": "All (Profit/Loss)",
+      "profitProfit": "Profit only",
+      "profitLoss": "Loss only",
+      "profitBreakEven": "Break-even",
+      "purchaseFrom": "Purchase (from)",
+      "purchaseTo": "Purchase (to)",
+      "clear": "Clear",
+      "results": "{{count}} items"
+    },
+    "table": {
+      "title": "Title",
+      "category": "Category",
+      "purchaseDate": "Purchase Date",
+      "saleDate": "Sale Date",
+      "purchasePrice": "Purchase Price",
+      "salePrice": "Sale Price",
+      "profit": "Profit/Loss"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "badge": {
+      "inStock": "In Stock"
+    }
+  },
+  "tradeForm": {
+    "createTitle": "New Trade",
+    "editTitle": "Edit Trade",
+    "cancel": "Cancel",
+    "save": "Save",
+    "fields": {
+      "title": "Title",
+      "titlePlaceholder": "e.g. 2016 Toyota Corolla",
+      "category": "Category",
+      "categorySelect": "Select",
+      "categoryCustom": "Custom",
+      "categoryPlaceholder": "e.g. Electric",
+      "purchaseDate": "Purchase Date",
+      "purchasePrice": "Purchase Price",
+      "sold": "Sold",
+      "saleDate": "Sale Date",
+      "salePrice": "Sale Price"
+    }
+  },
+  "about": {
+    "title": "About",
+    "desc": "Offline inventory and finance tracking app.",
+    "logoPlaceholder": "Cicibyte Corp logo placeholder",
+    "close": "Close"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languages": {
+      "az": "AZ — Azərbaycan",
+      "tr": "TR — Türkçe",
+      "en": "EN — English",
+      "ru": "RU — Русский"
+    }
+  },
+  "updates": {
+    "title": "Updates",
+    "subtitle": "Check and download new versions.",
+    "check": "Check for Updates",
+    "restart": "Restart",
+    "idle": "Ready.",
+    "checking": "Checking…",
+    "downloading": "Downloading update… %{{percent}}",
+    "downloaded": "Update is ready{{version}}. Click to restart.",
+    "upToDate": "You are on the latest version{{version}}.",
+    "error": "Update error: {{message}}",
+    "dev": "Auto-update is disabled in development mode."
+  }
+}

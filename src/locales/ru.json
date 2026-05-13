@@ -1,0 +1,115 @@
+{
+  "common": {
+    "close": "Закрыть"
+  },
+  "app": {
+    "name": "GarageLedger",
+    "loading": "Загрузка…"
+  },
+  "nav": {
+    "dashboard": "Панель",
+    "inventory": "Инвентарь",
+    "settings": "Настройки"
+  },
+  "topbar": {
+    "currency": "Валюта",
+    "about": "О программе"
+  },
+  "dashboard": {
+    "stats": {
+      "activeCount": "Активные авто",
+      "investment": "Общие вложения",
+      "monthProfit": "Прибыль за месяц"
+    },
+    "charts": {
+      "weekly": "Прибыль/убыток за неделю",
+      "monthly": "Прибыль/убыток за месяц"
+    }
+  },
+  "inventory": {
+    "title": "Инвентарь",
+    "subtitle": "Отслеживайте операции покупки/продажи.",
+    "new": "Новая сделка",
+    "empty": "Записей пока нет.",
+    "filters": {
+      "title": "Фильтры",
+      "searchPlaceholder": "Поиск: название",
+      "categoryAll": "Все категории",
+      "statusAll": "Все статусы",
+      "statusInStock": "В наличии",
+      "statusSold": "Продано",
+      "profitAll": "Все (прибыль/убыток)",
+      "profitProfit": "Только прибыль",
+      "profitLoss": "Только убыток",
+      "profitBreakEven": "Ноль",
+      "purchaseFrom": "Покупка (с)",
+      "purchaseTo": "Покупка (по)",
+      "clear": "Сбросить",
+      "results": "{{count}} записей"
+    },
+    "table": {
+      "title": "Название",
+      "category": "Категория",
+      "purchaseDate": "Дата покупки",
+      "saleDate": "Дата продажи",
+      "purchasePrice": "Цена покупки",
+      "salePrice": "Цена продажи",
+      "profit": "Прибыль/убыток"
+    },
+    "actions": {
+      "edit": "Изменить",
+      "delete": "Удалить"
+    },
+    "badge": {
+      "inStock": "В наличии"
+    }
+  },
+  "tradeForm": {
+    "createTitle": "Новая сделка",
+    "editTitle": "Редактировать сделку",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "fields": {
+      "title": "Название",
+      "titlePlaceholder": "например: 2016 Toyota Corolla",
+      "category": "Категория",
+      "categorySelect": "Выбрать",
+      "categoryCustom": "Ввести",
+      "categoryPlaceholder": "например: Электро",
+      "purchaseDate": "Дата покупки",
+      "purchasePrice": "Цена покупки",
+      "sold": "Продано",
+      "saleDate": "Дата продажи",
+      "salePrice": "Цена продажи"
+    }
+  },
+  "about": {
+    "title": "О программе",
+    "desc": "Оффлайн-приложение для учёта инвентаря и финансов.",
+    "logoPlaceholder": "Cicibyte Corp logo placeholder",
+    "close": "Закрыть"
+  },
+  "settings": {
+    "title": "Настройки",
+    "language": "Язык",
+    "languages": {
+      "az": "AZ — Azərbaycan",
+      "tr": "TR — Türkçe",
+      "en": "EN — English",
+      "ru": "RU — Русский"
+    }
+  },
+  "updates": {
+    "title": "Обновления",
+    "subtitle": "Проверяйте и загружайте новые версии.",
+    "check": "Проверить обновления",
+    "restart": "Перезапустить",
+    "idle": "Готово.",
+    "checking": "Проверка…",
+    "downloading": "Загрузка обновления… %{{percent}}",
+    "downloaded": "Обновление готово{{version}}. Нажмите для перезапуска.",
+    "upToDate": "У вас установлена последняя версия{{version}}.",
+    "error": "Ошибка обновления: {{message}}",
+    "dev": "Автообновление отключено в режиме разработки."
+  }
+}

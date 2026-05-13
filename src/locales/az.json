@@ -1,0 +1,115 @@
+{
+  "common": {
+    "close": "Bağla"
+  },
+  "app": {
+    "name": "GarageLedger",
+    "loading": "Yüklənir…"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "inventory": "İnventar",
+    "settings": "Ayarlar"
+  },
+  "topbar": {
+    "currency": "Valyuta",
+    "about": "Haqqında"
+  },
+  "dashboard": {
+    "stats": {
+      "activeCount": "Aktiv Nəqliyyat Sayı",
+      "investment": "Ümumi İnvestisiya",
+      "monthProfit": "Bu Ayın Mənfəəti"
+    },
+    "charts": {
+      "weekly": "Həftəlik Mənfəət/Zərər",
+      "monthly": "Aylıq Mənfəət/Zərər"
+    }
+  },
+  "inventory": {
+    "title": "İnventar",
+    "subtitle": "Alış-satış əməliyyatlarını izləyin.",
+    "new": "Yeni Əməliyyat",
+    "empty": "Hələ qeyd yoxdur.",
+    "filters": {
+      "title": "Filtrlər",
+      "searchPlaceholder": "Axtar: Başlıq",
+      "categoryAll": "Bütün kateqoriyalar",
+      "statusAll": "Bütün statuslar",
+      "statusInStock": "Stokda",
+      "statusSold": "Satıldı",
+      "profitAll": "Hamısı (Mənfəət/Zərər)",
+      "profitProfit": "Yalnız mənfəət",
+      "profitLoss": "Yalnız zərər",
+      "profitBreakEven": "Başabaş",
+      "purchaseFrom": "Alış (başlanğıc)",
+      "purchaseTo": "Alış (bitmə)",
+      "clear": "Təmizlə",
+      "results": "{{count}} qeyd"
+    },
+    "table": {
+      "title": "Başlıq",
+      "category": "Kateqoriya",
+      "purchaseDate": "Alış Tarixi",
+      "saleDate": "Satış Tarixi",
+      "purchasePrice": "Alış Qiyməti",
+      "salePrice": "Satış Qiyməti",
+      "profit": "Mənfəət/Zərər"
+    },
+    "actions": {
+      "edit": "Dəyiş",
+      "delete": "Sil"
+    },
+    "badge": {
+      "inStock": "Stokda"
+    }
+  },
+  "tradeForm": {
+    "createTitle": "Yeni Əməliyyat",
+    "editTitle": "Əməliyyatı Dəyiş",
+    "cancel": "İmtina",
+    "save": "Yadda saxla",
+    "fields": {
+      "title": "Başlıq",
+      "titlePlaceholder": "Məs: 2016 Toyota Corolla",
+      "category": "Kateqoriya",
+      "categorySelect": "Seç",
+      "categoryCustom": "Yaz",
+      "categoryPlaceholder": "Məs: Elektrik",
+      "purchaseDate": "Alış Tarixi",
+      "purchasePrice": "Alış Qiyməti",
+      "sold": "Satıldı",
+      "saleDate": "Satış Tarixi",
+      "salePrice": "Satış Qiyməti"
+    }
+  },
+  "about": {
+    "title": "Haqqında",
+    "desc": "Çevrimdışı inventar və maliyyə izləmə tətbiqi.",
+    "logoPlaceholder": "Cicibyte Corp logo placeholder",
+    "close": "Bağla"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "language": "Dil",
+    "languages": {
+      "az": "AZ — Azərbaycan",
+      "tr": "TR — Türkçe",
+      "en": "EN — English",
+      "ru": "RU — Русский"
+    }
+  },
+  "updates": {
+    "title": "Yeniləmələr",
+    "subtitle": "Yeni versiyaları yoxlayın və endirin.",
+    "check": "Yeniləmələri Yoxla",
+    "restart": "Yenidən Başlat",
+    "idle": "Hazır.",
+    "checking": "Yoxlanılır…",
+    "downloading": "Yeniləmə endirilir… %{{percent}}",
+    "downloaded": "Yeniləmə hazırdır{{version}}. Yenidən başlatmaq üçün klikləyin.",
+    "upToDate": "Siz ən son versiyanı{{version}} istifadə edirsiniz.",
+    "error": "Yeniləmə xətası: {{message}}",
+    "dev": "Develop modunda auto-update deaktivdir."
+  }
+}
