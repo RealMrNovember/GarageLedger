@@ -20,6 +20,7 @@ export function CurrencySelect({
         <option value="AZN">AZN</option>
         <option value="USD">USD</option>
         <option value="EUR">EUR</option>
+        <option value="TRY">TRY</option>
       </select>
     </label>
   )

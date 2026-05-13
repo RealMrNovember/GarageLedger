@@ -9,14 +9,17 @@ export function Modal({
   open,
   onClose,
   footer,
+  maxWidthClassName,
   children,
 }: PropsWithChildren<{
   title: string
   open: boolean
   onClose: () => void
   footer?: ReactNode
+  maxWidthClassName?: string
 }>) {
   const { t } = useTranslation()
+  const maxW = maxWidthClassName?.trim() || 'max-w-xl'
 
   return (
     <AnimatePresence>
@@ -39,17 +42,21 @@ export function Modal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.985 }}
             transition={{ type: 'spring', stiffness: 520, damping: 38, mass: 0.9 }}
-            className="w-full max-w-xl"
+            className={['w-full', maxW].join(' ')}
           >
-            <Card className="relative overflow-hidden bg-white/70 backdrop-blur-md dark:bg-[#1e1e1e]/75">
-              <div className="flex items-center justify-between gap-4 px-6 py-4">
+            <Card className="relative flex max-h-[calc(100vh-3rem)] flex-col overflow-hidden bg-white/70 backdrop-blur-md dark:bg-[#1e1e1e]/75">
+              <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-[var(--tf-border)] bg-white/40 px-6 py-4 backdrop-blur-md dark:bg-[#1e1e1e]/50">
                 <div className="text-sm font-semibold text-[var(--tf-ink)]">{title}</div>
                 <Button variant="ghost" onClick={onClose} className="px-3">
                   {t('common.close')}
                 </Button>
               </div>
-              <div className="px-6 pb-6">{children}</div>
-              {footer ? <div className="border-t border-[var(--tf-border)] px-6 py-4">{footer}</div> : null}
+              <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
+              {footer ? (
+                <div className="sticky bottom-0 border-t border-[var(--tf-border)] bg-white/40 px-6 py-4 backdrop-blur-md dark:bg-[#1e1e1e]/50">
+                  {footer}
+                </div>
+              ) : null}
             </Card>
           </motion.div>
         </motion.div>

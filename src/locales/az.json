@@ -414,6 +414,20 @@
       "notifications": "Auto-update sonrası \"Nə Yenilik Var?\" bildiriş sistemi inteqrasiya edildi."
     }
   },
+  "updateModal": {
+    "title": "Yeni yeniləmə mövcuddur {{version}}",
+    "later": "Sonra",
+    "updateNow": "İndi yenilə",
+    "restartInstall": "Yenidən başlat və qur",
+    "availableBody": "Yeni versiya tapıldı. İstəsəniz indi endirə bilərsiniz, endirmə bitdikdən sonra yenidən başladıb quraşdırın.",
+    "availableHint": "Endirmə arxa planda gedir. Tətbiqdən istifadə etməyə davam edə bilərsiniz.",
+    "downloadingBody": "Yeniləmə endirilir…",
+    "progress": "%{{percent}} endirildi",
+    "downloadedBody": "Yeniləmə hazırdır! Dəyişikliklərin tətbiqi üçün tətbiqin yenidən başlaması lazımdır.",
+    "downloadedHint": "İşinizi yadda saxlayın, sonra yenidən başladıb quraşdırın.",
+    "errorBody": "Yeniləmə zamanı xəta baş verdi.",
+    "idleBody": "Hələ yeniləmə statusu yoxdur."
+  },
   "settings": {
     "title": "Ayarlar",
     "language": "Dil",

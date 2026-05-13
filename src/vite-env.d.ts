@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-type CurrencyCode = 'AZN' | 'USD' | 'EUR'
+type CurrencyCode = 'AZN' | 'USD' | 'EUR' | 'TRY'
 
 type TradeItem = {
   id: string
@@ -85,6 +85,7 @@ type GarageLedgerApi = {
   updates: {
     getStatus: () => Promise<unknown>
     check: () => Promise<{ ok: boolean }>
+    download: () => Promise<{ ok: boolean }>
     install: () => Promise<{ ok: boolean }>
     onStatus: (handler: (payload: unknown) => void) => () => void
   }

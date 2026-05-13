@@ -18,12 +18,12 @@
 }
 
 .dark {
-  --tf-bg: #121212;
-  --tf-surface: #1e1e1e;
-  --tf-ink: #e5e7eb;
-  --tf-ink-muted: #9ca3af;
+  --tf-bg: #111827;
+  --tf-surface: #1f2937;
+  --tf-ink: #f3f4f6;
+  --tf-ink-muted: #d1d5db;
   --tf-accent: #c8a45a;
-  --tf-border: rgba(229, 231, 235, 0.12);
+  --tf-border: rgba(55, 65, 81, 0.9);
   --tf-shadow: 0 22px 60px -42px rgba(0, 0, 0, 0.75);
 }
 

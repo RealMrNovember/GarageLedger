@@ -414,6 +414,20 @@
       "notifications": "\"What's New\" notification system is integrated after auto-updates."
     }
   },
+  "updateModal": {
+    "title": "New update available {{version}}",
+    "later": "Later",
+    "updateNow": "Update now",
+    "restartInstall": "Restart & Install",
+    "availableBody": "A new version is available. You can download it now and install after the download completes.",
+    "availableHint": "Downloading happens in the background. You can keep using the app.",
+    "downloadingBody": "Downloading update…",
+    "progress": "{{percent}}% downloaded",
+    "downloadedBody": "Update is ready. The app needs to restart to apply changes.",
+    "downloadedHint": "Save your work, then restart and install.",
+    "errorBody": "Update error occurred.",
+    "idleBody": "No update status yet."
+  },
   "settings": {
     "title": "Settings",
     "language": "Language",

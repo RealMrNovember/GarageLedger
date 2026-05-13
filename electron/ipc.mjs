@@ -6,6 +6,7 @@ import { getDb } from './db.mjs'
 const { autoUpdater } = updater
 
 let lastUpdateStatus = { state: 'idle' }
+let updateTimer = null
 
 function broadcastUpdateStatus(payload) {
   lastUpdateStatus = payload
@@ -29,7 +30,6 @@ function registerUpdaterIpc({ isDev }) {
   })
   autoUpdater.on('update-available', (info) => {
     broadcastUpdateStatus({ state: 'available', version: info?.version })
-    void autoUpdater.downloadUpdate()
   })
   autoUpdater.on('update-not-available', (info) => {
     broadcastUpdateStatus({ state: 'upToDate', version: info?.version })
@@ -69,6 +69,17 @@ function registerUpdaterIpc({ isDev }) {
     }
   })
 
+  ipcMain.handle('garageledger:update:download', async () => {
+    if (isDev) return { ok: false }
+    try {
+      void autoUpdater.downloadUpdate()
+      return { ok: true }
+    } catch (e) {
+      broadcastUpdateStatus({ state: 'error', message: e?.message ?? String(e) })
+      return { ok: false }
+    }
+  })
+
   ipcMain.handle('garageledger:update:install', async () => {
     if (isDev) return { ok: false }
     try {
@@ -84,6 +95,11 @@ function registerUpdaterIpc({ isDev }) {
     setTimeout(() => {
       void setLastUpdateCheckAt().then(() => autoUpdater.checkForUpdates())
     }, 250)
+    if (!updateTimer) {
+      updateTimer = setInterval(() => {
+        void setLastUpdateCheckAt().then(() => autoUpdater.checkForUpdates())
+      }, 60 * 60 * 1000)
+    }
   }
 }
 

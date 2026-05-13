@@ -414,6 +414,20 @@
       "notifications": "Otomatik güncelleme sonrası \"Neler Yeni?\" bildirim sistemi entegre edildi."
     }
   },
+  "updateModal": {
+    "title": "Yeni bir güncelleme mevcut {{version}}",
+    "later": "Daha sonra",
+    "updateNow": "Şimdi güncelle",
+    "restartInstall": "Yeniden başlat ve kur",
+    "availableBody": "Yeni bir sürüm bulundu. İsterseniz şimdi indirebilir, indirme bitince kurulum için yeniden başlatabilirsiniz.",
+    "availableHint": "İndirme arka planda gerçekleşir. Uygulamayı kullanmaya devam edebilirsiniz.",
+    "downloadingBody": "Güncelleme indiriliyor…",
+    "progress": "%{{percent}} indirildi",
+    "downloadedBody": "Güncelleme hazır! Değişikliklerin uygulanması için uygulamanın yeniden başlatılması gerekiyor.",
+    "downloadedHint": "Çalışmanızı kaydedin, ardından yeniden başlatıp kurun.",
+    "errorBody": "Güncelleme sırasında bir hata oluştu.",
+    "idleBody": "Henüz güncelleme durumu yok."
+  },
   "settings": {
     "title": "Ayarlar",
     "language": "Dil",

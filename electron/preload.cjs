@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('GarageLedger', {
   updates: {
     getStatus: () => ipcRenderer.invoke('garageledger:update:getStatus'),
     check: () => ipcRenderer.invoke('garageledger:update:check'),
+    download: () => ipcRenderer.invoke('garageledger:update:download'),
     install: () => ipcRenderer.invoke('garageledger:update:install'),
     onStatus: (handler) => {
       const wrapped = (_evt, payload) => handler(payload)
