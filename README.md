@@ -1,87 +1,104 @@
-# 🚗📒 GarageLedger
+# GarageLedger
 
-Offline inventory + finance tracking desktop app built with React, Vite, Tailwind CSS and Electron.
+![GarageLedger](./GarageLedger.svg)
 
-Screenshot (placeholder): add a screenshot here once the first release UI is finalized.
+GarageLedger is a premium, offline-first desktop app for garages and vehicle trading teams that want clean inventory tracking and reliable financial analytics, without losing cost history.
 
-## ✨ Highlights
+“Garage” represents the day-to-day inventory reality. “Ledger” represents the finance truth behind every buy/sell.
 
-- 🌐 Multi-language: AZ (default), TR, EN, RU
-- 💱 Multi-currency: AZN (default), USD, EUR (instant UI update)
-- 📊 Dashboard: weekly/monthly profit charts + key stat widgets
-- 📦 Inventory table: in-stock badge, profit/loss, categories + advanced filtering
-- 💾 Offline local DB: LowDB JSON in Electron userData (no internet required)
-- 🔄 Auto-update ready: electron-updater + GitHub releases (NSIS target)
+## Design Philosophy (Quiet Luxury)
 
-## 🧱 Tech Stack
+GarageLedger follows a “Quiet Luxury / Digital Boutique” design approach:
 
+- Deep whites and soft beiges for calm, high-trust screens
+- Minimal chrome, subtle borders, soft shadows
+- Focus on clarity and confidence: numbers first, noise last
+
+## Tech Stack
+
+- Electron + electron-builder (Windows NSIS installer)
 - React + TypeScript + Vite
-- Tailwind CSS v4 (Vite plugin)
-- Electron + electron-builder
-- Recharts
-- i18next / react-i18next
+- Tailwind CSS v4
+- LowDB (local JSON DB under userData)
+- Recharts (analytics charts)
+- i18next / react-i18next (AZ default + TR/EN/RU)
 
-## 🚀 Getting Started (Dev)
+## Key Features
+
+- Multi-language: AZ (default), TR, EN, RU
+- Multi-currency: AZN (default), USD, EUR
+- Offline local database: works without internet
+- Auto-update: background update check/download via GitHub Releases (NSIS)
+- Local backups: daily automatic + manual backup/restore from Settings
+- Financial analytics:
+  - Monthly summary (bought count, investment paid, gross sales, net profit)
+  - Last 6 months comparison chart (sold count + profit)
+- Sold items keep cost history: sold records stay in the DB (not deleted)
+
+## Screenshots
+
+Placeholders:
+
+- Dashboard (placeholder)
+- Inventory (placeholder)
+- Settings (updates + backups) (placeholder)
+
+## Installation (Client / End-User)
+
+1) Open the GitHub Releases page and download the latest Windows installer:
+   - `GarageLedger Setup x.y.z.exe`
+2) Run the installer wizard.
+3) If Windows asks for admin permission, allow it (per-machine install).
+4) Launch GarageLedger from Start Menu.
+
+Important:
+
+- Your data is stored locally on the same Windows user profile and is not uploaded anywhere.
+- Updates do not wipe your data. Daily automatic backups add extra safety.
+
+## Data Storage & Backups
+
+GarageLedger uses Electron userData storage.
+
+- Main DB file: `garageledger.json`
+- Backups folder: `backups/` (date-stamped JSON backups)
+
+You can manage backups inside the app:
+
+- Settings → Backups: Create / Refresh / Open Folder / Restore
+
+## Development
 
 ```bash
-cd GarageLedger
 npm install
 npm run dev
 ```
 
-## 🏗️ Build
+## Build (Installer)
 
 ```bash
-cd GarageLedger
-npm run build
-```
-
-## 📦 Packaging (Windows)
-
-- Portable (single .exe):
-
-```bash
-cd GarageLedger
 npm run dist
 ```
 
-- NSIS Installer (recommended for auto-update):
+## Release (Auto GitHub Release)
 
-```bash
-cd GarageLedger
-npm run dist:installer
+The release flow is automated:
+
+1) Ensure the working tree is clean (commit your changes first).
+2) Ensure a GitHub token is available for electron-builder publishing:
+
+```powershell
+$env:GH_TOKEN="YOUR_GITHUB_TOKEN"
 ```
 
-## 🧭 Data Storage
-
-Data is stored locally in a JSON database file inside Electron userData directory:
-
-- Windows: `%AppData%\\GarageLedger\\garageledger.json` (path may vary depending on profile)
-
-## 🔄 Release / Publishing Guide (GitHub Releases)
-
-Auto-update works best with the NSIS installer target. A typical release flow:
-
-1) Bump `version` in `GarageLedger/package.json`
-2) Commit and tag the version
-3) Create a GitHub Release and upload the generated NSIS artifacts (or use publish command if configured)
-
-Commands:
+3) Run:
 
 ```bash
-cd GarageLedger
-npm run dist:installer
+npm run release
 ```
 
-## 🏷️ Repository Description (Suggested)
+This will:
 
-GarageLedger — Offline inventory & finance tracker (Electron + React). Multi-language, multi-currency, local DB, dashboard, and auto-update via GitHub Releases.
-
-## 🧷 GitHub Repo (CLI Notes)
-
-If you want to set the repository description from terminal (optional):
-
-```bash
-"C:\Program Files\GitHub CLI\gh.exe" auth login --web
-"C:\Program Files\GitHub CLI\gh.exe" repo edit RealMrNovember/GarageLedger --description "GarageLedger — Offline inventory & finance tracker (Electron + React). Multi-language, multi-currency, local DB, dashboard, and auto-update via GitHub Releases."
-```
+- bump patch version (`npm version patch`)
+- push commits and tags (`git push --follow-tags`)
+- build and publish NSIS installer to GitHub Releases (`electron-builder --publish always`)

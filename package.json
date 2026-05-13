@@ -1,16 +1,22 @@
 {
   "name": "garageledger",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "Quiet-luxury, offline-first garage inventory and financial analytics desktop app.",
   "author": "Mikail",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RealMrNovember/GarageLedger.git"
+  },
   "main": "electron/main.mjs",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"npm:electron:dev\"",
     "electron:dev": "wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
+    "icons": "node tools/generate-icon.mjs",
     "build": "tsc -b && vite build",
-    "dist": "npm run build && electron-builder --win nsis",
-    "publish": "npm run build && electron-builder --win nsis --publish always",
+    "dist": "npm run icons && npm run build && electron-builder --win nsis",
+    "publish": "npm run icons && npm run build && electron-builder --win nsis --publish always",
     "release": "npm version patch && git push --follow-tags && npm run publish",
     "lint": "eslint .",
     "preview": "vite preview"

@@ -11,6 +11,12 @@ node_modules
 dist
 dist-ssr
 *.local
+release
+out
+build
+*.exe
+*.blockmap
+latest.yml
 
 # Editor directories and files
 .vscode/*
