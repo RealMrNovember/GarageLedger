@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+# 🚗📒 GarageLedger
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Offline inventory + finance tracking desktop app built with React, Vite, Tailwind CSS and Electron.
 
-Currently, two official plugins are available:
+Screenshot (placeholder): add a screenshot here once the first release UI is finalized.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Highlights
 
-## React Compiler
+- 🌐 Multi-language: AZ (default), TR, EN, RU
+- 💱 Multi-currency: AZN (default), USD, EUR (instant UI update)
+- 📊 Dashboard: weekly/monthly profit charts + key stat widgets
+- 📦 Inventory table: in-stock badge, profit/loss, categories + advanced filtering
+- 💾 Offline local DB: LowDB JSON in Electron userData (no internet required)
+- 🔄 Auto-update ready: electron-updater + GitHub releases (NSIS target)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🧱 Tech Stack
 
-## Expanding the ESLint configuration
+- React + TypeScript + Vite
+- Tailwind CSS v4 (Vite plugin)
+- Electron + electron-builder
+- Recharts
+- i18next / react-i18next
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Getting Started (Dev)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd GarageLedger
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🏗️ Build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd GarageLedger
+npm run build
 ```
+
+## 📦 Packaging (Windows)
+
+- Portable (single .exe):
+
+```bash
+cd GarageLedger
+npm run dist
+```
+
+- NSIS Installer (recommended for auto-update):
+
+```bash
+cd GarageLedger
+npm run dist:installer
+```
+
+## 🧭 Data Storage
+
+Data is stored locally in a JSON database file inside Electron userData directory:
+
+- Windows: `%AppData%\\GarageLedger\\garageledger.json` (path may vary depending on profile)
+
+## 🔄 Release / Publishing Guide (GitHub Releases)
+
+Auto-update works best with the NSIS installer target. A typical release flow:
+
+1) Bump `version` in `GarageLedger/package.json`
+2) Commit and tag the version
+3) Create a GitHub Release and upload the generated NSIS artifacts (or use publish command if configured)
+
+Commands:
+
+```bash
+cd GarageLedger
+npm run dist:installer
+```
+
+## 🏷️ Repository Description (Suggested)
+
+GarageLedger — Offline inventory & finance tracker (Electron + React). Multi-language, multi-currency, local DB, dashboard, and auto-update via GitHub Releases.
