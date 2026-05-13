@@ -187,19 +187,94 @@
     "booklet": {
       "sections": [
         {
-          "title": "Add a vehicle",
-          "body": "Go to Inventory → New Trade. Fill vehicle details and purchase information, then save.",
-          "bullets": ["Brand/Model/Year/Engine", "Purchase date & purchase price", "Seller name & phone (optional)"]
+          "title": "Getting started",
+          "body": "GarageLedger is an offline-first garage/auto trading system. Your data is stored locally on your PC and is backed up automatically (daily) when the app is opened.",
+          "bullets": [
+            "Use Settings to change language, currency and theme",
+            "Use Inventory for day-to-day operations (buy, reserve, sell)",
+            "Use Reports to export a branded PDF for a date range"
+          ]
         },
         {
-          "title": "Enter expenses",
-          "body": "Open a trade and use the Expenses section to add multiple expense rows.",
-          "bullets": ["Date, description, amount", "Expenses are included in net profit calculations"]
+          "title": "Add / edit a vehicle (Inventory)",
+          "body": "Go to Inventory → New Trade. Fill vehicle details, category and purchase information. You can always edit a trade later from the Inventory table.",
+          "bullets": [
+            "Vehicle: brand, model, year, engine",
+            "Purchase: date and purchase price",
+            "Parties: select a seller/buyer from CRM or add instantly"
+          ]
         },
         {
-          "title": "Generate a report",
-          "body": "Go to Reports, choose a date range, and export a PDF that includes summary totals and a movements table.",
-          "bullets": ["Today / This Week / This Month / Last 30 Days", "Branded footer with Cicibyte Corp"]
+          "title": "Statuses: In stock / Reserved / Sold",
+          "body": "Every trade has a status that controls what data is required and how it is reported.",
+          "bullets": [
+            "In stock: purchase is recorded, no sale info yet",
+            "Reserved: reserve date + expected sale price + deposit (optional)",
+            "Sold: sale date + payment details and receivable tracking"
+          ]
+        },
+        {
+          "title": "Selling a vehicle: payment methods",
+          "body": "When marking a vehicle as Sold, choose a payment method. The form changes dynamically based on your selection.",
+          "bullets": [
+            "Cash: full amount received, remaining balance becomes 0",
+            "Installment: sale price + down payment + installment count; remaining and monthly amount are calculated",
+            "Trade-in (Barter): cash received + trade-in vehicle details and trade-in value"
+          ]
+        },
+        {
+          "title": "Trade-in (Barter): automatic stock entry",
+          "body": "When a sale is completed with Trade-in, the trade-in vehicle is automatically added to Inventory as a new In stock trade.",
+          "bullets": [
+            "Trade-in value becomes the purchase price of the new stock item",
+            "Seller of the trade-in item is set to the buyer of the sold vehicle",
+            "You can edit the newly created stock item later to add details/expenses"
+          ]
+        },
+        {
+          "title": "Pending payments & reminders",
+          "body": "If a sold trade has remaining balance > 0, it appears on Dashboard under Pending Payments & Reminders.",
+          "bullets": [
+            "Collect: subtract a received amount from remaining balance (removed from the list when it reaches 0)",
+            "Snooze: move the next payment date by 1 day, 3 days or 1 week",
+            "Use next payment date to keep receivables visible and never miss a collection"
+          ]
+        },
+        {
+          "title": "Expenses & true profit",
+          "body": "Use the Expenses section inside a trade to record all operational costs related to a vehicle.",
+          "bullets": [
+            "Each expense: date, description, amount",
+            "Net Profit (sold): sale price − (purchase price + total expenses)",
+            "Use consistent expense entries for accurate reporting and analytics"
+          ]
+        },
+        {
+          "title": "Reports & PDF export",
+          "body": "Go to Reports to view movements and export a high-quality PDF with summary totals and a table.",
+          "bullets": [
+            "Date presets: Today, This Week, This Month, Last 30 Days, Custom",
+            "Summary includes total investment, revenue and net profit (for sold items)",
+            "PDF is branded with header and Cicibyte Corp footer"
+          ]
+        },
+        {
+          "title": "CRM (Customers): people & profiles",
+          "body": "Customers is a standalone CRM module. You can add people manually and open a profile view at any time.",
+          "bullets": [
+            "Create a person: name, phone, email, role and notes",
+            "Profile shows: total volume, remaining receivable and transaction list",
+            "Use CRM selection when buying/selling instead of typing names manually"
+          ]
+        },
+        {
+          "title": "Backups, restore & updates",
+          "body": "GarageLedger protects your data with backups and supports auto-update via GitHub releases.",
+          "bullets": [
+            "Backups: automatic daily backups + manual backup/restore from Settings",
+            "Updates: use Settings → Check for Updates, then restart when downloaded",
+            "If you are behind on versions, ensure you installed the Setup (.exe) build (not a copied folder)"
+          ]
         }
       ]
     },
@@ -330,7 +405,7 @@
       {
         "title": "Quiet Luxury UI Polish",
         "body": "Modals, tables and micro-interactions were refined for a more premium experience.",
-        "bullets": ["Glassmorphism modal backdrop blur", "Softer shadows, refined tables and custom scrollbar"]
+        "bullets": ["Glassmorphism modal backdrop blur", "Softer shadows, refined tables and custom scrollbar", "Help Center handbook expanded and professionalized"]
       }
     ],
     "items": {

@@ -183,23 +183,98 @@
   },
   "help": {
     "title": "Yardım & Əlaqə",
-    "subtitle": "GarageLedger istifadəsi üçün qısa bələdçi və dəstək məlumatları.",
+    "subtitle": "GarageLedger üçün detallı istifadə bələdçisi və dəstək məlumatları.",
     "booklet": {
       "sections": [
         {
-          "title": "Avto əlavə et",
-          "body": "İnventar → Yeni Əməliyyat bölməsindən avto məlumatlarını və alış detallarını daxil edib yadda saxlayın.",
-          "bullets": ["Marka/Model/İl/Motor", "Alış tarixi və alış qiyməti", "Satıcı adı və telefonu (opsional)"]
+          "title": "Başlanğıc",
+          "body": "GarageLedger, qalereya üçün offline işləyən ERP/CRM sistemidir. Məlumatlarınız kompüterinizdə saxlanır və tətbiq açıldıqda gündəlik avtomatik yedək yaradılır.",
+          "bullets": [
+            "Ayarlar: dil, valyuta və tema seçimi",
+            "İnventar: alış / rezerve / satış əməliyyatları",
+            "Hesabatlar: tarix aralığına görə PDF ixrac"
+          ]
         },
         {
-          "title": "Masraf daxil et",
-          "body": "Əməliyyatı açıb Masraflar bölməsinə bir neçə masraf sətri əlavə edin.",
-          "bullets": ["Tarix, açıqlama, məbləğ", "Masraflar net kâr hesabına daxil edilir"]
+          "title": "Avto əlavə et / dəyiş (İnventar)",
+          "body": "İnventar → Yeni Əməliyyat ilə yeni qeyd yaradın. Avto məlumatlarını, kateqoriyanı və alış detallarını daxil edib yadda saxlayın. Cədvəldən istənilən vaxt dəyişə bilərsiniz.",
+          "bullets": [
+            "Avto: marka, model, il, motor",
+            "Alış: tarix və alış qiyməti",
+            "Şəxslər: satıcı/alıcıyı CRM-dən seçin və ya anında əlavə edin"
+          ]
         },
         {
-          "title": "Hesabat al",
-          "body": "Hesabatlar səhifəsində tarix aralığını seçib xülasə və hərəkət cədvəlini PDF kimi ixrac edin.",
-          "bullets": ["Bu gün / Bu həftə / Bu ay / Son 30 gün", "Footer’da Cicibyte Corp imzası"]
+          "title": "Statuslar: Stokda / Rezerve / Satıldı",
+          "body": "Hər əməliyyatın statusu tələb olunan sahələri və hesabatlara düşməsini müəyyən edir.",
+          "bullets": [
+            "Stokda: yalnız alış qeydi, satış məlumatı yoxdur",
+            "Rezerve: rezerve tarixi + satış qiyməti + kapora (opsional)",
+            "Satıldı: satış tarixi + ödəniş metodu və qalan balans izləmə"
+          ]
+        },
+        {
+          "title": "Satış: ödəniş metodları",
+          "body": "Avto satarkən Ödəniş Metodu seçin. Seçimə görə forma dinamik dəyişir.",
+          "bullets": [
+            "Peşin: tam məbləğ alınır, qalan balans 0 olur",
+            "Taksitli: satış məbləği + peşinat + taksit sayı; qalan balans və aylıq məbləğ hesablanır",
+            "Takas (Barter): alınan nəğd + takas avtosu + takas bedeli"
+          ]
+        },
+        {
+          "title": "Takas (Barter): avtomatik stok əlavə etmə",
+          "body": "Takasla satış tamamlandıqda, takasa verilən avto avtomatik olaraq yeni Stokda qeyd kimi İnventar-a əlavə edilir.",
+          "bullets": [
+            "Takas bedeli yeni stok qeydinin alış qiyməti olur",
+            "Takas avtosunun satıcısı satılan avtonun alıcısı kimi yazılır",
+            "Sonradan əlavə detallar və masraflar daxil edə bilərsiniz"
+          ]
+        },
+        {
+          "title": "Yaxın ödənişlər və xatırlatma",
+          "body": "Satılmış əməliyyatda qalan balans > 0 olarsa, Dashboard-da Yaxın Ödənişlər siyahısında görünür.",
+          "bullets": [
+            "Tahsil Et: daxil edilən məbləği qalan balansdan çıxarır (0 olanda siyahıdan çıxır)",
+            "Ertele: növbəti ödəniş tarixini 1 gün, 3 gün və ya 1 həftə irəli alır",
+            "Növbəti ödəniş tarixi ilə heç bir alacağı qaçırmayın"
+          ]
+        },
+        {
+          "title": "Masraflar və real mənfəət",
+          "body": "Masraflar bölməsində avto ilə bağlı bütün xərcləri daxil edin.",
+          "bullets": [
+            "Hər masraf: tarix, açıqlama, məbləğ",
+            "Net Kâr (satıldı): Satış Qiyməti − (Alış Qiyməti + Toplam Masraf)",
+            "Dəqiq hesabat üçün masrafları ardıcıl daxil edin"
+          ]
+        },
+        {
+          "title": "Hesabatlar və PDF ixracı",
+          "body": "Hesabatlar səhifəsində hərəkətləri izləyin və şık PDF ixrac edin.",
+          "bullets": [
+            "Hazır aralıqlar: Bu gün, Bu həftə, Bu ay, Son 30 gün, Xüsusi",
+            "Xülasə: Toplam Yatırım, Ciro və Net Kâr (satılanlar üzrə)",
+            "PDF footer’ında Cicibyte Corp imzası"
+          ]
+        },
+        {
+          "title": "CRM (Müştərilər): şəxs qeydi və cari profil",
+          "body": "Müştərilər artıq müstəqil CRM moduludur. Şəxsləri manual əlavə edib cari profili açın.",
+          "bullets": [
+            "Şəxs əlavə et: ad, telefon, e-poçt, rol, qeydlər",
+            "Cari profil: ümumi həcm, qalan alacaq və əməliyyat siyahısı",
+            "Alış/satış formalarında CRM-dən axtar/seç ilə sürətli işləyin"
+          ]
+        },
+        {
+          "title": "Yedəkləmə, geri yükləmə və yeniləmələr",
+          "body": "GarageLedger məlumat təhlükəsizliyi üçün yedək yaradır və GitHub üzərindən auto-update ilə yenilənir.",
+          "bullets": [
+            "Yedəklər: gündəlik avtomatik + Ayarlar’dan manual yedək/geri yüklə",
+            "Yeniləmələr: Ayarlar → Yeniləmələri Yoxla, endiriləndə yenidən başladın",
+            "Versiyadan geri qalmamaq üçün Setup (.exe) quraşdırmasını istifadə edin"
+          ]
         }
       ]
     },
@@ -330,7 +405,7 @@
       {
         "title": "Quiet Luxury UI Dokunuşları",
         "body": "Modallar, cədvəllər və mikro animasiyalar daha premium hiss üçün yeniləndi.",
-        "bullets": ["Cam effekti: backdrop-blur", "Yumşaq kölgələr, modern cədvəllər, xüsusi scrollbar"]
+        "bullets": ["Cam effekti: backdrop-blur", "Yumşaq kölgələr, modern cədvəllər, xüsusi scrollbar", "Yardım bölməsi daha detallı və peşəkar istifadə bələdçisi ilə genişləndirildi"]
       }
     ],
     "items": {

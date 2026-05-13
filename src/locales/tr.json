@@ -183,23 +183,98 @@
   },
   "help": {
     "title": "Yardım & İletişim",
-    "subtitle": "GarageLedger kullanım kılavuzu ve destek bilgileri.",
+    "subtitle": "GarageLedger için detaylı kullanım kılavuzu ve destek bilgileri.",
     "booklet": {
       "sections": [
         {
-          "title": "Araç ekleme",
-          "body": "Envanter → Yeni İşlem bölümünden araç bilgilerini ve alım detaylarını girip kaydedin.",
-          "bullets": ["Marka/Model/Yıl/Motor", "Alım tarihi ve alış fiyatı", "Satıcı adı ve telefonu (opsiyonel)"]
+          "title": "Başlangıç",
+          "body": "GarageLedger, galeriniz için offline çalışan bir ERP/CRM sistemidir. Verileriniz bilgisayarınızda saklanır ve uygulama açıldığında günlük otomatik yedekleme alır.",
+          "bullets": [
+            "Ayarlar’dan dil, para birimi ve tema seçimi yapın",
+            "Envanter: günlük alım / rezerve / satış işlemleri",
+            "Raporlar: tarih aralığına göre PDF çıktı"
+          ]
         },
         {
-          "title": "Masraf girme",
-          "body": "İşlemi açıp Masraflar alanına birden fazla masraf satırı ekleyin.",
-          "bullets": ["Tarih, açıklama, tutar", "Masraflar net kâr hesabına dahil edilir"]
+          "title": "Araç ekleme / düzenleme (Envanter)",
+          "body": "Envanter → Yeni İşlem ile yeni kayıt açın. Araç bilgilerini, kategoriyi ve alış detaylarını girip kaydedin. Envanter tablosundan her zaman düzenleyebilirsiniz.",
+          "bullets": [
+            "Araç: marka, model, yıl, motor",
+            "Alış: tarih ve alış fiyatı",
+            "Kişiler: satıcı/alıcıyı CRM’den seçin veya anında ekleyin"
+          ]
         },
         {
-          "title": "Rapor alma",
-          "body": "Raporlar sayfasında tarih aralığı seçip özet ve hareket tablosunu içeren PDF çıktısı alın.",
-          "bullets": ["Bugün / Bu Hafta / Bu Ay / Son 30 Gün", "Footer’da Cicibyte Corp imzası"]
+          "title": "Statüler: Stokta / Rezerve / Satıldı",
+          "body": "Her işlem statüye göre farklı alanları zorunlu kılar ve raporlara farklı yansır.",
+          "bullets": [
+            "Stokta: sadece alış kaydı tutulur, satış bilgisi yoktur",
+            "Rezerve: rezerve tarihi + tahmini satış fiyatı + kapora (opsiyonel)",
+            "Satıldı: satış tarihi + ödeme yöntemi ve kalan bakiye takibi"
+          ]
+        },
+        {
+          "title": "Araç satışı: ödeme yöntemleri",
+          "body": "Araç satarken Ödeme Yöntemi seçin. Seçime göre form dinamik olarak değişir.",
+          "bullets": [
+            "Peşin: tam tutar alınır, kalan bakiye 0 olur",
+            "Taksitli: satış bedeli + peşinat + taksit sayısı; kalan bakiye ve aylık tutar hesaplanır",
+            "Takas (Barter): alınan nakit + takas aracı bilgileri + takas bedeli"
+          ]
+        },
+        {
+          "title": "Takas (Barter): otomatik stok girişi",
+          "body": "Takas ile satış tamamlandığında, takasa bırakılan araç otomatik olarak Envanter’e yeni bir Stokta kayıt olarak eklenir.",
+          "bullets": [
+            "Takas bedeli, yeni stok kaydının alış fiyatı olarak yazılır",
+            "Takas aracının satıcısı, satılan aracın alıcısı olarak atanır",
+            "Yeni stok kaydını sonradan düzenleyip masraf/ek detay girebilirsiniz"
+          ]
+        },
+        {
+          "title": "Yaklaşan ödemeler ve hatırlatıcı",
+          "body": "Satılmış bir işlemde kalan bakiye > 0 ise Dashboard’da Yaklaşan Ödemeler listesinde görünür.",
+          "bullets": [
+            "Tahsil Et: girilen tutarı kalan bakiyeden düşer (0 olunca listeden kalkar)",
+            "Ertele: sonraki ödeme tarihini 1 gün, 3 gün veya 1 hafta ileri alır",
+            "Sonraki ödeme tarihi ile hiçbir alacağı gözden kaçırmayın"
+          ]
+        },
+        {
+          "title": "Masraflar ve gerçek kâr",
+          "body": "Masraflar alanında araca ait tüm operasyonel giderleri kaydedin.",
+          "bullets": [
+            "Her masraf: tarih, açıklama, tutar",
+            "Net Kâr (satıldı): Satış Fiyatı − (Alış Fiyatı + Toplam Masraf)",
+            "Doğru rapor için masrafları düzenli ve tutarlı girin"
+          ]
+        },
+        {
+          "title": "Raporlar ve PDF çıktısı",
+          "body": "Raporlar sayfasında hareketleri görüntüleyin ve şık bir PDF çıktısı alın.",
+          "bullets": [
+            "Hazır aralıklar: Bugün, Bu Hafta, Bu Ay, Son 30 Gün, Özel",
+            "Özet: Toplam Yatırım, Ciro ve Net Kâr (satılanlar üzerinden)",
+            "PDF footer’ında Cicibyte Corp imzası bulunur"
+          ]
+        },
+        {
+          "title": "CRM (Müşteriler): kişi kaydı ve cari profil",
+          "body": "Müşteriler artık bağımsız bir CRM modülüdür. Kişileri manuel ekleyebilir ve cari profil ekranını açabilirsiniz.",
+          "bullets": [
+            "Kişi ekleme: ad, telefon, e-posta, rol, notlar",
+            "Cari profil: toplam hacim, kalan alacak ve işlem listesi",
+            "Alım/satım formlarında CRM’den arama/seçme ile hızlı işlem"
+          ]
+        },
+        {
+          "title": "Yedekleme, geri yükleme ve güncellemeler",
+          "body": "GarageLedger veri güvenliği için yedekleme alır ve GitHub üzerinden auto-update ile güncellenir.",
+          "bullets": [
+            "Yedekleme: günlük otomatik yedek + Ayarlar’dan manuel yedek/geri yükle",
+            "Güncellemeler: Ayarlar → Güncellemeleri Kontrol Et, indirilince yeniden başlat",
+            "Eski sürümde kalmamak için Setup (.exe) kurulumunu kullanın"
+          ]
         }
       ]
     },
@@ -330,7 +405,7 @@
       {
         "title": "Quiet Luxury UI Dokunuşları",
         "body": "Modal, tablo ve mikro etkileşimler daha modern ve yumuşak bir hissiyat için elden geçirildi.",
-        "bullets": ["Cam efekti: backdrop-blur", "Yumuşak gölgeler, modern tablolar, özel scrollbar"]
+        "bullets": ["Cam efekti: backdrop-blur", "Yumuşak gölgeler, modern tablolar, özel scrollbar", "Yardım menüsü daha detaylı ve profesyonel kullanım kılavuzu ile genişletildi"]
       }
     ],
     "items": {
