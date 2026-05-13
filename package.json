@@ -80,6 +80,7 @@
       "icon": "build/icon.ico"
     },
     "nsis": {
+      "artifactName": "GarageLedger.Setup.${version}.${ext}",
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
