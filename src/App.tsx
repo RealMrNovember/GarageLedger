@@ -28,6 +28,13 @@ function compareVersions(a: string, b: string): number {
   return 0
 }
 
+type UpdateStatus =
+  | { state: 'idle' }
+  | { state: 'available'; version: string }
+  | { state: 'downloading'; version?: string; percent?: number; transferred?: number; total?: number }
+  | { state: 'downloaded'; version?: string }
+  | { state: 'error'; version?: string; message?: string }
+
 export default function App() {
   const { t } = useTranslation()
   const { ready, items, contacts, currency, setCurrency, upsertItem, upsertContact, removeItem } = useGarageLedger()
@@ -37,9 +44,10 @@ export default function App() {
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
   const [whatsNewVersion, setWhatsNewVersion] = useState<string>('')
   const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('garageledger.theme') === 'dark' ? 'dark' : 'light'))
-  const [_fxTick, setFxTick] = useState(0)
+  const [, setFxTick] = useState(0)
   const [updateModalOpen, setUpdateModalOpen] = useState(false)
-  const [updateStatus, setUpdateStatus] = useState<any>({ state: 'idle' })
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus>({ state: 'idle' })
+  const updateVersion = 'version' in updateStatus ? updateStatus.version : ''
   const whatsNewSections = useMemo(() => {
     const raw = t('whatsNew.sections', { returnObjects: true }) as unknown
     if (!Array.isArray(raw)) return []
@@ -71,9 +79,10 @@ export default function App() {
     if (!api?.updates?.onStatus) return
     const dismissedKey = 'garageledger.updateDismissedVersion'
     const off = api.updates.onStatus((payload) => {
-      setUpdateStatus(payload as any)
-      const state = (payload as any)?.state
-      const version = String((payload as any)?.version ?? '')
+      const next = payload as UpdateStatus
+      setUpdateStatus(next)
+      const state = next.state
+      const version = 'version' in next ? String(next.version ?? '') : ''
       if (state === 'available' && version) {
         const dismissed = localStorage.getItem(dismissedKey) ?? ''
         if (dismissed !== version) setUpdateModalOpen(true)
@@ -242,11 +251,10 @@ export default function App() {
       </Modal>
 
       <Modal
-        title={t('updateModal.title', { version: updateStatus?.version ? `v${updateStatus.version}` : '' })}
+        title={t('updateModal.title', { version: updateVersion ? `v${updateVersion}` : '' })}
         open={updateModalOpen}
         onClose={() => {
-          const version = String(updateStatus?.version ?? '')
-          if (updateStatus?.state === 'available' && version) localStorage.setItem('garageledger.updateDismissedVersion', version)
+          if (updateStatus.state === 'available' && updateVersion) localStorage.setItem('garageledger.updateDismissedVersion', updateVersion)
           setUpdateModalOpen(false)
         }}
         maxWidthClassName="max-w-2xl"
@@ -257,8 +265,7 @@ export default function App() {
                 type="button"
                 className="rounded-2xl border border-[var(--tf-border)] bg-white/60 px-4 py-2 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:bg-black/5 dark:bg-white/5"
                 onClick={() => {
-                  const version = String(updateStatus?.version ?? '')
-                  if (version) localStorage.setItem('garageledger.updateDismissedVersion', version)
+                  if (updateVersion) localStorage.setItem('garageledger.updateDismissedVersion', updateVersion)
                   setUpdateModalOpen(false)
                 }}
               >
