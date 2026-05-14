@@ -43,7 +43,7 @@
     "autoprefixer": "^10.5.0",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
-    "electron": "^42.0.1",
+    "electron": "22.3.27",
     "electron-builder": "^26.8.1",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
@@ -69,23 +69,28 @@
       "electron/**",
       "package.json"
     ],
+    "extraResources": [
+      "../prompt.md",
+      "README.md"
+    ],
     "asar": true,
     "win": {
       "target": [
         {
           "target": "nsis",
           "arch": [
-            "x64"
+            "x64",
+            "ia32"
           ]
         }
       ],
       "signAndEditExecutable": false,
       "verifyUpdateCodeSignature": false,
-      "artifactName": "GarageLedger.Setup.${version}.${ext}",
+      "artifactName": "GarageLedger.Setup.${version}.${arch}.${ext}",
       "icon": "build/icon.ico"
     },
     "nsis": {
-      "artifactName": "GarageLedger.Setup.${version}.${ext}",
+      "artifactName": "GarageLedger.Setup.${version}.${arch}.${ext}",
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,

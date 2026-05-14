@@ -98,6 +98,12 @@ type GarageLedgerApi = {
   app: {
     getInfo: () => Promise<{ version: string; name: string; isPackaged: boolean }>
   }
+  pdf: {
+    getFont: () => Promise<{ ok: boolean; fileName?: string; base64?: string }>
+  }
+  whatsNew: {
+    getLatestPhase: () => Promise<{ ok: boolean; title?: string; bullets?: string[] }>
+  }
   updates: {
     getStatus: () => Promise<unknown>
     check: () => Promise<{ ok: boolean }>

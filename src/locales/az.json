@@ -447,6 +447,22 @@
   "settings": {
     "title": "Ayarlar",
     "language": "Dil",
+    "sections": {
+      "company": "ŞİRKƏT PROFİLİ",
+      "security": "TƏHLÜKƏSİZLİK",
+      "local": "YERLİ AYARLAR",
+      "system": "SİSTEM"
+    },
+    "fx": {
+      "last": "Son məzənnə yenilənməsi: {{value}}",
+      "refresh": "Məzənnələri Yenilə"
+    },
+    "feedback": {
+      "title": "Geri Bildirim",
+      "subtitle": "WhatsApp ilə təklif və ya problem bildirin.",
+      "placeholder": "Mesajınızı yazın…",
+      "send": "WhatsApp-a Göndər"
+    },
     "theme": {
       "title": "Tema",
       "subtitle": "Açıq və qaranlıq mod arasında keçid edin.",

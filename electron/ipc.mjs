@@ -1,4 +1,6 @@
-import { BrowserWindow, app, ipcMain } from 'electron'
+import { BrowserWindow, app, ipcMain, net, powerMonitor } from 'electron'
+import path from 'node:path'
+import fs from 'node:fs/promises'
 import updater from 'electron-updater'
 import { createBackup, ensureDailyBackup, listBackups, openBackupFolder, restoreBackup } from './backups.mjs'
 import { getDb } from './db.mjs'
@@ -21,9 +23,38 @@ async function setLastUpdateCheckAt() {
   await db.write()
 }
 
+async function isOnlineForUpdateCheck() {
+  const wins = BrowserWindow.getAllWindows()
+  const win = wins.find((w) => !w.isDestroyed()) ?? null
+  if (!win) return net.isOnline()
+  try {
+    const v = await win.webContents.executeJavaScript('navigator.onLine', true)
+    return Boolean(v)
+  } catch {
+    return net.isOnline()
+  }
+}
+
 function registerUpdaterIpc({ isDev }) {
   autoUpdater.autoDownload = false
   autoUpdater.requestHeaders = { 'Cache-Control': 'no-cache', Pragma: 'no-cache' }
+
+  const safeCheckForUpdates = async () => {
+    if (isDev) {
+      broadcastUpdateStatus({ state: 'dev' })
+      return { ok: false }
+    }
+    const online = await isOnlineForUpdateCheck()
+    if (!online) return { ok: false }
+    try {
+      await setLastUpdateCheckAt()
+      await autoUpdater.checkForUpdates()
+      return { ok: true }
+    } catch (e) {
+      broadcastUpdateStatus({ state: 'error', message: e?.message ?? String(e) })
+      return { ok: false }
+    }
+  }
 
   autoUpdater.on('checking-for-update', () => {
     broadcastUpdateStatus({ state: 'checking' })
@@ -55,18 +86,7 @@ function registerUpdaterIpc({ isDev }) {
   })
 
   ipcMain.handle('garageledger:update:check', async () => {
-    if (isDev) {
-      broadcastUpdateStatus({ state: 'dev' })
-      return { ok: false }
-    }
-    try {
-      await setLastUpdateCheckAt()
-      await autoUpdater.checkForUpdates()
-      return { ok: true }
-    } catch (e) {
-      broadcastUpdateStatus({ state: 'error', message: e?.message ?? String(e) })
-      return { ok: false }
-    }
+    return safeCheckForUpdates()
   })
 
   ipcMain.handle('garageledger:update:download', async () => {
@@ -93,13 +113,19 @@ function registerUpdaterIpc({ isDev }) {
 
   if (!isDev) {
     setTimeout(() => {
-      void setLastUpdateCheckAt().then(() => autoUpdater.checkForUpdates())
+      void safeCheckForUpdates()
     }, 250)
     if (!updateTimer) {
       updateTimer = setInterval(() => {
-        void setLastUpdateCheckAt().then(() => autoUpdater.checkForUpdates())
+        void safeCheckForUpdates()
       }, 60 * 60 * 1000)
     }
+
+    powerMonitor.on('resume', () => {
+      setTimeout(() => {
+        void safeCheckForUpdates()
+      }, 8000)
+    })
   }
 }
 
@@ -108,6 +134,65 @@ export function registerIpc({ isDev } = { isDev: false }) {
 
   ipcMain.handle('garageledger:app:getInfo', async () => {
     return { version: app.getVersion(), name: app.getName(), isPackaged: app.isPackaged }
+  })
+
+  ipcMain.handle('garageledger:pdf:getFont', async () => {
+    const candidates = [
+      'C:\\\\Windows\\\\Fonts\\\\arial.ttf',
+      'C:\\\\Windows\\\\Fonts\\\\arialuni.ttf',
+      'C:\\\\Windows\\\\Fonts\\\\calibri.ttf',
+    ]
+    for (const p of candidates) {
+      try {
+        const buf = await fs.readFile(p)
+        return { ok: true, fileName: path.basename(p), base64: buf.toString('base64') }
+      } catch {
+        continue
+      }
+    }
+    return { ok: false }
+  })
+
+  function extractLatestCompletedPhase(markdown) {
+    const text = String(markdown ?? '')
+    const lines = text.split(/\r?\n/)
+    const phases = []
+    let current = null
+    for (const line of lines) {
+      const h = line.match(/^##\s+(.+?)\s*$/)
+      if (h) {
+        if (current) phases.push(current)
+        current = { title: h[1].trim(), bullets: [] }
+        continue
+      }
+      if (!current) continue
+      const m = line.match(/^\s*-\s*\[(x|X)\]\s*(.+)\s*$/)
+      if (m) current.bullets.push(m[2].trim())
+    }
+    if (current) phases.push(current)
+    const completed = phases.filter((p) => p.bullets.length)
+    if (!completed.length) return null
+    return completed[completed.length - 1]
+  }
+
+  ipcMain.handle('garageledger:whatsnew:getLatestPhase', async () => {
+    const candidates = [
+      path.join(process.resourcesPath, 'prompt.md'),
+      path.join(app.getAppPath(), 'prompt.md'),
+      path.join(app.getAppPath(), '..', 'prompt.md'),
+      path.join(app.getAppPath(), '..', '..', 'prompt.md'),
+    ]
+    for (const p of candidates) {
+      try {
+        const md = await fs.readFile(p, 'utf8')
+        const phase = extractLatestCompletedPhase(md)
+        if (!phase) return { ok: false }
+        return { ok: true, title: phase.title, bullets: phase.bullets }
+      } catch {
+        continue
+      }
+    }
+    return { ok: false }
   })
 
   ipcMain.handle('garageledger:backup:ensureDaily', async () => {

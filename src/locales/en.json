@@ -447,6 +447,22 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
+    "sections": {
+      "company": "COMPANY PROFILE",
+      "security": "SECURITY",
+      "local": "LOCAL",
+      "system": "SYSTEM"
+    },
+    "fx": {
+      "last": "Last FX update: {{value}}",
+      "refresh": "Refresh Rates"
+    },
+    "feedback": {
+      "title": "Feedback",
+      "subtitle": "Send suggestions or report issues via WhatsApp.",
+      "placeholder": "Write your message…",
+      "send": "Send on WhatsApp"
+    },
     "theme": {
       "title": "Theme",
       "subtitle": "Switch between light and dark mode.",

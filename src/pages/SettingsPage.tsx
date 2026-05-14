@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { i18n } from '../i18n'
+import { refreshFxRates } from '../lib/currency'
+import type { CurrencyCode } from '../lib/currency'
 import type { GarageLedgerSettings } from '../lib/types'
 
 const languages = ['az', 'tr', 'en', 'ru'] as const
@@ -19,6 +21,7 @@ type UpdateStatus =
   | { state: 'dev' }
 
 type BackupItem = { fileName: string; fullPath: string; size: number; mtimeMs: number }
+const currencies = ['AZN', 'USD', 'EUR', 'TRY'] as const
 
 function base64FromBytes(bytes: Uint8Array): string {
   let s = ''
@@ -72,6 +75,8 @@ export function SettingsPage({
   const [lockNew, setLockNew] = useState('')
   const [lockConfirm, setLockConfirm] = useState('')
   const [supportCode, setSupportCode] = useState('')
+  const [fxFetchedAt, setFxFetchedAt] = useState<string | null>(null)
+  const [feedbackText, setFeedbackText] = useState('')
 
   useEffect(() => {
     const api = window.GarageLedger
@@ -101,6 +106,17 @@ export function SettingsPage({
     }
 
     void load()
+  }, [])
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('garageledger.fxRates.v1')
+      if (!raw) return
+      const parsed = JSON.parse(raw) as { fetchedAt?: string }
+      if (parsed?.fetchedAt) setFxFetchedAt(String(parsed.fetchedAt))
+    } catch {
+      return
+    }
   }, [])
 
   useEffect(() => {
@@ -150,21 +166,286 @@ export function SettingsPage({
         <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.title')}</div>
       </div>
 
+      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.company')}</div>
       <Card className="p-5">
-        <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.language')}</div>
-        <select
-          value={current}
-          onChange={(e) => void i18n.changeLanguage(e.target.value)}
-          className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-        >
-          {languages.map((lng) => (
-            <option key={lng} value={lng}>
-              {t(`settings.languages.${lng}`)}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.company.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.company.subtitle')}</div>
+          </div>
+          <Button
+            onClick={async () => {
+              await onUpdateSettings({
+                companyProfile: {
+                  name: companyName.trim(),
+                  logoDataUrl: companyLogo.trim(),
+                  address: companyAddress.trim(),
+                  phone: companyPhone.trim(),
+                  email: companyEmail.trim(),
+                  website: companyWebsite.trim(),
+                },
+              })
+            }}
+          >
+            {t('settings.company.save')}
+          </Button>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.name')}</div>
+            <input
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.website')}</div>
+            <input
+              value={companyWebsite}
+              onChange={(e) => setCompanyWebsite(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div className="lg:col-span-2">
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.address')}</div>
+            <textarea
+              value={companyAddress}
+              onChange={(e) => setCompanyAddress(e.target.value)}
+              rows={3}
+              className="mt-2 w-full resize-none rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.phone')}</div>
+            <input
+              value={companyPhone}
+              onChange={(e) => setCompanyPhone(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.email')}</div>
+            <input
+              value={companyEmail}
+              onChange={(e) => setCompanyEmail(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div className="lg:col-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.logo')}</div>
+              {companyLogo ? (
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-[var(--tf-ink)] underline decoration-[var(--tf-border)] underline-offset-4"
+                  onClick={() => setCompanyLogo('')}
+                >
+                  {t('settings.company.removeLogo')}
+                </button>
+              ) : null}
+            </div>
+            <input
+              type="file"
+              accept="image/png,image/jpeg"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                const reader = new FileReader()
+                reader.onload = () => setCompanyLogo(String(reader.result ?? ''))
+                reader.readAsDataURL(file)
+              }}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2 text-sm text-[var(--tf-ink)] outline-none"
+            />
+            {companyLogo ? (
+              <div className="mt-3 flex items-center gap-3 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/40 p-3">
+                <img src={companyLogo} alt="logo" className="h-10 w-10 rounded-xl object-cover" />
+                <div className="text-xs text-[var(--tf-ink-muted)]">{t('settings.company.logoHint')}</div>
+              </div>
+            ) : null}
+          </div>
+        </div>
       </Card>
 
+      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.security')}</div>
+      <Card className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.lock.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.lock.subtitle')}</div>
+          </div>
+          <div className="rounded-full border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-3 py-1 text-xs font-semibold text-[var(--tf-ink)]">
+            {settings.appLock?.enabled ? t('settings.lock.enabled') : t('settings.lock.disabled')}
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.lock.current')}</div>
+            <input
+              value={lockCurrent}
+              onChange={(e) => setLockCurrent(e.target.value)}
+              type="password"
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div />
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.lock.new')}</div>
+            <input
+              value={lockNew}
+              onChange={(e) => setLockNew(e.target.value)}
+              type="password"
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.lock.confirm')}</div>
+            <input
+              value={lockConfirm}
+              onChange={(e) => setLockConfirm(e.target.value)}
+              type="password"
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/40 p-4">
+          <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.lock.supportCode')}</div>
+          <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.lock.supportCodeHint')}</div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <input
+              value={supportCode}
+              onChange={(e) => setSupportCode(e.target.value)}
+              type="password"
+              className="w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+            <Button
+              variant="ghost"
+              onClick={async () => {
+                const hasExisting = Boolean(settings.appLock?.passwordHash && settings.appLock?.passwordSalt)
+                if (!hasExisting) return
+                const salt = settings.appLock?.passwordSalt ?? ''
+                const hash = settings.appLock?.passwordHash ?? ''
+                const currentHash = await hashPassword(lockCurrent, salt)
+                if (currentHash !== hash) return
+                await onUpdateSettings({ appLock: { ...(settings.appLock ?? { enabled: false, passwordSalt: null, passwordHash: null }), supportCode: supportCode.trim() || null } })
+              }}
+            >
+              {t('settings.company.save')}
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs text-[var(--tf-ink-muted)]">{t('settings.lock.hint')}</div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                window.open('https://wa.me/905354895050', '_blank', 'noreferrer')
+              }}
+            >
+              {t('settings.lock.forgot')}
+            </Button>
+            <Button
+              onClick={async () => {
+                const hasExisting = Boolean(settings.appLock?.passwordHash && settings.appLock?.passwordSalt)
+                if (lockNew.trim().length < 4) return
+                if (lockNew !== lockConfirm) return
+
+                if (hasExisting) {
+                  const salt = settings.appLock?.passwordSalt ?? ''
+                  const hash = settings.appLock?.passwordHash ?? ''
+                  const currentHash = await hashPassword(lockCurrent, salt)
+                  if (currentHash !== hash) return
+                }
+
+                const saltBytes = new Uint8Array(16)
+                crypto.getRandomValues(saltBytes)
+                const saltB64 = base64FromBytes(saltBytes)
+                const newHash = await hashPassword(lockNew, saltB64)
+                await onUpdateSettings({ appLock: { enabled: true, passwordSalt: saltB64, passwordHash: newHash } })
+                setLockCurrent('')
+                setLockNew('')
+                setLockConfirm('')
+              }}
+            >
+              {settings.appLock?.enabled ? t('settings.lock.change') : t('settings.lock.enable')}
+            </Button>
+            {settings.appLock?.enabled ? (
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  const salt = settings.appLock?.passwordSalt ?? ''
+                  const hash = settings.appLock?.passwordHash ?? ''
+                  if (!salt || !hash) return
+                  const currentHash = await hashPassword(lockCurrent, salt)
+                  if (currentHash !== hash) return
+                  await onUpdateSettings({ appLock: { enabled: false, passwordSalt: null, passwordHash: null } })
+                  setLockCurrent('')
+                  setLockNew('')
+                  setLockConfirm('')
+                }}
+              >
+                {t('settings.lock.disable')}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      </Card>
+
+      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.local')}</div>
+      <Card className="p-5">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.language')}</div>
+            <select
+              value={current}
+              onChange={(e) => void i18n.changeLanguage(e.target.value)}
+              className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            >
+              {languages.map((lng) => (
+                <option key={lng} value={lng}>
+                  {t(`settings.languages.${lng}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.currency')}</div>
+            <select
+              value={(settings.currency ?? 'AZN') as CurrencyCode}
+              onChange={(e) => void onUpdateSettings({ currency: e.target.value as CurrencyCode })}
+              className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            >
+              {currencies.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">
+              {t('settings.fx.last', { value: fxFetchedAt ? new Date(fxFetchedAt).toLocaleString() : '—' })}
+            </div>
+            <div className="mt-3">
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  if (typeof navigator !== 'undefined' && !navigator.onLine) return
+                  const fx = await refreshFxRates()
+                  setFxFetchedAt(fx?.fetchedAt ?? null)
+                }}
+              >
+                {t('settings.fx.refresh')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.system')}</div>
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -178,6 +459,7 @@ export function SettingsPage({
           <div className="flex items-center gap-2">
             <Button
               onClick={async () => {
+                if (typeof navigator !== 'undefined' && !navigator.onLine) return
                 await window.GarageLedger?.updates?.check()
                 const settings = await window.GarageLedger?.settings?.get()
                 if (settings) {
@@ -342,229 +624,29 @@ export function SettingsPage({
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.company.title')}</div>
-            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.company.subtitle')}</div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.feedback.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.feedback.subtitle')}</div>
           </div>
           <Button
-            onClick={async () => {
-              await onUpdateSettings({
-                companyProfile: {
-                  name: companyName.trim(),
-                  logoDataUrl: companyLogo.trim(),
-                  address: companyAddress.trim(),
-                  phone: companyPhone.trim(),
-                  email: companyEmail.trim(),
-                  website: companyWebsite.trim(),
-                },
-              })
+            onClick={() => {
+              const company = companyName.trim() || '—'
+              const version = appVersion ? `v${appVersion}` : '—'
+              const body = feedbackText.trim()
+              const msg = encodeURIComponent(`Company: ${company}\nVersion: ${version}\n\n${body}`)
+              window.open(`https://wa.me/905354895050?text=${msg}`, '_blank', 'noreferrer')
             }}
+            disabled={!feedbackText.trim()}
           >
-            {t('settings.company.save')}
+            {t('settings.feedback.send')}
           </Button>
         </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.name')}</div>
-            <input
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            />
-          </div>
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.website')}</div>
-            <input
-              value={companyWebsite}
-              onChange={(e) => setCompanyWebsite(e.target.value)}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            />
-          </div>
-          <div className="lg:col-span-2">
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.address')}</div>
-            <textarea
-              value={companyAddress}
-              onChange={(e) => setCompanyAddress(e.target.value)}
-              rows={3}
-              className="mt-2 w-full resize-none rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            />
-          </div>
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.phone')}</div>
-            <input
-              value={companyPhone}
-              onChange={(e) => setCompanyPhone(e.target.value)}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            />
-          </div>
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.email')}</div>
-            <input
-              value={companyEmail}
-              onChange={(e) => setCompanyEmail(e.target.value)}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            />
-          </div>
-          <div className="lg:col-span-2">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.logo')}</div>
-              {companyLogo ? (
-                <button
-                  type="button"
-                  className="text-xs font-semibold text-[var(--tf-ink)] underline decoration-[var(--tf-border)] underline-offset-4"
-                  onClick={() => setCompanyLogo('')}
-                >
-                  {t('settings.company.removeLogo')}
-                </button>
-              ) : null}
-            </div>
-            <input
-              type="file"
-              accept="image/png,image/jpeg"
-              onChange={(e) => {
-                const file = e.target.files?.[0]
-                if (!file) return
-                const reader = new FileReader()
-                reader.onload = () => setCompanyLogo(String(reader.result ?? ''))
-                reader.readAsDataURL(file)
-              }}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2 text-sm text-[var(--tf-ink)] outline-none"
-            />
-            {companyLogo ? (
-              <div className="mt-3 flex items-center gap-3 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/40 p-3">
-                <img src={companyLogo} alt="logo" className="h-10 w-10 rounded-xl object-cover" />
-                <div className="text-xs text-[var(--tf-ink-muted)]">{t('settings.company.logoHint')}</div>
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </Card>
-
-      <Card className="p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.lock.title')}</div>
-            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.lock.subtitle')}</div>
-          </div>
-          <div className="rounded-full border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-3 py-1 text-xs font-semibold text-[var(--tf-ink)]">
-            {settings.appLock?.enabled ? t('settings.lock.enabled') : t('settings.lock.disabled')}
-          </div>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.lock.current')}</div>
-            <input
-              value={lockCurrent}
-              onChange={(e) => setLockCurrent(e.target.value)}
-              type="password"
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            />
-          </div>
-          <div />
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.lock.new')}</div>
-            <input
-              value={lockNew}
-              onChange={(e) => setLockNew(e.target.value)}
-              type="password"
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            />
-          </div>
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.lock.confirm')}</div>
-            <input
-              value={lockConfirm}
-              onChange={(e) => setLockConfirm(e.target.value)}
-              type="password"
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            />
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/40 p-4">
-          <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.lock.supportCode')}</div>
-          <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.lock.supportCodeHint')}</div>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <input
-              value={supportCode}
-              onChange={(e) => setSupportCode(e.target.value)}
-              type="password"
-              className="w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            />
-            <Button
-              variant="ghost"
-              onClick={async () => {
-                const hasExisting = Boolean(settings.appLock?.passwordHash && settings.appLock?.passwordSalt)
-                if (!hasExisting) return
-                const salt = settings.appLock?.passwordSalt ?? ''
-                const hash = settings.appLock?.passwordHash ?? ''
-                const currentHash = await hashPassword(lockCurrent, salt)
-                if (currentHash !== hash) return
-                await onUpdateSettings({ appLock: { ...(settings.appLock ?? { enabled: false, passwordSalt: null, passwordHash: null }), supportCode: supportCode.trim() || null } })
-              }}
-            >
-              {t('settings.company.save')}
-            </Button>
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="text-xs text-[var(--tf-ink-muted)]">{t('settings.lock.hint')}</div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => {
-                window.open('https://wa.me/905354895050', '_blank', 'noreferrer')
-              }}
-            >
-              {t('settings.lock.forgot')}
-            </Button>
-            <Button
-              onClick={async () => {
-                const hasExisting = Boolean(settings.appLock?.passwordHash && settings.appLock?.passwordSalt)
-                if (lockNew.trim().length < 4) return
-                if (lockNew !== lockConfirm) return
-
-                if (hasExisting) {
-                  const salt = settings.appLock?.passwordSalt ?? ''
-                  const hash = settings.appLock?.passwordHash ?? ''
-                  const currentHash = await hashPassword(lockCurrent, salt)
-                  if (currentHash !== hash) return
-                }
-
-                const saltBytes = new Uint8Array(16)
-                crypto.getRandomValues(saltBytes)
-                const saltB64 = base64FromBytes(saltBytes)
-                const newHash = await hashPassword(lockNew, saltB64)
-                await onUpdateSettings({ appLock: { enabled: true, passwordSalt: saltB64, passwordHash: newHash } })
-                setLockCurrent('')
-                setLockNew('')
-                setLockConfirm('')
-              }}
-            >
-              {settings.appLock?.enabled ? t('settings.lock.change') : t('settings.lock.enable')}
-            </Button>
-            {settings.appLock?.enabled ? (
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  const salt = settings.appLock?.passwordSalt ?? ''
-                  const hash = settings.appLock?.passwordHash ?? ''
-                  if (!salt || !hash) return
-                  const currentHash = await hashPassword(lockCurrent, salt)
-                  if (currentHash !== hash) return
-                  await onUpdateSettings({ appLock: { enabled: false, passwordSalt: null, passwordHash: null } })
-                  setLockCurrent('')
-                  setLockNew('')
-                  setLockConfirm('')
-                }}
-              >
-                {t('settings.lock.disable')}
-              </Button>
-            ) : null}
-          </div>
-        </div>
+        <textarea
+          value={feedbackText}
+          onChange={(e) => setFeedbackText(e.target.value)}
+          rows={4}
+          className="mt-4 w-full resize-none rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+          placeholder={t('settings.feedback.placeholder')}
+        />
       </Card>
     </div>
   )

@@ -447,6 +447,22 @@
   "settings": {
     "title": "Ayarlar",
     "language": "Dil",
+    "sections": {
+      "company": "ŞİRKET PROFİLİ",
+      "security": "GÜVENLİK",
+      "local": "YEREL AYARLAR",
+      "system": "SİSTEM"
+    },
+    "fx": {
+      "last": "Son kur güncellemesi: {{value}}",
+      "refresh": "Kurları Güncelle"
+    },
+    "feedback": {
+      "title": "Geri Bildirim",
+      "subtitle": "WhatsApp üzerinden öneri veya sorun bildirin.",
+      "placeholder": "Mesajınızı yazın…",
+      "send": "WhatsApp’a Gönder"
+    },
     "theme": {
       "title": "Tema",
       "subtitle": "Aydınlık ve karanlık mod arasında geçiş yapın.",

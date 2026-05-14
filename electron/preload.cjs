@@ -19,6 +19,12 @@ contextBridge.exposeInMainWorld('GarageLedger', {
   app: {
     getInfo: () => ipcRenderer.invoke('garageledger:app:getInfo'),
   },
+  pdf: {
+    getFont: () => ipcRenderer.invoke('garageledger:pdf:getFont'),
+  },
+  whatsNew: {
+    getLatestPhase: () => ipcRenderer.invoke('garageledger:whatsnew:getLatestPhase'),
+  },
   updates: {
     getStatus: () => ipcRenderer.invoke('garageledger:update:getStatus'),
     check: () => ipcRenderer.invoke('garageledger:update:check'),

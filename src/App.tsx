@@ -43,6 +43,7 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
   const [whatsNewVersion, setWhatsNewVersion] = useState<string>('')
+  const [whatsNewDynamic, setWhatsNewDynamic] = useState<{ title: string; bullets: string[] } | null>(null)
   const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('garageledger.theme') === 'dark' ? 'dark' : 'light'))
   const [, setFxTick] = useState(0)
   const [updateModalOpen, setUpdateModalOpen] = useState(false)
@@ -71,6 +72,33 @@ export default function App() {
       })
       .filter((s) => s.title)
   }, [t])
+
+  useEffect(() => {
+    if (!whatsNewOpen) return
+    setWhatsNewDynamic(null)
+    const load = async () => {
+      const res = await window.GarageLedger?.whatsNew?.getLatestPhase?.()
+      if (!res?.ok) return
+      const title = String(res.title ?? '').trim()
+      const bullets = Array.isArray(res.bullets) ? res.bullets.map((b) => String(b)) : []
+      if (!title) return
+      setWhatsNewDynamic({ title, bullets })
+    }
+    void load()
+  }, [whatsNewOpen])
+
+  const whatsNewRenderedSections = useMemo(() => {
+    if (whatsNewDynamic?.title) {
+      return [
+        {
+          title: whatsNewDynamic.title,
+          body: '',
+          bullets: whatsNewDynamic.bullets,
+        },
+      ]
+    }
+    return whatsNewSections
+  }, [whatsNewDynamic, whatsNewSections])
 
   useEffect(() => {
     const isDark = theme === 'dark'
@@ -358,7 +386,7 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {whatsNewSections.map((s) => (
+            {whatsNewRenderedSections.map((s) => (
               <div
                 key={s.title}
                 className="rounded-3xl border border-[var(--tf-border)] bg-white/60 p-5 shadow-[var(--tf-shadow)] transition duration-200 hover:-translate-y-[0.5px] dark:bg-white/5"
@@ -367,7 +395,7 @@ export default function App() {
                   <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--tf-accent)]" />
                   <div className="min-w-0">
                     <div className="text-sm font-semibold text-[var(--tf-ink)]">{s.title}</div>
-                    <div className="mt-2 text-sm leading-relaxed text-[var(--tf-ink)]">{s.body}</div>
+                    {s.body ? <div className="mt-2 text-sm leading-relaxed text-[var(--tf-ink)]">{s.body}</div> : null}
                   </div>
                 </div>
                 {s.bullets.length ? (

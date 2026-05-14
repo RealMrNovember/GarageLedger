@@ -212,8 +212,18 @@ export function ReportsPage({
     return { investment, revenue, netProfit }
   }, [items, resolvedRange.from, resolvedRange.to])
 
-  const exportPdf = () => {
+  const exportPdf = async () => {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' })
+    const fontRes = await window.GarageLedger?.pdf?.getFont?.()
+    let fontFamily: string = 'helvetica'
+    if (fontRes?.ok && fontRes.base64 && fontRes.fileName) {
+      const fileName = fontRes.fileName
+      const base64 = fontRes.base64
+      fontFamily = 'GarageLedgerFont'
+      doc.addFileToVFS(fileName, base64)
+      doc.addFont(fileName, fontFamily, 'normal')
+      doc.setFont(fontFamily, 'normal')
+    }
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
 
@@ -261,35 +271,37 @@ export function ReportsPage({
         r.profit == null ? '—' : formatMoneyPdf(r.profit, currency),
       ]),
       columnStyles: {
-        0: { cellWidth: 52 },
-        1: { cellWidth: 52 },
-        2: { cellWidth: 140 },
-        3: { cellWidth: 56, halign: 'right' },
-        4: { cellWidth: 56, halign: 'right' },
-        5: { cellWidth: 56, halign: 'right' },
-        6: { cellWidth: 110 },
-        7: { cellWidth: 56, halign: 'right' },
+        0: { cellWidth: 52, overflow: 'linebreak' },
+        1: { cellWidth: 52, overflow: 'linebreak' },
+        2: { cellWidth: 140, overflow: 'linebreak' },
+        3: { cellWidth: 'wrap', halign: 'right' },
+        4: { cellWidth: 'wrap', halign: 'right' },
+        5: { cellWidth: 'wrap', halign: 'right' },
+        6: { cellWidth: 'auto', overflow: 'linebreak' },
+        7: { cellWidth: 'wrap', halign: 'right' },
       },
       styles: {
-        font: 'helvetica',
+        font: fontFamily,
         fontSize: 8.5,
         textColor: [30, 41, 59],
         cellPadding: 4,
+        overflow: 'linebreak',
+        cellWidth: 'wrap',
       },
       headStyles: {
         fillColor: [245, 240, 232],
         textColor: [15, 23, 42],
-        fontStyle: 'bold',
+        fontStyle: 'normal',
       },
       alternateRowStyles: { fillColor: [250, 250, 250] },
       margin: { left: 40, right: 40 },
       didDrawPage: (data) => {
         const companyName = String(profile.name ?? '').trim()
-        doc.setFont('helvetica', 'bold')
+        doc.setFont(fontFamily, 'normal')
         doc.setFontSize(16)
         doc.text(companyName || title, headX, headerY)
 
-        doc.setFont('helvetica', 'normal')
+        doc.setFont(fontFamily, 'normal')
         doc.setFontSize(10)
         doc.text(title, headX, headerY + 16)
         doc.setFontSize(9)
@@ -318,10 +330,10 @@ export function ReportsPage({
           126,
         )
 
-        doc.setFont('helvetica', 'bold')
+        doc.setFont(fontFamily, 'normal')
         doc.setFontSize(10)
         doc.text('GarageLedger | Cicibyte Corp', pageWidth - 40, pageHeight - 22, { align: 'right' })
-        doc.setFont('helvetica', 'normal')
+        doc.setFont(fontFamily, 'normal')
         doc.setFontSize(9)
         doc.text(`Page ${data.pageNumber}`, 40, pageHeight - 22)
 
@@ -343,7 +355,13 @@ export function ReportsPage({
           <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('reports.title')}</div>
           <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('reports.subtitle')}</div>
         </div>
-        <Button onClick={exportPdf}>{t('reports.export')}</Button>
+        <Button
+          onClick={() => {
+            void exportPdf()
+          }}
+        >
+          {t('reports.export')}
+        </Button>
       </div>
 
       <Card className="p-5">
