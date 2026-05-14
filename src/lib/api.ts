@@ -18,6 +18,7 @@ function migrateItem(raw: unknown): TradeItem | null {
   const model = anyItem.model as string | undefined
   const yearRaw = anyItem.year as number | string | undefined
   const engine = anyItem.engine as string | undefined
+  const vin = (anyItem.vin ?? (anyItem as Record<string, unknown>).VIN ?? anyItem.chassisNo ?? anyItem.chassis) as string | undefined
 
   const expensesRaw = anyItem.expenses
   const expenses = Array.isArray(expensesRaw)
@@ -84,6 +85,7 @@ function migrateItem(raw: unknown): TradeItem | null {
     model: String(model ?? ''),
     year,
     engine: String(engine ?? ''),
+    vin: String(vin ?? ''),
     category: String(anyItem.category ?? 'Diğer'),
     purchaseDate: String(anyItem.purchaseDate ?? ''),
     purchasePrice: Number(anyItem.purchasePrice ?? 0),

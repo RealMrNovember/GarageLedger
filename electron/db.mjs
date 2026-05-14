@@ -45,6 +45,7 @@ function migrateItem(raw) {
   const model = anyItem.model ?? ''
   const year = anyItem.year == null ? null : Number(anyItem.year)
   const engine = anyItem.engine ?? ''
+  const vin = anyItem.vin ?? anyItem.VIN ?? anyItem.chassisNo ?? anyItem.chassis ?? ''
 
   const expenses = Array.isArray(anyItem.expenses) ? anyItem.expenses : []
   const normalizedExpenses = expenses
@@ -105,6 +106,7 @@ function migrateItem(raw) {
     model: String(model ?? ''),
     year: Number.isFinite(year) ? year : null,
     engine: String(engine ?? ''),
+    vin: String(vin ?? ''),
     category: String(anyItem.category ?? 'Diğer'),
     purchaseDate: String(anyItem.purchaseDate ?? ''),
     purchasePrice: Number(anyItem.purchasePrice ?? 0),

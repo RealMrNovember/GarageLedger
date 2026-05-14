@@ -8,6 +8,7 @@ type TradeItem = {
   model: string
   year: number | null
   engine: string
+  vin: string
   category: string
   purchaseDate: string
   status: 'in_stock' | 'reserved' | 'sold'

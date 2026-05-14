@@ -34,6 +34,9 @@ export function TradeFormModal({
   const [model, setModel] = useState('')
   const [year, setYear] = useState<number | ''>('')
   const [engine, setEngine] = useState('')
+  const [vin, setVin] = useState('')
+  const [vinLoading, setVinLoading] = useState(false)
+  const [vinToast, setVinToast] = useState<string | null>(null)
   const [sellerContactId, setSellerContactId] = useState<string | null>(null)
   const [sellerName, setSellerName] = useState('')
   const [sellerPhone, setSellerPhone] = useState('')
@@ -80,6 +83,9 @@ export function TradeFormModal({
       setModel('')
       setYear('')
       setEngine('')
+      setVin('')
+      setVinLoading(false)
+      setVinToast(null)
       setSellerContactId(null)
       setSellerName('')
       setSellerPhone('')
@@ -125,6 +131,9 @@ export function TradeFormModal({
     setModel(initial.model ?? '')
     setYear(initial.year ?? '')
     setEngine(initial.engine ?? '')
+    setVin(initial.vin ?? '')
+    setVinLoading(false)
+    setVinToast(null)
     setSellerContactId(initial.sellerContactId ?? null)
     setSellerName(initial.sellerName ?? '')
     setSellerPhone(initial.sellerPhone ?? '')
@@ -241,6 +250,64 @@ export function TradeFormModal({
 
   const canSaveContact = contactName.trim().length > 0 || contactPhone.trim().length > 0
 
+  const showVinToast = (key: string) => {
+    setVinToast(t(key))
+    window.setTimeout(() => setVinToast(null), 2800)
+  }
+
+  const decodeVin = async () => {
+    const v = vin.trim().toUpperCase()
+    if (!v) return
+    setVinToast(null)
+    setVinLoading(true)
+    try {
+      const ctrl = new AbortController()
+      const timeout = window.setTimeout(() => ctrl.abort(), 9000)
+      const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(v)}?format=json`, {
+        signal: ctrl.signal,
+      })
+      window.clearTimeout(timeout)
+      if (!res.ok) {
+        showVinToast('vinDecoder.notFound')
+        return
+      }
+      const json = (await res.json()) as { Results?: Array<Record<string, string | null | undefined>> }
+      const r = json?.Results?.[0]
+      if (!r || typeof r !== 'object') {
+        showVinToast('vinDecoder.notFound')
+        return
+      }
+
+      const make = String(r.Make ?? '').trim()
+      const nextModel = String(r.Model ?? '').trim()
+      const yearRaw = String(r.ModelYear ?? '').trim()
+      const displacement = String(r.DisplacementL ?? '').trim()
+      const fuel = String(r.FuelTypePrimary ?? '').trim()
+
+      const parsedYear = Number(yearRaw)
+      const yearValue = Number.isFinite(parsedYear) && parsedYear > 1900 ? parsedYear : null
+
+      const hasAny = Boolean(make || nextModel || yearValue || displacement || fuel)
+      if (!hasAny) {
+        showVinToast('vinDecoder.notFound')
+        return
+      }
+
+      if (make) setBrand(make)
+      if (nextModel) setModel(nextModel)
+      if (yearValue != null) setYear(yearValue)
+
+      const dispPart = displacement ? `${displacement}L` : ''
+      const fuelPart = fuel ? fuel : ''
+      const combined = [dispPart, fuelPart].filter(Boolean).join(' · ')
+      if (combined) setEngine(combined)
+    } catch {
+      showVinToast('vinDecoder.notFound')
+    } finally {
+      setVinLoading(false)
+    }
+  }
+
   return (
     <>
       <Modal
@@ -268,6 +335,7 @@ export function TradeFormModal({
                 model: model.trim(),
                 year: year === '' ? null : Number(year),
                 engine: engine.trim(),
+                vin: vin.trim(),
                 category: resolvedCategory,
                 purchaseDate,
                 status,
@@ -324,6 +392,7 @@ export function TradeFormModal({
                   model: tradeInModel.trim(),
                   year: tradeInYear === '' ? null : Number(tradeInYear),
                   engine: tradeInEngine.trim(),
+                  vin: '',
                   category: resolvedCategory,
                   purchaseDate: sellDate,
                   status: 'in_stock',
@@ -397,6 +466,56 @@ export function TradeFormModal({
               placeholder={t('tradeForm.fields.enginePlaceholder')}
               className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
             />
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-xs font-medium text-slate-600">{t('vinDecoder.vinLabel')}</div>
+            {vinToast ? <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{vinToast}</div> : null}
+          </div>
+          <div className="mt-2 flex items-stretch gap-2">
+            <input
+              value={vin}
+              onChange={(e) => setVin(e.target.value)}
+              placeholder={t('vinDecoder.vinPlaceholder')}
+              className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none placeholder:text-[var(--tf-ink-muted)] focus:border-black/20 dark:focus:border-white/20"
+            />
+            <button
+              type="button"
+              onClick={() => void decodeVin()}
+              disabled={vinLoading || vin.trim().length < 5}
+              className={[
+                'inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border px-4 text-sm font-semibold transition duration-200',
+                'border-[var(--tf-border)] bg-[var(--tf-surface)]/60 text-[var(--tf-ink)] hover:bg-black/5 dark:hover:bg-white/5',
+                'disabled:cursor-not-allowed disabled:opacity-60',
+              ].join(' ')}
+            >
+              {vinLoading ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/20 border-t-black/60 dark:border-white/20 dark:border-t-white/60" />
+                  {t('vinDecoder.loading')}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-80">
+                    <path
+                      d="M9 3l1.2 5.4L16 10l-5.4 1.2L9 17l-1.2-5.8L2 10l5.8-1.6L9 3z"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M18 4l.7 2.9L22 8l-3.3.8L18 12l-.7-3.2L14 8l3.3-1.1L18 4z"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  {t('vinDecoder.fetch')}
+                </span>
+              )}
+            </button>
           </div>
         </div>
 

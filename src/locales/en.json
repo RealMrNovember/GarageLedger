@@ -371,6 +371,13 @@
       "expenseDescPlaceholder": "Description (e.g. paint, inspection, service)"
     }
   },
+  "vinDecoder": {
+    "vinLabel": "VIN (Chassis No)",
+    "vinPlaceholder": "Enter VIN",
+    "fetch": "Fetch details",
+    "loading": "Fetching…",
+    "notFound": "No info found, please enter manually."
+  },
   "about": {
     "title": "About",
     "desc": "Offline inventory and finance tracking app.",

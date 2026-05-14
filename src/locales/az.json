@@ -371,6 +371,13 @@
       "expenseDescPlaceholder": "Açıqlama (məs: boya, ekspertiza, servis)"
     }
   },
+  "vinDecoder": {
+    "vinLabel": "Şassi No (VIN)",
+    "vinPlaceholder": "VIN daxil edin",
+    "fetch": "Məlumatları Gətir",
+    "loading": "Gətirilir…",
+    "notFound": "Məlumat tapılmadı, zəhmət olmasa manual daxil edin."
+  },
   "about": {
     "title": "Haqqında",
     "desc": "Çevrimdışı inventar və maliyyə izləmə tətbiqi.",

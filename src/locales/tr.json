@@ -371,6 +371,13 @@
       "expenseDescPlaceholder": "Açıklama (örn: Boya, ekspertiz, bakım)"
     }
   },
+  "vinDecoder": {
+    "vinLabel": "Şasi No (VIN)",
+    "vinPlaceholder": "VIN girin",
+    "fetch": "Bilgileri Getir",
+    "loading": "Getiriliyor…",
+    "notFound": "Bilgi bulunamadı, lütfen manuel giriniz."
+  },
   "about": {
     "title": "Hakkında",
     "desc": "Çevrimdışı envanter ve finans takip uygulaması.",
