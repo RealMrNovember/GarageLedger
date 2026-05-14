@@ -98,7 +98,8 @@
       {
         "provider": "github",
         "owner": "RealMrNovember",
-        "repo": "GarageLedger"
+        "repo": "GarageLedger",
+        "releaseType": "release"
       }
     ]
   }
