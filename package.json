@@ -17,8 +17,7 @@
     "build": "tsc -b && vite build",
     "dist": "npm run icons && npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis",
     "publish": "npm run icons && npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis --publish always",
-    "release": "git push && npm run publish",
-    "release:minor": "npm version minor && git push --follow-tags && npm run publish",
+    "release": "npm version minor && git push --follow-tags && npm run publish",
     "lint": "eslint .",
     "preview": "vite preview"
   },

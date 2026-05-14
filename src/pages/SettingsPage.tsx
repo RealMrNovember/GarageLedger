@@ -94,15 +94,15 @@ export function SettingsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <div className="text-sm font-semibold text-slate-900">{t('settings.title')}</div>
+        <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.title')}</div>
       </div>
 
       <Card className="p-5">
-        <div className="text-xs font-medium text-slate-600">{t('settings.language')}</div>
+        <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.language')}</div>
         <select
           value={current}
           onChange={(e) => void i18n.changeLanguage(e.target.value)}
-          className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
+          className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
         >
           {languages.map((lng) => (
             <option key={lng} value={lng}>
@@ -115,12 +115,12 @@ export function SettingsPage() {
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-sm font-semibold text-slate-900">{t('updates.title')}</div>
-            <div className="mt-1 text-xs text-slate-500">{t('updates.subtitle')}</div>
-            <div className="mt-2 text-xs text-slate-500">
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('updates.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('updates.subtitle')}</div>
+            <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">
               {t('updates.currentVersion', { version: appVersion ? `v${appVersion}` : '—' })}
             </div>
-            <div className="mt-1 text-xs text-slate-500">{t('updates.lastCheck', { value: lastUpdateCheckLabel })}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('updates.lastCheck', { value: lastUpdateCheckLabel })}</div>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -143,10 +143,10 @@ export function SettingsPage() {
 
         <div className="mt-4">
           {status.state === 'checking' ? (
-            <div className="text-sm text-slate-700">{t('updates.checking')}</div>
+            <div className="text-sm text-[var(--tf-ink)]">{t('updates.checking')}</div>
           ) : status.state === 'downloading' ? (
             <div className="space-y-2">
-              <div className="text-sm text-slate-700">{t('updates.downloading', { percent: progress ?? 0 })}</div>
+              <div className="text-sm text-[var(--tf-ink)]">{t('updates.downloading', { percent: progress ?? 0 })}</div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-black/10">
                 <div
                   className="h-full rounded-full bg-[var(--tf-accent)] transition-[width] duration-200"
@@ -155,7 +155,7 @@ export function SettingsPage() {
               </div>
             </div>
           ) : status.state === 'downloaded' ? (
-            <div className="rounded-2xl border border-[var(--tf-border)] bg-white/60 p-4 text-sm text-slate-800">
+            <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 p-4 text-sm text-[var(--tf-ink)]">
               {t('updates.downloaded', { version: versionLabel })}
             </div>
           ) : status.state === 'upToDate' ? (
@@ -167,11 +167,11 @@ export function SettingsPage() {
               {t('updates.error', { message: status.message ?? '' })}
             </div>
           ) : status.state === 'dev' ? (
-            <div className="rounded-2xl border border-[var(--tf-border)] bg-white/60 p-4 text-sm text-slate-700">
+            <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 p-4 text-sm text-[var(--tf-ink)]">
               {t('updates.dev')}
             </div>
           ) : (
-            <div className="text-xs text-slate-500">{t('updates.idle')}</div>
+            <div className="text-xs text-[var(--tf-ink-muted)]">{t('updates.idle')}</div>
           )}
         </div>
       </Card>
@@ -179,8 +179,8 @@ export function SettingsPage() {
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-sm font-semibold text-slate-900">{t('backups.title')}</div>
-            <div className="mt-1 text-xs text-slate-500">{t('backups.subtitle')}</div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('backups.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('backups.subtitle')}</div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -233,20 +233,20 @@ export function SettingsPage() {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="text-xs text-slate-500">{t('backups.last', { value: lastBackupLabel })}</div>
-          <div className="text-xs text-slate-500">{t('backups.count', { count: backupItems.length })}</div>
+          <div className="text-xs text-[var(--tf-ink-muted)]">{t('backups.last', { value: lastBackupLabel })}</div>
+          <div className="text-xs text-[var(--tf-ink-muted)]">{t('backups.count', { count: backupItems.length })}</div>
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-white/40">
+        <div className="mt-4 overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/40">
           {backupItems.length === 0 ? (
-            <div className="px-4 py-4 text-sm text-slate-600">{t('backups.empty')}</div>
+            <div className="px-4 py-4 text-sm text-[var(--tf-ink-muted)]">{t('backups.empty')}</div>
           ) : (
             <div className="divide-y divide-[var(--tf-border)]">
               {backupItems.slice(0, 20).map((b) => (
                 <div key={b.fileName} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                   <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-slate-900">{b.fileName}</div>
-                    <div className="mt-1 text-xs text-slate-500">{new Date(b.mtimeMs).toLocaleString()}</div>
+                    <div className="truncate text-sm font-medium text-[var(--tf-ink)]">{b.fileName}</div>
+                    <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{new Date(b.mtimeMs).toLocaleString()}</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button

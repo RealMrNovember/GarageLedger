@@ -2,51 +2,45 @@
 
 ![GarageLedger](./GarageLedger.svg)
 
-GarageLedger is a premium, offline-first desktop app for garages and vehicle trading teams that want clean inventory tracking and reliable financial analytics, without losing cost history.
+GarageLedger, **Cicibyte Corp** için geliştirilen; galeriler ve araç alım-satım ekipleri için tasarlanmış **offline çalışan masaüstü ERP/CRM** uygulamasıdır. Envanterinizi, alım-satım akışlarınızı ve finansal görünümünüzü tek yerde yönetmenizi sağlar.
 
-“Garage” represents the day-to-day inventory reality. “Ledger” represents the finance truth behind every buy/sell.
+“Garage” günlük envanter gerçeğini, “Ledger” ise her işlem arkasındaki finansal muhasebe gerçeğini temsil eder.
 
-## Design Philosophy (Quiet Luxury)
+## Tasarım Dili (Quiet Luxury)
 
-GarageLedger follows a “Quiet Luxury / Digital Boutique” design approach:
+GarageLedger, “Quiet Luxury / Digital Boutique” tasarım yaklaşımını hedefler:
 
-- Deep whites and soft beiges for calm, high-trust screens
-- Minimal chrome, subtle borders, soft shadows
-- Focus on clarity and confidence: numbers first, noise last
+- “Deep Whites / Soft Beiges” ile sakin, güven veren arayüz
+- Minimal çizgiler, yumuşak gölgeler, cam efekti (glassmorphism)
+- Odak: netlik ve güven; “numbers first, noise last”
 
-## Tech Stack
+## Teknik Stack
 
 - Electron + electron-builder (Windows NSIS installer)
 - React + TypeScript + Vite
 - Tailwind CSS v4
-- LowDB (local JSON DB under userData)
-- Recharts (analytics charts)
-- i18next / react-i18next (AZ default + TR/EN/RU)
+- **LowDB** (local JSON DB, Electron userData altında)
+  - İhtiyaç halinde SQLite/SQL tabanlı depolamaya taşınabilecek şekilde tasarlanmıştır
+- Recharts (analitik grafikler)
+- i18next / react-i18next (**AZ varsayılan** + TR/EN/RU)
+- jsPDF + jspdf-autotable (profesyonel PDF raporlama)
 
-## Key Features
+## Ana Modüller & Özellikler
 
-- Multi-language: AZ (default), TR, EN, RU
-- Multi-currency: AZN (default), USD, EUR
-- Offline local database: works without internet
-- Auto-update: background update check/download via GitHub Releases (NSIS)
-- Local backups: daily automatic + manual backup/restore from Settings
-- Financial analytics:
-  - Monthly summary (bought count, investment paid, gross sales, net profit)
-  - Last 6 months comparison chart (sold count + profit)
-- Sold items keep cost history: sold records stay in the DB (not deleted)
+- **Envanter (Inventory)**: araç kayıtları, durumlar (stok / rezerve / satıldı), filtreleme ve hızlı düzenleme
+- **Finans & Analitik**: yatırım, ciro, net kâr; dashboard özetleri ve grafikler
+- **Cari CRM (Müşteriler/Rehber)**: kişi kaydı, rol (alıcı/satıcı), cari profil ve işlem geçmişi
+- **PDF Raporlama**: tarih aralığına göre antetli, tablo ve özet içeren PDF export
+- **Otomatik Güncelleme**: GitHub Releases üzerinden auto-update + uygulama içi güncelleme bildirimi
+- **Dark Mode**: yüksek kontrast, okunabilirlik odaklı “Midnight Onyx”
+- **Çoklu Dil**: AZ (default), TR, EN, RU
+- **Çoklu Para Birimi**: AZN, USD, EUR, TRY (+ online/offline kur cache)
+- **Yedekleme**: günlük otomatik yedek + Ayarlar’dan manuel yedek/geri yükleme
 
-## Screenshots
-
-Placeholders:
-
-- Dashboard (placeholder)
-- Inventory (placeholder)
-- Settings (updates + backups) (placeholder)
-
-## Installation (Client / End-User)
+## Kurulum (Windows)
 
 1) Open the GitHub Releases page and download the latest Windows installer:
-   - `GarageLedger Setup x.y.z.exe`
+   - `GarageLedger.Setup.x.y.z.exe`
 2) Run the installer wizard.
 3) If Windows asks for admin permission, allow it (per-machine install).
 4) Launch GarageLedger from Start Menu.
@@ -56,7 +50,7 @@ Important:
 - Your data is stored locally on the same Windows user profile and is not uploaded anywhere.
 - Updates do not wipe your data. Daily automatic backups add extra safety.
 
-## Data Storage & Backups
+## Veri Depolama & Yedekler
 
 GarageLedger uses Electron userData storage.
 
@@ -67,7 +61,7 @@ You can manage backups inside the app:
 
 - Settings → Backups: Create / Refresh / Open Folder / Restore
 
-## Development
+## Geliştirme
 
 ```bash
 npm install
@@ -80,9 +74,9 @@ npm run dev
 npm run dist
 ```
 
-## Release (Auto GitHub Release)
+## Release (Auto GitHub Release / Auto-Update)
 
-The release flow is automated:
+Yayın akışı otomatikleştirilmiştir:
 
 1) Ensure the working tree is clean (commit your changes first).
 2) Ensure a GitHub token is available for electron-builder publishing:
@@ -97,8 +91,14 @@ $env:GH_TOKEN="YOUR_GITHUB_TOKEN"
 npm run release
 ```
 
-This will:
+Bu komut:
 
-- bump patch version (`npm version patch`)
+- minor sürüm artırır (`npm version minor`)
 - push commits and tags (`git push --follow-tags`)
 - build and publish NSIS installer to GitHub Releases (`electron-builder --publish always`)
+
+## İletişim
+
+- Mikail | Cicibyte Corp
+- E-posta: mozkarci1991@gmail.com
+- WhatsApp: +90 535 489 50 50

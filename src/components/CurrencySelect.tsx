@@ -10,12 +10,12 @@ export function CurrencySelect({
 }) {
   const { t } = useTranslation()
   return (
-    <label className="inline-flex items-center gap-2 rounded-2xl border border-[var(--tf-border)] bg-white/70 px-3 py-2 text-sm shadow-sm dark:bg-white/5">
+    <label className="inline-flex items-center gap-2 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-3 py-2 text-sm shadow-sm">
       <span className="text-[var(--tf-ink-muted)]">{t('topbar.currency')}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as CurrencyCode)}
-        className="bg-transparent text-sm font-medium text-[var(--tf-ink)] outline-none"
+        className="rounded-xl bg-transparent px-2 py-1 text-sm font-medium text-[var(--tf-ink)] outline-none dark:bg-gray-800"
       >
         <option value="AZN">AZN</option>
         <option value="USD">USD</option>

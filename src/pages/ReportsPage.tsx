@@ -72,6 +72,21 @@ function movementTypeLabel(type: MovementType, t: (key: string) => string): stri
   return t('reports.types.sold')
 }
 
+function formatMoneyPdf(value: number, currency: CurrencyCode): string {
+  const amount = Number.isFinite(value) ? value : 0
+  const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount)
+  return `${formatted} ${currency}`
+}
+
+function sanitizePdfText(value: string): string {
+  return value
+    .replaceAll('—', '-')
+    .replaceAll('·', '-')
+    .replaceAll('→', '->')
+    .replace(/[^\x20-\x7E]/g, '')
+    .trim()
+}
+
 export function ReportsPage({ items, currency }: { items: TradeItem[]; currency: CurrencyCode }) {
   const { t } = useTranslation()
   const [preset, setPreset] = useState<PresetKey>('thisMonth')
@@ -175,34 +190,44 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
 
-    const title = 'GarageLedger Report'
-    const rangeLabel = `${resolvedRange.from} → ${resolvedRange.to}`
+    const title = 'GarageLedger — Report'
+    const rangeLabel = `${resolvedRange.from} - ${resolvedRange.to}`
+    const currencyLabel = `Currency: ${currency}`
 
     autoTable(doc, {
-      startY: 112,
+      startY: 150,
       head: [
         [
-          t('reports.table.date'),
-          t('reports.table.type'),
-          t('reports.table.vehicle'),
-          t('reports.table.purchase'),
-          t('reports.table.sale'),
-          t('reports.table.expenses'),
-          t('reports.table.profit'),
+          'Date',
+          'Type',
+          'Vehicle',
+          'Purchase',
+          'Sale',
+          'Expenses',
+          'Profit',
         ],
       ],
       body: rows.map((r) => [
         r.date,
-        movementTypeLabel(r.type, t),
-        r.vehicle,
-        formatMoney(r.purchasePrice, currency),
-        r.sellPrice == null ? '—' : formatMoney(r.sellPrice, currency),
-        r.expenses ? formatMoney(r.expenses, currency) : '—',
-        r.profit == null ? '—' : formatMoney(r.profit, currency),
+        r.type === 'purchase' ? 'Purchase' : r.type === 'reserved' ? 'Reserved' : 'Sold',
+        sanitizePdfText(r.vehicle),
+        formatMoneyPdf(r.purchasePrice, currency),
+        r.sellPrice == null ? '—' : formatMoneyPdf(r.sellPrice, currency),
+        r.expenses ? formatMoneyPdf(r.expenses, currency) : '—',
+        r.profit == null ? '—' : formatMoneyPdf(r.profit, currency),
       ]),
+      columnStyles: {
+        0: { cellWidth: 60 },
+        1: { cellWidth: 60 },
+        2: { cellWidth: 160 },
+        3: { cellWidth: 58, halign: 'right' },
+        4: { cellWidth: 58, halign: 'right' },
+        5: { cellWidth: 58, halign: 'right' },
+        6: { cellWidth: 58, halign: 'right' },
+      },
       styles: {
         font: 'helvetica',
-        fontSize: 9,
+        fontSize: 8.5,
         textColor: [30, 41, 59],
         cellPadding: 4,
       },
@@ -213,7 +238,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
       },
       alternateRowStyles: { fillColor: [250, 250, 250] },
       margin: { left: 40, right: 40 },
-      didDrawPage: () => {
+      didDrawPage: (data) => {
         doc.setFont('helvetica', 'bold')
         doc.setFontSize(16)
         doc.text(title, 40, 44)
@@ -221,13 +246,36 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(10)
         doc.text(rangeLabel, 40, 62)
+        doc.setFontSize(9)
+        doc.text(currencyLabel, 40, 78)
+
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(9)
+        doc.text(
+          `Investment: ${formatMoneyPdf(totals.investment, currency)}`,
+          40,
+          98,
+        )
+        doc.text(
+          `Revenue: ${formatMoneyPdf(totals.revenue, currency)}`,
+          40,
+          112,
+        )
+        doc.text(
+          `Net Profit: ${formatMoneyPdf(totals.netProfit, currency)}`,
+          40,
+          126,
+        )
 
         doc.setFont('helvetica', 'bold')
         doc.setFontSize(10)
         doc.text('Cicibyte Corp', pageWidth - 40, pageHeight - 22, { align: 'right' })
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(9)
+        doc.text(`Page ${data.pageNumber}`, 40, pageHeight - 22)
 
         doc.setDrawColor(226, 232, 240)
-        doc.line(40, 72, pageWidth - 40, 72)
+        doc.line(40, 136, pageWidth - 40, 136)
         doc.line(40, pageHeight - 32, pageWidth - 40, pageHeight - 32)
       },
     })
@@ -271,7 +319,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
                     }
                   }
                 }}
-                className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
               >
                 <option value="today">{t('reports.filters.presets.today')}</option>
                 <option value="thisWeek">{t('reports.filters.presets.thisWeek')}</option>
@@ -282,7 +330,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
             </div>
 
             <div className="lg:col-span-4">
-              <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-white/60 px-4 py-3 text-sm">
+              <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 px-4 py-3 text-sm">
                 <span className="text-[var(--tf-ink-muted)]">{t('reports.filters.from')}</span>
                 <input
                   type="date"
@@ -297,7 +345,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
             </div>
 
             <div className="lg:col-span-4">
-              <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-white/60 px-4 py-3 text-sm">
+              <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 px-4 py-3 text-sm">
                 <span className="text-[var(--tf-ink-muted)]">{t('reports.filters.to')}</span>
                 <input
                   type="date"
@@ -323,7 +371,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[980px] text-left text-sm">
-            <thead className="bg-white/45">
+            <thead className="bg-[var(--tf-surface)]/55">
               <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">
                 <th className="px-5 py-4">{t('reports.table.date')}</th>
                 <th className="px-5 py-4">{t('reports.table.type')}</th>
@@ -337,7 +385,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
             <tbody className="divide-y divide-[var(--tf-border)]">
               {rows.length === 0 ? (
                 <tr>
-                  <td className="px-5 py-8 text-sm text-slate-500" colSpan={7}>
+                  <td className="px-5 py-8 text-sm text-[var(--tf-ink-muted)]" colSpan={7}>
                     {t('reports.empty')}
                   </td>
                 </tr>

@@ -52,6 +52,35 @@ textarea {
   color: var(--tf-ink);
 }
 
+.dark option {
+  background-color: var(--tf-surface);
+  color: var(--tf-ink);
+}
+
+.dark input[type="date"] {
+  color-scheme: dark;
+}
+
+.dark .text-slate-900,
+.dark .text-slate-800 {
+  color: var(--tf-ink) !important;
+}
+
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: var(--tf-ink-muted) !important;
+}
+
+.dark .bg-white\/90,
+.dark .bg-white\/70,
+.dark .bg-white\/60,
+.dark .bg-white\/50,
+.dark .bg-white\/45,
+.dark .bg-white\/40 {
+  background-color: rgba(31, 41, 55, 0.72) !important;
+}
+
 .dark input::placeholder,
 .dark textarea::placeholder {
   color: rgba(229, 231, 235, 0.46);

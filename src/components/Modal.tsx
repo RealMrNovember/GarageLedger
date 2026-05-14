@@ -25,7 +25,7 @@ export function Modal({
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -44,7 +44,7 @@ export function Modal({
             transition={{ type: 'spring', stiffness: 520, damping: 38, mass: 0.9 }}
             className={['w-full', maxW].join(' ')}
           >
-            <Card className="relative flex max-h-[calc(100vh-3rem)] flex-col overflow-hidden bg-white/70 backdrop-blur-md dark:bg-[#1e1e1e]/75">
+            <Card className="relative flex max-h-[90vh] flex-col overflow-hidden bg-white/70 backdrop-blur-md dark:bg-[#1e1e1e]/75">
               <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-[var(--tf-border)] bg-white/40 px-6 py-4 backdrop-blur-md dark:bg-[#1e1e1e]/50">
                 <div className="text-sm font-semibold text-[var(--tf-ink)]">{title}</div>
                 <Button variant="ghost" onClick={onClose} className="px-3">

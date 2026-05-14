@@ -437,12 +437,12 @@ export function TradeFormModal({
                   onFocus={() => setSellerPickerOpen(true)}
                   onBlur={() => setTimeout(() => setSellerPickerOpen(false), 120)}
                   placeholder={t('tradeForm.fields.contactSearchPlaceholder')}
-                  className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+                  className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none placeholder:text-[var(--tf-ink-muted)] focus:border-black/20 dark:focus:border-white/20"
                 />
                 {sellerSelected ? (
                   <button
                     type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-900"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--tf-ink-muted)] hover:text-[var(--tf-ink)]"
                     onClick={() => {
                       setSellerContactId(null)
                       setSellerQuery('')
@@ -452,24 +452,26 @@ export function TradeFormModal({
                   </button>
                 ) : null}
                 {sellerPickerOpen && !sellerSelected ? (
-                  <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-white/90 shadow-[var(--tf-shadow)]">
+                  <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)] shadow-[var(--tf-shadow)]">
                     {filteredSellerContacts.length === 0 ? (
-                      <div className="px-4 py-3 text-sm text-slate-600">{t('tradeForm.emptyContacts')}</div>
+                      <div className="px-4 py-3 text-sm text-[var(--tf-ink-muted)]">{t('tradeForm.emptyContacts')}</div>
                     ) : (
                       <div className="divide-y divide-[var(--tf-border)]">
                         {filteredSellerContacts.map((c) => (
                           <button
                             key={c.id}
                             type="button"
-                            className="w-full px-4 py-3 text-left text-sm text-slate-800 hover:bg-black/5"
+                            className="w-full px-4 py-3 text-left text-sm text-[var(--tf-ink)] hover:bg-black/5 dark:hover:bg-white/5"
                             onClick={() => {
                               setSellerContactId(c.id)
                               setSellerQuery('')
                               setSellerPickerOpen(false)
                             }}
                           >
-                            <div className="font-semibold text-slate-900">{c.name || '—'}</div>
-                            <div className="mt-1 text-xs text-slate-500">{[c.phone, c.email].filter(Boolean).join(' · ') || '—'}</div>
+                            <div className="font-semibold text-[var(--tf-ink)]">{c.name || '—'}</div>
+                            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">
+                              {[c.phone, c.email].filter(Boolean).join(' · ') || '—'}
+                            </div>
                           </button>
                         ))}
                       </div>
@@ -479,12 +481,12 @@ export function TradeFormModal({
               </div>
             </div>
             <div>
-              <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.sellerPhone')}</div>
+              <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('tradeForm.fields.sellerPhone')}</div>
               <input
                 value={sellerPhone}
                 onChange={(e) => setSellerPhone(e.target.value)}
                 placeholder={t('tradeForm.fields.sellerPhonePlaceholder')}
-                className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+                className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none placeholder:text-[var(--tf-ink-muted)] focus:border-black/20 dark:focus:border-white/20"
               />
             </div>
           </div>
@@ -521,12 +523,12 @@ export function TradeFormModal({
                     onFocus={() => setBuyerPickerOpen(true)}
                     onBlur={() => setTimeout(() => setBuyerPickerOpen(false), 120)}
                     placeholder={t('tradeForm.fields.contactSearchPlaceholder')}
-                    className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+                  className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none placeholder:text-[var(--tf-ink-muted)] focus:border-black/20 dark:focus:border-white/20"
                   />
                   {buyerSelected ? (
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-900"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--tf-ink-muted)] hover:text-[var(--tf-ink)]"
                       onClick={() => {
                         setBuyerContactId(null)
                         setBuyerQuery('')
@@ -536,24 +538,26 @@ export function TradeFormModal({
                     </button>
                   ) : null}
                   {buyerPickerOpen && !buyerSelected ? (
-                    <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-white/90 shadow-[var(--tf-shadow)]">
+                    <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)] shadow-[var(--tf-shadow)]">
                       {filteredBuyerContacts.length === 0 ? (
-                        <div className="px-4 py-3 text-sm text-slate-600">{t('tradeForm.emptyContacts')}</div>
+                        <div className="px-4 py-3 text-sm text-[var(--tf-ink-muted)]">{t('tradeForm.emptyContacts')}</div>
                       ) : (
                         <div className="divide-y divide-[var(--tf-border)]">
                           {filteredBuyerContacts.map((c) => (
                             <button
                               key={c.id}
                               type="button"
-                              className="w-full px-4 py-3 text-left text-sm text-slate-800 hover:bg-black/5"
+                              className="w-full px-4 py-3 text-left text-sm text-[var(--tf-ink)] hover:bg-black/5 dark:hover:bg-white/5"
                               onClick={() => {
                                 setBuyerContactId(c.id)
                                 setBuyerQuery('')
                                 setBuyerPickerOpen(false)
                               }}
                             >
-                              <div className="font-semibold text-slate-900">{c.name || '—'}</div>
-                              <div className="mt-1 text-xs text-slate-500">{[c.phone, c.email].filter(Boolean).join(' · ') || '—'}</div>
+                              <div className="font-semibold text-[var(--tf-ink)]">{c.name || '—'}</div>
+                              <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">
+                                {[c.phone, c.email].filter(Boolean).join(' · ') || '—'}
+                              </div>
                             </button>
                           ))}
                         </div>
@@ -563,12 +567,12 @@ export function TradeFormModal({
                 </div>
               </div>
               <div>
-                <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.buyerPhone')}</div>
+                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('tradeForm.fields.buyerPhone')}</div>
                 <input
                   value={buyerPhone}
                   onChange={(e) => setBuyerPhone(e.target.value)}
                   placeholder={t('tradeForm.fields.buyerPhonePlaceholder')}
-                  className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+                  className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none placeholder:text-[var(--tf-ink-muted)] focus:border-black/20 dark:focus:border-white/20"
                 />
               </div>
             </div>
@@ -577,7 +581,7 @@ export function TradeFormModal({
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.category')}</div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('tradeForm.fields.category')}</div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -585,8 +589,8 @@ export function TradeFormModal({
                 className={[
                   'rounded-2xl border px-3 py-2 text-sm font-medium',
                   categoryMode === 'select'
-                    ? 'border-slate-900/20 bg-black/5 text-slate-900'
-                    : 'border-[var(--tf-border)] bg-white/60 text-slate-700 hover:bg-black/5',
+                    ? 'border-[var(--tf-border)] bg-black/5 text-[var(--tf-ink)] dark:bg-white/5'
+                    : 'border-[var(--tf-border)] bg-[var(--tf-surface)]/60 text-[var(--tf-ink-muted)] hover:bg-black/5 dark:hover:bg-white/5',
                 ].join(' ')}
               >
                 {t('tradeForm.fields.categorySelect')}
@@ -597,8 +601,8 @@ export function TradeFormModal({
                 className={[
                   'rounded-2xl border px-3 py-2 text-sm font-medium',
                   categoryMode === 'custom'
-                    ? 'border-slate-900/20 bg-black/5 text-slate-900'
-                    : 'border-[var(--tf-border)] bg-white/60 text-slate-700 hover:bg-black/5',
+                    ? 'border-[var(--tf-border)] bg-black/5 text-[var(--tf-ink)] dark:bg-white/5'
+                    : 'border-[var(--tf-border)] bg-[var(--tf-surface)]/60 text-[var(--tf-ink-muted)] hover:bg-black/5 dark:hover:bg-white/5',
                 ].join(' ')}
               >
                 {t('tradeForm.fields.categoryCustom')}
@@ -609,7 +613,7 @@ export function TradeFormModal({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
+                className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
               >
                 {categories.map((c) => (
                   <option key={c} value={c}>

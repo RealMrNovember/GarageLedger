@@ -138,7 +138,7 @@ export function InventoryPage({
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t('inventory.filters.searchPlaceholder')}
-                className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+                className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none placeholder:text-[var(--tf-ink-muted)] focus:border-black/20 dark:focus:border-white/20"
               />
             </div>
 
@@ -146,7 +146,7 @@ export function InventoryPage({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
               >
                 <option value="__all__">{t('inventory.filters.categoryAll')}</option>
                 {categories.map((c) => (
@@ -164,7 +164,7 @@ export function InventoryPage({
                   const v = e.target.value
                   if (v === '__all__' || v === 'active' || v === 'reserved' || v === 'sold') setStatus(v)
                 }}
-                className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
               >
                 <option value="__all__">{t('inventory.filters.statusAll')}</option>
                 <option value="active">{t('inventory.filters.statusInStock')}</option>
@@ -180,7 +180,7 @@ export function InventoryPage({
                   const v = e.target.value
                   if (v === '__all__' || v === 'profit' || v === 'loss' || v === 'breakEven') setProfitFilter(v)
                 }}
-                className="w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
               >
                 <option value="__all__">{t('inventory.filters.profitAll')}</option>
                 <option value="profit">{t('inventory.filters.profitProfit')}</option>
@@ -190,25 +190,25 @@ export function InventoryPage({
             </div>
 
             <div className="lg:col-span-3">
-              <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-white/60 px-4 py-3 text-sm">
-                <span className="text-slate-600">{t('inventory.filters.purchaseFrom')}</span>
+              <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 px-4 py-3 text-sm">
+                <span className="text-[var(--tf-ink-muted)]">{t('inventory.filters.purchaseFrom')}</span>
                 <input
                   type="date"
                   value={purchaseFrom}
                   onChange={(e) => setPurchaseFrom(e.target.value)}
-                  className="bg-transparent text-sm text-slate-900 outline-none"
+                  className="bg-transparent text-sm text-[var(--tf-ink)] outline-none"
                 />
               </label>
             </div>
 
             <div className="lg:col-span-3">
-              <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-white/60 px-4 py-3 text-sm">
-                <span className="text-slate-600">{t('inventory.filters.purchaseTo')}</span>
+              <label className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 px-4 py-3 text-sm">
+                <span className="text-[var(--tf-ink-muted)]">{t('inventory.filters.purchaseTo')}</span>
                 <input
                   type="date"
                   value={purchaseTo}
                   onChange={(e) => setPurchaseTo(e.target.value)}
-                  className="bg-transparent text-sm text-slate-900 outline-none"
+                  className="bg-transparent text-sm text-[var(--tf-ink)] outline-none"
                 />
               </label>
             </div>
@@ -219,7 +219,7 @@ export function InventoryPage({
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[980px] text-left text-sm">
-            <thead className="bg-white/45">
+            <thead className="bg-[var(--tf-surface)]/55">
               <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">
                 <th className="px-5 py-4">{t('inventory.table.vehicle')}</th>
                 <th className="px-5 py-4">{t('inventory.table.category')}</th>
@@ -234,7 +234,7 @@ export function InventoryPage({
             <tbody className="divide-y divide-[var(--tf-border)]">
               {filtered.length === 0 ? (
                 <tr>
-                  <td className="px-5 py-8 text-sm text-slate-500" colSpan={8}>
+                  <td className="px-5 py-8 text-sm text-[var(--tf-ink-muted)]" colSpan={8}>
                     {t('inventory.empty')}
                   </td>
                 </tr>
@@ -264,7 +264,7 @@ export function InventoryPage({
                           </div>
                         )}
                         {item.status === 'reserved' ? (
-                          <div className="mt-2 text-xs text-slate-600">
+                          <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">
                             {t('inventory.reserved.line', {
                               deposit: formatMoney(item.deposit ?? 0, currency),
                               remaining: remaining == null ? '—' : formatMoney(remaining, currency),
