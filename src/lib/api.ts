@@ -237,7 +237,11 @@ export const api = {
     const data = readLocal()
     data.settings = { ...data.settings, ...patch }
     if (patch.companyProfile) data.settings.companyProfile = { ...(data.settings.companyProfile ?? {}), ...patch.companyProfile }
-    if (patch.appLock) data.settings.appLock = { ...(data.settings.appLock ?? { enabled: false, passwordSalt: null, passwordHash: null }), ...patch.appLock }
+    if (patch.appLock)
+      data.settings.appLock = {
+        ...(data.settings.appLock ?? { enabled: false, passwordSalt: null, passwordHash: null, supportCode: null }),
+        ...patch.appLock,
+      }
     writeLocal(data)
     return data.settings
   },

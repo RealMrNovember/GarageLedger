@@ -475,6 +475,8 @@
       "current": "Current password",
       "new": "New password",
       "confirm": "Confirm password",
+      "supportCode": "Support unlock code",
+      "supportCodeHint": "Optional. If set, this code can unlock the app (for support). Requires current password to change.",
       "hint": "If you forget your password, contact support.",
       "forgot": "Forgot password?",
       "enable": "Enable",

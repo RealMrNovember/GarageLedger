@@ -229,11 +229,12 @@ export function registerIpc({ isDev } = { isDev: false }) {
     }
 
     if ('appLock' in p && p.appLock && typeof p.appLock === 'object') {
-      db.data.settings.appLock ||= { enabled: false, passwordSalt: null, passwordHash: null }
+      db.data.settings.appLock ||= { enabled: false, passwordSalt: null, passwordHash: null, supportCode: null }
       const al = p.appLock
       if ('enabled' in al) db.data.settings.appLock.enabled = Boolean(al.enabled)
       if ('passwordSalt' in al) db.data.settings.appLock.passwordSalt = al.passwordSalt == null ? null : String(al.passwordSalt)
       if ('passwordHash' in al) db.data.settings.appLock.passwordHash = al.passwordHash == null ? null : String(al.passwordHash)
+      if ('supportCode' in al) db.data.settings.appLock.supportCode = al.supportCode == null ? null : String(al.supportCode)
     }
 
     await db.write()

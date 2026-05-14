@@ -75,6 +75,7 @@ type GarageLedgerSettings = {
     enabled: boolean
     passwordSalt: string | null
     passwordHash: string | null
+    supportCode?: string | null
   }
 }
 

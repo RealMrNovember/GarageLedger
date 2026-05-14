@@ -71,6 +71,7 @@ export function SettingsPage({
   const [lockCurrent, setLockCurrent] = useState('')
   const [lockNew, setLockNew] = useState('')
   const [lockConfirm, setLockConfirm] = useState('')
+  const [supportCode, setSupportCode] = useState('')
 
   useEffect(() => {
     const api = window.GarageLedger
@@ -112,6 +113,7 @@ export function SettingsPage({
     setCompanyPhone(String(p.phone ?? ''))
     setCompanyEmail(String(p.email ?? ''))
     setCompanyWebsite(String(p.website ?? ''))
+    setSupportCode(String(settings.appLock?.supportCode ?? ''))
   }, [settings])
 
   const canUpdate = apiAvailable && Boolean(window.GarageLedger?.updates)
@@ -477,6 +479,33 @@ export function SettingsPage({
               type="password"
               className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
             />
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/40 p-4">
+          <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.lock.supportCode')}</div>
+          <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.lock.supportCodeHint')}</div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <input
+              value={supportCode}
+              onChange={(e) => setSupportCode(e.target.value)}
+              type="password"
+              className="w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+            <Button
+              variant="ghost"
+              onClick={async () => {
+                const hasExisting = Boolean(settings.appLock?.passwordHash && settings.appLock?.passwordSalt)
+                if (!hasExisting) return
+                const salt = settings.appLock?.passwordSalt ?? ''
+                const hash = settings.appLock?.passwordHash ?? ''
+                const currentHash = await hashPassword(lockCurrent, salt)
+                if (currentHash !== hash) return
+                await onUpdateSettings({ appLock: { ...(settings.appLock ?? { enabled: false, passwordSalt: null, passwordHash: null }), supportCode: supportCode.trim() || null } })
+              }}
+            >
+              {t('settings.company.save')}
+            </Button>
           </div>
         </div>
 

@@ -475,6 +475,8 @@
       "current": "Cari parol",
       "new": "Yeni parol",
       "confirm": "Yeni parol (təkrar)",
+      "supportCode": "Dəstək açma kodu",
+      "supportCodeHint": "Opsional. Ayarlanarsa bu kod ilə tətbiqi açmaq olar. Dəyişmək üçün cari parol lazımdır.",
       "hint": "Parolu unutduqda dəstəyə müraciət edin.",
       "forgot": "Parolu Unutdum",
       "enable": "Aktiv et",

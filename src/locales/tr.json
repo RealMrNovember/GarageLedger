@@ -475,6 +475,8 @@
       "current": "Mevcut parola",
       "new": "Yeni parola",
       "confirm": "Yeni parola (tekrar)",
+      "supportCode": "Destek açma kodu",
+      "supportCodeHint": "Opsiyonel. Ayarlanırsa bu kod ile uygulama açılabilir. Değiştirmek için mevcut parola gerekir.",
       "hint": "Parolanızı unutursanız destek ile iletişime geçin.",
       "forgot": "Parolamı Unuttum",
       "enable": "Etkinleştir",

@@ -93,6 +93,13 @@ export default function App() {
 
   const unlock = async () => {
     setLockError('')
+    const supportCode = String(settings.appLock?.supportCode ?? '').trim()
+    if (supportCode && lockPassword.trim() === supportCode) {
+      setLockPassword('')
+      setLockUnlocked(true)
+      setLockOpen(false)
+      return
+    }
     const salt = settings.appLock?.passwordSalt ?? ''
     const hash = settings.appLock?.passwordHash ?? ''
     if (!salt || !hash) {

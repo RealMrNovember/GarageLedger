@@ -12,7 +12,7 @@ const defaultData = {
     lastBackupAt: null,
     lastUpdateCheckAt: null,
     companyProfile: { name: '', logoDataUrl: '', address: '', phone: '', email: '', website: '' },
-    appLock: { enabled: false, passwordSalt: null, passwordHash: null },
+    appLock: { enabled: false, passwordSalt: null, passwordHash: null, supportCode: null },
   },
 }
 
@@ -244,12 +244,13 @@ export async function getDb() {
       if (!('website' in p)) p.website = ''
     }
     if (!('appLock' in db.data.settings) || !db.data.settings.appLock) {
-      db.data.settings.appLock = { enabled: false, passwordSalt: null, passwordHash: null }
+      db.data.settings.appLock = { enabled: false, passwordSalt: null, passwordHash: null, supportCode: null }
     } else {
       const l = db.data.settings.appLock
       if (!('enabled' in l)) l.enabled = false
       if (!('passwordSalt' in l)) l.passwordSalt = null
       if (!('passwordHash' in l)) l.passwordHash = null
+      if (!('supportCode' in l)) l.supportCode = null
     }
     db.data.items = db.data.items.map(migrateItem).filter(Boolean)
     db.data.contacts = db.data.contacts.map(migrateContact).filter(Boolean)
