@@ -80,6 +80,8 @@
           ]
         }
       ],
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false,
       "artifactName": "GarageLedger.Setup.${version}.${ext}",
       "icon": "build/icon.ico"
     },
