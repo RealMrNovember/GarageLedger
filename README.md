@@ -28,9 +28,12 @@ GarageLedger, “Quiet Luxury / Digital Boutique” tasarım yaklaşımını hed
 ## Ana Modüller & Özellikler
 
 - **Envanter (Inventory)**: araç kayıtları, durumlar (stok / rezerve / satıldı), filtreleme ve hızlı düzenleme
+- **VIN Decoder (NHTSA)**: şasi no (VIN) ile araç bilgilerini otomatik doldurma (Marka/Model/Yıl/Motor)
 - **Finans & Analitik**: yatırım, ciro, net kâr; dashboard özetleri ve grafikler
 - **Cari CRM (Müşteriler/Rehber)**: kişi kaydı, rol (alıcı/satıcı), cari profil ve işlem geçmişi
-- **PDF Raporlama**: tarih aralığına göre antetli, tablo ve özet içeren PDF export
+- **Şirket Profili (White‑Label)**: şirket adı/logo/adres/iletişim bilgileri ile kişiselleştirilmiş raporlar
+- **PDF Raporlama**: tarih aralığına göre antetli (logo + şirket bilgileri), tablo + özet içeren profesyonel PDF export
+- **Uygulama Kilidi**: parola ile giriş kilidi (unutma durumunda destek yönlendirmesi)
 - **Otomatik Güncelleme**: GitHub Releases üzerinden auto-update + uygulama içi güncelleme bildirimi
 - **Dark Mode**: yüksek kontrast, okunabilirlik odaklı “Midnight Onyx”
 - **Çoklu Dil**: AZ (default), TR, EN, RU
