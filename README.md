@@ -2,7 +2,7 @@
 
 ![GarageLedger](./GarageLedger.svg)
 
-GarageLedger, **Cicibyte Corp** için geliştirilen; galeriler ve araç alım-satım ekipleri için tasarlanmış **offline çalışan masaüstü ERP/CRM** uygulamasıdır. Envanterinizi, alım-satım akışlarınızı ve finansal görünümünüzü tek yerde yönetmenizi sağlar.
+GarageLedger, **Cicibyte Corp** tarafından geliştirilen; galeriler ve araç alım-satım ekipleri için tasarlanmış **offline çalışan masaüstü ERP/CRM** uygulamasıdır. Envanterinizi, alım-satım akışlarınızı ve finansal görünümünüzü tek yerde yönetmenizi sağlar.
 
 “Garage” günlük envanter gerçeğini, “Ledger” ise her işlem arkasındaki finansal muhasebe gerçeğini temsil eder.
 
