@@ -60,4 +60,17 @@ export type GarageLedgerSettings = {
   currency: CurrencyCode
   lastBackupAt?: string | null
   lastUpdateCheckAt?: string | null
+  companyProfile?: {
+    name?: string
+    logoDataUrl?: string
+    address?: string
+    phone?: string
+    email?: string
+    website?: string
+  }
+  appLock?: {
+    enabled: boolean
+    passwordSalt: string | null
+    passwordHash: string | null
+  }
 }

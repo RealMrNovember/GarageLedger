@@ -9,7 +9,7 @@ import { itemProfit, totalExpenses } from '../lib/compute'
 import { formatMoney } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
 import { parseIsoDate, startOfDay, toIsoDateInputValue } from '../lib/dates'
-import type { TradeItem } from '../lib/types'
+import type { GarageLedgerSettings, TradeItem } from '../lib/types'
 
 type PresetKey = 'today' | 'thisWeek' | 'thisMonth' | 'last30' | 'custom'
 type MovementType = 'purchase' | 'reserved' | 'sold'
@@ -22,6 +22,7 @@ type MovementRow = {
   sellPrice: number | null
   deposit: number | null
   expenses: number
+  expenseNotes: string
   profit: number | null
   seller: string
   buyer: string
@@ -83,11 +84,34 @@ function sanitizePdfText(value: string): string {
     .replaceAll('—', '-')
     .replaceAll('·', '-')
     .replaceAll('→', '->')
-    .replace(/[^\x20-\x7E]/g, '')
     .trim()
 }
 
-export function ReportsPage({ items, currency }: { items: TradeItem[]; currency: CurrencyCode }) {
+function expenseNotesText(item: TradeItem, currency: CurrencyCode): string {
+  const lines = (item.expenses ?? [])
+    .map((e) => {
+      const amount = Number(e.amount ?? 0)
+      const desc = String(e.description ?? '').trim()
+      if (!amount && !desc) return ''
+      if (!amount) return desc
+      if (!desc) return formatMoneyPdf(amount, currency)
+      return `${formatMoneyPdf(amount, currency)} - ${desc}`
+    })
+    .filter(Boolean)
+  return lines.join('; ')
+}
+
+type CompanyProfile = NonNullable<GarageLedgerSettings['companyProfile']>
+
+export function ReportsPage({
+  items,
+  currency,
+  companyProfile,
+}: {
+  items: TradeItem[]
+  currency: CurrencyCode
+  companyProfile?: CompanyProfile
+}) {
   const { t } = useTranslation()
   const [preset, setPreset] = useState<PresetKey>('thisMonth')
   const initial = useMemo(() => presetRange('thisMonth'), [])
@@ -119,6 +143,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
           sellPrice: null,
           deposit: null,
           expenses: totalExpenses(item),
+          expenseNotes: expenseNotesText(item, currency),
           profit: null,
           seller,
           buyer: '',
@@ -134,6 +159,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
           sellPrice: item.sellPrice,
           deposit: item.deposit,
           expenses: totalExpenses(item),
+          expenseNotes: expenseNotesText(item, currency),
           profit: null,
           seller,
           buyer,
@@ -149,6 +175,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
           sellPrice: item.sellPrice,
           deposit: null,
           expenses: totalExpenses(item),
+          expenseNotes: expenseNotesText(item, currency),
           profit: itemProfit(item),
           seller,
           buyer,
@@ -157,7 +184,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
     }
 
     return out.sort((a, b) => b.date.localeCompare(a.date))
-  }, [items, resolvedRange.from, resolvedRange.to])
+  }, [items, currency, resolvedRange.from, resolvedRange.to])
 
   const totals = useMemo(() => {
     const fromD = startOfDay(parseIsoDate(resolvedRange.from))
@@ -193,9 +220,24 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
     const title = 'GarageLedger — Report'
     const rangeLabel = `${resolvedRange.from} - ${resolvedRange.to}`
     const currencyLabel = `Currency: ${currency}`
+    const profile = companyProfile ?? {}
+    const profileLines = [profile.address, [profile.phone, profile.email, profile.website].filter(Boolean).join(' · ')]
+      .map((x) => String(x ?? '').trim())
+      .filter(Boolean)
+
+    const headerY = 44
+    const logo = String(profile.logoDataUrl ?? '').trim()
+    const headX = logo.startsWith('data:image/') ? 98 : 40
+    if (logo.startsWith('data:image/')) {
+      const mime = logo.slice(5, logo.indexOf(';'))
+      const fmt = mime === 'image/png' ? 'PNG' : mime === 'image/jpeg' ? 'JPEG' : null
+      if (fmt) {
+        doc.addImage(logo, fmt, 40, 28, 48, 48)
+      }
+    }
 
     autoTable(doc, {
-      startY: 150,
+      startY: 168,
       head: [
         [
           'Date',
@@ -204,6 +246,7 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
           'Purchase',
           'Sale',
           'Expenses',
+          'Expense Notes',
           'Profit',
         ],
       ],
@@ -214,16 +257,18 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
         formatMoneyPdf(r.purchasePrice, currency),
         r.sellPrice == null ? '—' : formatMoneyPdf(r.sellPrice, currency),
         r.expenses ? formatMoneyPdf(r.expenses, currency) : '—',
+        r.expenseNotes ? sanitizePdfText(r.expenseNotes) : '—',
         r.profit == null ? '—' : formatMoneyPdf(r.profit, currency),
       ]),
       columnStyles: {
-        0: { cellWidth: 60 },
-        1: { cellWidth: 60 },
-        2: { cellWidth: 160 },
-        3: { cellWidth: 58, halign: 'right' },
-        4: { cellWidth: 58, halign: 'right' },
-        5: { cellWidth: 58, halign: 'right' },
-        6: { cellWidth: 58, halign: 'right' },
+        0: { cellWidth: 52 },
+        1: { cellWidth: 52 },
+        2: { cellWidth: 140 },
+        3: { cellWidth: 56, halign: 'right' },
+        4: { cellWidth: 56, halign: 'right' },
+        5: { cellWidth: 56, halign: 'right' },
+        6: { cellWidth: 110 },
+        7: { cellWidth: 56, halign: 'right' },
       },
       styles: {
         font: 'helvetica',
@@ -239,17 +284,23 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
       alternateRowStyles: { fillColor: [250, 250, 250] },
       margin: { left: 40, right: 40 },
       didDrawPage: (data) => {
+        const companyName = String(profile.name ?? '').trim()
         doc.setFont('helvetica', 'bold')
         doc.setFontSize(16)
-        doc.text(title, 40, 44)
+        doc.text(companyName || title, headX, headerY)
 
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(10)
-        doc.text(rangeLabel, 40, 62)
+        doc.text(title, headX, headerY + 16)
         doc.setFontSize(9)
-        doc.text(currencyLabel, 40, 78)
+        doc.text(rangeLabel, headX, headerY + 32)
+        doc.text(currencyLabel, headX, headerY + 46)
 
-        doc.setFont('helvetica', 'bold')
+        if (profileLines.length) {
+          doc.setFontSize(9)
+          doc.text(profileLines[0] ?? '', 40, 92)
+          if (profileLines[1]) doc.text(profileLines[1], 40, 106)
+        }
         doc.setFontSize(9)
         doc.text(
           `Investment: ${formatMoneyPdf(totals.investment, currency)}`,
@@ -269,13 +320,13 @@ export function ReportsPage({ items, currency }: { items: TradeItem[]; currency:
 
         doc.setFont('helvetica', 'bold')
         doc.setFontSize(10)
-        doc.text('Cicibyte Corp', pageWidth - 40, pageHeight - 22, { align: 'right' })
+        doc.text('GarageLedger | Cicibyte Corp', pageWidth - 40, pageHeight - 22, { align: 'right' })
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(9)
         doc.text(`Page ${data.pageNumber}`, 40, pageHeight - 22)
 
         doc.setDrawColor(226, 232, 240)
-        doc.line(40, 136, pageWidth - 40, 136)
+        doc.line(40, 144, pageWidth - 40, 144)
         doc.line(40, pageHeight - 32, pageWidth - 40, pageHeight - 32)
       },
     })

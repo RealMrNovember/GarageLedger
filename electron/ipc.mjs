@@ -205,4 +205,38 @@ export function registerIpc({ isDev } = { isDev: false }) {
     await db.write()
     return db.data.settings
   })
+
+  ipcMain.handle('garageledger:settings:update', async (_evt, patch) => {
+    const db = await getDb()
+    const p = patch && typeof patch === 'object' ? patch : {}
+
+    if ('currency' in p && (p.currency === 'AZN' || p.currency === 'USD' || p.currency === 'EUR' || p.currency === 'TRY')) {
+      db.data.settings.currency = p.currency
+    }
+
+    if ('lastBackupAt' in p) db.data.settings.lastBackupAt = p.lastBackupAt == null ? null : String(p.lastBackupAt)
+    if ('lastUpdateCheckAt' in p) db.data.settings.lastUpdateCheckAt = p.lastUpdateCheckAt == null ? null : String(p.lastUpdateCheckAt)
+
+    if ('companyProfile' in p && p.companyProfile && typeof p.companyProfile === 'object') {
+      db.data.settings.companyProfile ||= { name: '', logoDataUrl: '', address: '', phone: '', email: '', website: '' }
+      const cp = p.companyProfile
+      if ('name' in cp) db.data.settings.companyProfile.name = String(cp.name ?? '')
+      if ('logoDataUrl' in cp) db.data.settings.companyProfile.logoDataUrl = String(cp.logoDataUrl ?? '')
+      if ('address' in cp) db.data.settings.companyProfile.address = String(cp.address ?? '')
+      if ('phone' in cp) db.data.settings.companyProfile.phone = String(cp.phone ?? '')
+      if ('email' in cp) db.data.settings.companyProfile.email = String(cp.email ?? '')
+      if ('website' in cp) db.data.settings.companyProfile.website = String(cp.website ?? '')
+    }
+
+    if ('appLock' in p && p.appLock && typeof p.appLock === 'object') {
+      db.data.settings.appLock ||= { enabled: false, passwordSalt: null, passwordHash: null }
+      const al = p.appLock
+      if ('enabled' in al) db.data.settings.appLock.enabled = Boolean(al.enabled)
+      if ('passwordSalt' in al) db.data.settings.appLock.passwordSalt = al.passwordSalt == null ? null : String(al.passwordSalt)
+      if ('passwordHash' in al) db.data.settings.appLock.passwordHash = al.passwordHash == null ? null : String(al.passwordHash)
+    }
+
+    await db.write()
+    return db.data.settings
+  })
 }

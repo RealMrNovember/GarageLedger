@@ -62,6 +62,19 @@ type GarageLedgerSettings = {
   currency: CurrencyCode
   lastBackupAt?: string | null
   lastUpdateCheckAt?: string | null
+  companyProfile?: {
+    name?: string
+    logoDataUrl?: string
+    address?: string
+    phone?: string
+    email?: string
+    website?: string
+  }
+  appLock?: {
+    enabled: boolean
+    passwordSalt: string | null
+    passwordHash: string | null
+  }
 }
 
 type GarageLedgerApi = {
@@ -78,6 +91,7 @@ type GarageLedgerApi = {
   settings: {
     get: () => Promise<GarageLedgerSettings>
     setCurrency: (currency: CurrencyCode) => Promise<GarageLedgerSettings>
+    update: (patch: Partial<GarageLedgerSettings>) => Promise<GarageLedgerSettings>
   }
   app: {
     getInfo: () => Promise<{ version: string; name: string; isPackaged: boolean }>

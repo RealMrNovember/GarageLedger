@@ -4,7 +4,17 @@ import { app } from 'electron'
 import { Low } from 'lowdb'
 import { JSONFile } from 'lowdb/node'
 
-const defaultData = { items: [], contacts: [], settings: { currency: 'AZN', lastBackupAt: null, lastUpdateCheckAt: null } }
+const defaultData = {
+  items: [],
+  contacts: [],
+  settings: {
+    currency: 'AZN',
+    lastBackupAt: null,
+    lastUpdateCheckAt: null,
+    companyProfile: { name: '', logoDataUrl: '', address: '', phone: '', email: '', website: '' },
+    appLock: { enabled: false, passwordSalt: null, passwordHash: null },
+  },
+}
 
 let dbPromise
 
@@ -220,6 +230,25 @@ export async function getDb() {
     if (!db.data.settings.currency) db.data.settings.currency = 'AZN'
     if (!('lastBackupAt' in db.data.settings)) db.data.settings.lastBackupAt = null
     if (!('lastUpdateCheckAt' in db.data.settings)) db.data.settings.lastUpdateCheckAt = null
+    if (!('companyProfile' in db.data.settings) || !db.data.settings.companyProfile) {
+      db.data.settings.companyProfile = { name: '', logoDataUrl: '', address: '', phone: '', email: '', website: '' }
+    } else {
+      const p = db.data.settings.companyProfile
+      if (!('name' in p)) p.name = ''
+      if (!('logoDataUrl' in p)) p.logoDataUrl = ''
+      if (!('address' in p)) p.address = ''
+      if (!('phone' in p)) p.phone = ''
+      if (!('email' in p)) p.email = ''
+      if (!('website' in p)) p.website = ''
+    }
+    if (!('appLock' in db.data.settings) || !db.data.settings.appLock) {
+      db.data.settings.appLock = { enabled: false, passwordSalt: null, passwordHash: null }
+    } else {
+      const l = db.data.settings.appLock
+      if (!('enabled' in l)) l.enabled = false
+      if (!('passwordSalt' in l)) l.passwordSalt = null
+      if (!('passwordHash' in l)) l.passwordHash = null
+    }
     db.data.items = db.data.items.map(migrateItem).filter(Boolean)
     db.data.contacts = db.data.contacts.map(migrateContact).filter(Boolean)
     ensureContactsFromItems({ items: db.data.items, contacts: db.data.contacts })

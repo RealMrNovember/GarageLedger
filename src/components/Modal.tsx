@@ -1,6 +1,7 @@
 import type { PropsWithChildren, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
+import { createPortal } from 'react-dom'
 import { Card } from './Card'
 import { Button } from './Button'
 
@@ -21,7 +22,7 @@ export function Modal({
   const { t } = useTranslation()
   const maxW = maxWidthClassName?.trim() || 'max-w-xl'
 
-  return (
+  const content = (
     <AnimatePresence>
       {open ? (
         <motion.div
@@ -63,4 +64,7 @@ export function Modal({
       ) : null}
     </AnimatePresence>
   )
+
+  if (typeof document === 'undefined') return content
+  return createPortal(content, document.body)
 }

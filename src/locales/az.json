@@ -375,7 +375,16 @@
     "title": "Haqqında",
     "desc": "Çevrimdışı inventar və maliyyə izləmə tətbiqi.",
     "logoPlaceholder": "Cicibyte Corp logo placeholder",
+    "createdBy": "Created By",
     "close": "Bağla"
+  },
+  "lock": {
+    "title": "Tətbiq kilidlidir",
+    "subtitle": "Davam etmək üçün parolu daxil edin.",
+    "password": "Parol",
+    "unlock": "Kilidi Aç",
+    "forgot": "Parolu Unutdum",
+    "error": "Parol yanlışdır."
   },
   "whatsNew": {
     "title": "Nə Yenilik Var? ({{version}})",
@@ -437,6 +446,33 @@
       "toggle": "Tema dəyişdir",
       "light": "Açıq",
       "dark": "Qaranlıq"
+    },
+    "company": {
+      "title": "Şirkət Profili",
+      "subtitle": "Şirkət məlumatları və logo hesabatlara əlavə olunur.",
+      "name": "Şirkət adı",
+      "logo": "Logo",
+      "logoHint": "Logo bu cihazda yerli saxlanır.",
+      "removeLogo": "Sil",
+      "address": "Ünvan",
+      "phone": "Telefon",
+      "email": "E-poçt",
+      "website": "Veb sayt",
+      "save": "Yadda saxla"
+    },
+    "lock": {
+      "title": "Tətbiq Kilidi",
+      "subtitle": "Tətbiqə giriş üçün parol tələb et.",
+      "enabled": "Aktiv",
+      "disabled": "Deaktiv",
+      "current": "Cari parol",
+      "new": "Yeni parol",
+      "confirm": "Yeni parol (təkrar)",
+      "hint": "Parolu unutduqda dəstəyə müraciət edin.",
+      "forgot": "Parolu Unutdum",
+      "enable": "Aktiv et",
+      "change": "Dəyiş",
+      "disable": "Söndür"
     },
     "languages": {
       "az": "AZ — Azərbaycan",

@@ -37,7 +37,7 @@ type UpdateStatus =
 
 export default function App() {
   const { t } = useTranslation()
-  const { ready, items, contacts, currency, setCurrency, upsertItem, upsertContact, removeItem } = useGarageLedger()
+  const { ready, items, contacts, currency, settings, setCurrency, updateSettings, upsertItem, upsertContact, removeItem } = useGarageLedger()
   const categories = useMemo(() => uniqueCategories(items), [items])
   const [nav, setNav] = useState<NavKey>('dashboard')
   const [aboutOpen, setAboutOpen] = useState(false)
@@ -48,6 +48,14 @@ export default function App() {
   const [updateModalOpen, setUpdateModalOpen] = useState(false)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>({ state: 'idle' })
   const updateVersion = 'version' in updateStatus ? updateStatus.version : ''
+  const [lockOpen, setLockOpen] = useState(false)
+  const [lockUnlocked, setLockUnlocked] = useState(false)
+  const [lockPassword, setLockPassword] = useState('')
+  const [lockError, setLockError] = useState('')
+
+  const lockEnabled = Boolean(
+    settings.appLock?.enabled && settings.appLock.passwordSalt && settings.appLock.passwordHash,
+  )
   const whatsNewSections = useMemo(() => {
     const raw = t('whatsNew.sections', { returnObjects: true }) as unknown
     if (!Array.isArray(raw)) return []
@@ -73,6 +81,51 @@ export default function App() {
   useEffect(() => {
     void refreshFxRates().then(() => setFxTick(Date.now()))
   }, [])
+
+  useEffect(() => {
+    if (!ready) return
+    if (lockEnabled && !lockUnlocked) setLockOpen(true)
+    if (!lockEnabled) {
+      setLockOpen(false)
+      setLockUnlocked(false)
+    }
+  }, [ready, lockEnabled, lockUnlocked])
+
+  const unlock = async () => {
+    setLockError('')
+    const salt = settings.appLock?.passwordSalt ?? ''
+    const hash = settings.appLock?.passwordHash ?? ''
+    if (!salt || !hash) {
+      setLockOpen(false)
+      return
+    }
+    try {
+      const enc = new TextEncoder()
+      const key = await crypto.subtle.importKey('raw', enc.encode(lockPassword), { name: 'PBKDF2' }, false, ['deriveBits'])
+      const bin = atob(salt)
+      const saltBytes = new Uint8Array(bin.length)
+      for (let i = 0; i < bin.length; i += 1) saltBytes[i] = bin.charCodeAt(i)
+      const saltBuf = saltBytes.buffer.slice(saltBytes.byteOffset, saltBytes.byteOffset + saltBytes.byteLength) as ArrayBuffer
+      const bits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt: saltBuf, iterations: 200_000, hash: 'SHA-256' },
+        key,
+        256,
+      )
+      const outBytes = new Uint8Array(bits)
+      let out = ''
+      for (const b of outBytes) out += String.fromCharCode(b)
+      const derived = btoa(out)
+      if (derived !== hash) {
+        setLockError(t('lock.error'))
+        return
+      }
+      setLockPassword('')
+      setLockUnlocked(true)
+      setLockOpen(false)
+    } catch {
+      setLockError(t('lock.error'))
+    }
+  }
 
   useEffect(() => {
     const api = window.GarageLedger
@@ -156,7 +209,7 @@ export default function App() {
                     onUpsertContact={(contact) => void upsertContact(contact)}
                   />
                 ) : nav === 'reports' ? (
-                  <ReportsPage items={items} currency={currency} />
+                  <ReportsPage items={items} currency={currency} companyProfile={settings.companyProfile} />
                 ) : nav === 'customers' ? (
                   <CustomersPage
                     items={items}
@@ -167,7 +220,7 @@ export default function App() {
                 ) : nav === 'help' ? (
                   <HelpPage />
                 ) : (
-                  <SettingsPage />
+                  <SettingsPage settings={settings} onUpdateSettings={(patch) => updateSettings(patch)} />
                 )}
               </motion.div>
             </AnimatePresence>
@@ -178,15 +231,91 @@ export default function App() {
       </div>
 
       <Modal title={t('about.title')} open={aboutOpen} onClose={() => setAboutOpen(false)}>
-        <div className="flex items-start gap-4">
-          <Logo size={42} />
-          <div className="space-y-2">
-            <div className="text-sm font-semibold text-slate-900">{t('app.name')}</div>
-            <div className="text-sm text-slate-600">{t('about.desc')}</div>
-            <div className="text-xs text-slate-500">{t('about.logoPlaceholder')}</div>
+        <div className="space-y-4">
+          <div className="flex items-start gap-4">
+            <Logo size={44} />
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-[var(--tf-ink)]">Cicibyte Corp</div>
+              <div className="mt-1 text-sm text-[var(--tf-ink-muted)]">{t('about.desc')}</div>
+              <div className="mt-2 text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('about.createdBy')}</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <a
+              href="https://github.com/RealMrNovember"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
+            >
+              <span>GitHub</span>
+              <span className="text-xs text-[var(--tf-ink-muted)]">RealMrNovember</span>
+            </a>
+            <a
+              href="mailto:mozkarci1991@gmail.com"
+              className="flex items-center justify-between rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
+            >
+              <span>Email</span>
+              <span className="text-xs text-[var(--tf-ink-muted)]">mozkarci1991@gmail.com</span>
+            </a>
+            <a
+              href="https://wa.me/905354895050"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
+            >
+              <span>WhatsApp</span>
+              <span className="text-xs text-[var(--tf-ink-muted)]">+90 535 489 50 50</span>
+            </a>
           </div>
         </div>
       </Modal>
+
+      {lockOpen ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/10 backdrop-blur-md dark:bg-black/60" />
+          <div className="relative w-full max-w-md rounded-3xl border border-[var(--tf-border)] bg-white/70 p-6 shadow-[var(--tf-shadow)] backdrop-blur-md dark:bg-[#1e1e1e]/80">
+            <div className="flex items-start gap-4">
+              <Logo size={42} />
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('lock.title')}</div>
+                <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('lock.subtitle')}</div>
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('lock.password')}</div>
+              <input
+                value={lockPassword}
+                onChange={(e) => setLockPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') void unlock()
+                }}
+                type="password"
+                className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+              />
+              {lockError ? <div className="mt-2 text-xs font-semibold text-rose-600">{lockError}</div> : null}
+            </div>
+
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
+              <button
+                type="button"
+                className="text-xs font-semibold text-[var(--tf-ink)] underline decoration-[var(--tf-border)] underline-offset-4"
+                onClick={() => window.open('https://wa.me/905354895050', '_blank', 'noreferrer')}
+              >
+                {t('lock.forgot')}
+              </button>
+              <button
+                type="button"
+                className="rounded-2xl bg-[var(--tf-accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-[0.5px] hover:shadow-md dark:text-black dark:hover:bg-[#b89145]"
+                onClick={() => void unlock()}
+              >
+                {t('lock.unlock')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <Modal
         title={t('whatsNew.title', { version: `v${whatsNewVersion}` })}

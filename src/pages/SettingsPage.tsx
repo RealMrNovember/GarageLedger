@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { i18n } from '../i18n'
+import type { GarageLedgerSettings } from '../lib/types'
 
 const languages = ['az', 'tr', 'en', 'ru'] as const
 type Lang = (typeof languages)[number]
@@ -19,16 +20,57 @@ type UpdateStatus =
 
 type BackupItem = { fileName: string; fullPath: string; size: number; mtimeMs: number }
 
-export function SettingsPage() {
+function base64FromBytes(bytes: Uint8Array): string {
+  let s = ''
+  for (const b of bytes) s += String.fromCharCode(b)
+  return btoa(s)
+}
+
+function bytesFromBase64(b64: string): Uint8Array {
+  const bin = atob(b64)
+  const out = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i += 1) out[i] = bin.charCodeAt(i)
+  return out
+}
+
+async function hashPassword(password: string, saltB64: string): Promise<string> {
+  const enc = new TextEncoder()
+  const key = await crypto.subtle.importKey('raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits'])
+  const salt = bytesFromBase64(saltB64)
+  const saltBuf = salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength) as ArrayBuffer
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt: saltBuf, iterations: 200_000, hash: 'SHA-256' },
+    key,
+    256,
+  )
+  return base64FromBytes(new Uint8Array(bits))
+}
+
+export function SettingsPage({
+  settings,
+  onUpdateSettings,
+}: {
+  settings: GarageLedgerSettings
+  onUpdateSettings: (patch: Partial<GarageLedgerSettings>) => Promise<GarageLedgerSettings>
+}) {
   const { t } = useTranslation()
   const current = (i18n.language as Lang) || 'az'
   const [status, setStatus] = useState<UpdateStatus>({ state: 'idle' })
   const [backupItems, setBackupItems] = useState<BackupItem[]>([])
   const [backupBusy, setBackupBusy] = useState(false)
-  const [lastBackupAt, setLastBackupAt] = useState<string | null>(null)
-  const [lastUpdateCheckAt, setLastUpdateCheckAt] = useState<string | null>(null)
+  const [lastBackupAt, setLastBackupAt] = useState<string | null>(settings.lastBackupAt ?? null)
+  const [lastUpdateCheckAt, setLastUpdateCheckAt] = useState<string | null>(settings.lastUpdateCheckAt ?? null)
   const [appVersion, setAppVersion] = useState<string | null>(null)
   const [apiAvailable, setApiAvailable] = useState(false)
+  const [companyName, setCompanyName] = useState('')
+  const [companyLogo, setCompanyLogo] = useState('')
+  const [companyAddress, setCompanyAddress] = useState('')
+  const [companyPhone, setCompanyPhone] = useState('')
+  const [companyEmail, setCompanyEmail] = useState('')
+  const [companyWebsite, setCompanyWebsite] = useState('')
+  const [lockCurrent, setLockCurrent] = useState('')
+  const [lockNew, setLockNew] = useState('')
+  const [lockConfirm, setLockConfirm] = useState('')
 
   useEffect(() => {
     const api = window.GarageLedger
@@ -47,14 +89,11 @@ export function SettingsPage() {
     if (!api?.backups?.list) return
 
     const load = async () => {
-      const [settings, list, info, s] = await Promise.all([
-        api.settings.get(),
+      const [list, info, s] = await Promise.all([
         api.backups.list(),
         api.app?.getInfo?.(),
         api.updates?.getStatus?.(),
       ])
-      setLastBackupAt(settings.lastBackupAt ?? null)
-      setLastUpdateCheckAt(settings.lastUpdateCheckAt ?? null)
       setAppVersion(info?.version ?? null)
       if (list.ok) setBackupItems(list.items)
       if (s && typeof s === 'object' && 'state' in s) setStatus(s as UpdateStatus)
@@ -62,6 +101,18 @@ export function SettingsPage() {
 
     void load()
   }, [])
+
+  useEffect(() => {
+    setLastBackupAt(settings.lastBackupAt ?? null)
+    setLastUpdateCheckAt(settings.lastUpdateCheckAt ?? null)
+    const p = settings.companyProfile ?? {}
+    setCompanyName(String(p.name ?? ''))
+    setCompanyLogo(String(p.logoDataUrl ?? ''))
+    setCompanyAddress(String(p.address ?? ''))
+    setCompanyPhone(String(p.phone ?? ''))
+    setCompanyEmail(String(p.email ?? ''))
+    setCompanyWebsite(String(p.website ?? ''))
+  }, [settings])
 
   const canUpdate = apiAvailable && Boolean(window.GarageLedger?.updates)
   const canBackup = apiAvailable && Boolean(window.GarageLedger?.backups)
@@ -127,7 +178,10 @@ export function SettingsPage() {
               onClick={async () => {
                 await window.GarageLedger?.updates?.check()
                 const settings = await window.GarageLedger?.settings?.get()
-                if (settings) setLastUpdateCheckAt(settings.lastUpdateCheckAt ?? null)
+                if (settings) {
+                  setLastUpdateCheckAt(settings.lastUpdateCheckAt ?? null)
+                  await onUpdateSettings({ lastUpdateCheckAt: settings.lastUpdateCheckAt ?? null })
+                }
               }}
               disabled={!canUpdate || status.state === 'checking' || status.state === 'downloading'}
             >
@@ -191,8 +245,9 @@ export function SettingsPage() {
                   if (!api?.backups) return
                   const created = await api.backups.create()
                   const list = await api.backups.list()
-                  const settings = await api.settings.get()
-                  setLastBackupAt(settings.lastBackupAt ?? null)
+                  const nextSettings = await api.settings.get()
+                  setLastBackupAt(nextSettings.lastBackupAt ?? null)
+                  await onUpdateSettings({ lastBackupAt: nextSettings.lastBackupAt ?? null })
                   if (list.ok) setBackupItems(list.items)
                   if (!created.ok) setBackupBusy(false)
                 } finally {
@@ -211,8 +266,9 @@ export function SettingsPage() {
                   const api = window.GarageLedger
                   if (!api?.backups) return
                   const list = await api.backups.list()
-                  const settings = await api.settings.get()
-                  setLastBackupAt(settings.lastBackupAt ?? null)
+                  const nextSettings = await api.settings.get()
+                  setLastBackupAt(nextSettings.lastBackupAt ?? null)
+                  await onUpdateSettings({ lastBackupAt: nextSettings.lastBackupAt ?? null })
                   if (list.ok) setBackupItems(list.items)
                 } finally {
                   setBackupBusy(false)
@@ -258,8 +314,11 @@ export function SettingsPage() {
                         try {
                           const res = await window.GarageLedger?.backups?.restore(b.fileName)
                           const list = await window.GarageLedger?.backups?.list()
-                          const settings = await window.GarageLedger?.settings?.get()
-                          if (settings) setLastBackupAt(settings.lastBackupAt ?? null)
+                          const nextSettings = await window.GarageLedger?.settings?.get()
+                          if (nextSettings) {
+                            setLastBackupAt(nextSettings.lastBackupAt ?? null)
+                            await onUpdateSettings({ lastBackupAt: nextSettings.lastBackupAt ?? null })
+                          }
                           if (list?.ok) setBackupItems(list.items)
                           if (!res?.ok) setBackupBusy(false)
                         } finally {
@@ -275,6 +334,207 @@ export function SettingsPage() {
               ))}
             </div>
           )}
+        </div>
+      </Card>
+
+      <Card className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.company.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.company.subtitle')}</div>
+          </div>
+          <Button
+            onClick={async () => {
+              await onUpdateSettings({
+                companyProfile: {
+                  name: companyName.trim(),
+                  logoDataUrl: companyLogo.trim(),
+                  address: companyAddress.trim(),
+                  phone: companyPhone.trim(),
+                  email: companyEmail.trim(),
+                  website: companyWebsite.trim(),
+                },
+              })
+            }}
+          >
+            {t('settings.company.save')}
+          </Button>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.name')}</div>
+            <input
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.website')}</div>
+            <input
+              value={companyWebsite}
+              onChange={(e) => setCompanyWebsite(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div className="lg:col-span-2">
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.address')}</div>
+            <textarea
+              value={companyAddress}
+              onChange={(e) => setCompanyAddress(e.target.value)}
+              rows={3}
+              className="mt-2 w-full resize-none rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.phone')}</div>
+            <input
+              value={companyPhone}
+              onChange={(e) => setCompanyPhone(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.email')}</div>
+            <input
+              value={companyEmail}
+              onChange={(e) => setCompanyEmail(e.target.value)}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div className="lg:col-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.company.logo')}</div>
+              {companyLogo ? (
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-[var(--tf-ink)] underline decoration-[var(--tf-border)] underline-offset-4"
+                  onClick={() => setCompanyLogo('')}
+                >
+                  {t('settings.company.removeLogo')}
+                </button>
+              ) : null}
+            </div>
+            <input
+              type="file"
+              accept="image/png,image/jpeg"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                const reader = new FileReader()
+                reader.onload = () => setCompanyLogo(String(reader.result ?? ''))
+                reader.readAsDataURL(file)
+              }}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2 text-sm text-[var(--tf-ink)] outline-none"
+            />
+            {companyLogo ? (
+              <div className="mt-3 flex items-center gap-3 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/40 p-3">
+                <img src={companyLogo} alt="logo" className="h-10 w-10 rounded-xl object-cover" />
+                <div className="text-xs text-[var(--tf-ink-muted)]">{t('settings.company.logoHint')}</div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.lock.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.lock.subtitle')}</div>
+          </div>
+          <div className="rounded-full border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-3 py-1 text-xs font-semibold text-[var(--tf-ink)]">
+            {settings.appLock?.enabled ? t('settings.lock.enabled') : t('settings.lock.disabled')}
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.lock.current')}</div>
+            <input
+              value={lockCurrent}
+              onChange={(e) => setLockCurrent(e.target.value)}
+              type="password"
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div />
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.lock.new')}</div>
+            <input
+              value={lockNew}
+              onChange={(e) => setLockNew(e.target.value)}
+              type="password"
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.lock.confirm')}</div>
+            <input
+              value={lockConfirm}
+              onChange={(e) => setLockConfirm(e.target.value)}
+              type="password"
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs text-[var(--tf-ink-muted)]">{t('settings.lock.hint')}</div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                window.open('https://wa.me/905354895050', '_blank', 'noreferrer')
+              }}
+            >
+              {t('settings.lock.forgot')}
+            </Button>
+            <Button
+              onClick={async () => {
+                const hasExisting = Boolean(settings.appLock?.passwordHash && settings.appLock?.passwordSalt)
+                if (lockNew.trim().length < 4) return
+                if (lockNew !== lockConfirm) return
+
+                if (hasExisting) {
+                  const salt = settings.appLock?.passwordSalt ?? ''
+                  const hash = settings.appLock?.passwordHash ?? ''
+                  const currentHash = await hashPassword(lockCurrent, salt)
+                  if (currentHash !== hash) return
+                }
+
+                const saltBytes = new Uint8Array(16)
+                crypto.getRandomValues(saltBytes)
+                const saltB64 = base64FromBytes(saltBytes)
+                const newHash = await hashPassword(lockNew, saltB64)
+                await onUpdateSettings({ appLock: { enabled: true, passwordSalt: saltB64, passwordHash: newHash } })
+                setLockCurrent('')
+                setLockNew('')
+                setLockConfirm('')
+              }}
+            >
+              {settings.appLock?.enabled ? t('settings.lock.change') : t('settings.lock.enable')}
+            </Button>
+            {settings.appLock?.enabled ? (
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  const salt = settings.appLock?.passwordSalt ?? ''
+                  const hash = settings.appLock?.passwordHash ?? ''
+                  if (!salt || !hash) return
+                  const currentHash = await hashPassword(lockCurrent, salt)
+                  if (currentHash !== hash) return
+                  await onUpdateSettings({ appLock: { enabled: false, passwordSalt: null, passwordHash: null } })
+                  setLockCurrent('')
+                  setLockNew('')
+                  setLockConfirm('')
+                }}
+              >
+                {t('settings.lock.disable')}
+              </Button>
+            ) : null}
+          </div>
         </div>
       </Card>
     </div>

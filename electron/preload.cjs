@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('GarageLedger', {
   settings: {
     get: () => ipcRenderer.invoke('garageledger:settings:get'),
     setCurrency: (currency) => ipcRenderer.invoke('garageledger:settings:setCurrency', currency),
+    update: (patch) => ipcRenderer.invoke('garageledger:settings:update', patch),
   },
   app: {
     getInfo: () => ipcRenderer.invoke('garageledger:app:getInfo'),

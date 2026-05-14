@@ -375,7 +375,16 @@
     "title": "About",
     "desc": "Offline inventory and finance tracking app.",
     "logoPlaceholder": "Cicibyte Corp logo placeholder",
+    "createdBy": "Created by",
     "close": "Close"
+  },
+  "lock": {
+    "title": "App locked",
+    "subtitle": "Enter your password to continue.",
+    "password": "Password",
+    "unlock": "Unlock",
+    "forgot": "Forgot password?",
+    "error": "Incorrect password."
   },
   "whatsNew": {
     "title": "What's New? ({{version}})",
@@ -437,6 +446,33 @@
       "toggle": "Toggle theme",
       "light": "Light",
       "dark": "Dark"
+    },
+    "company": {
+      "title": "Company Profile",
+      "subtitle": "Your company name and logo will appear on reports.",
+      "name": "Company name",
+      "logo": "Logo",
+      "logoHint": "Logo is stored locally on this device.",
+      "removeLogo": "Remove",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "website": "Website",
+      "save": "Save"
+    },
+    "lock": {
+      "title": "App Lock",
+      "subtitle": "Require a password before accessing the app.",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm password",
+      "hint": "If you forget your password, contact support.",
+      "forgot": "Forgot password?",
+      "enable": "Enable",
+      "change": "Change",
+      "disable": "Disable"
     },
     "languages": {
       "az": "AZ — Azərbaycan",

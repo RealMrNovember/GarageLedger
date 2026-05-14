@@ -375,7 +375,16 @@
     "title": "Hakkında",
     "desc": "Çevrimdışı envanter ve finans takip uygulaması.",
     "logoPlaceholder": "Cicibyte Corp logo placeholder",
+    "createdBy": "Created By",
     "close": "Kapat"
+  },
+  "lock": {
+    "title": "Uygulama kilitli",
+    "subtitle": "Devam etmek için parolanızı girin.",
+    "password": "Parola",
+    "unlock": "Kilidi Aç",
+    "forgot": "Parolamı Unuttum",
+    "error": "Parola hatalı."
   },
   "whatsNew": {
     "title": "Neler Yeni? ({{version}})",
@@ -437,6 +446,33 @@
       "toggle": "Tema değiştir",
       "light": "Açık",
       "dark": "Koyu"
+    },
+    "company": {
+      "title": "Şirket Profili",
+      "subtitle": "Şirket bilgileri ve logonuz raporlara eklenir.",
+      "name": "Şirket adı",
+      "logo": "Logo",
+      "logoHint": "Logo bu cihazda yerel olarak saklanır.",
+      "removeLogo": "Kaldır",
+      "address": "Adres",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "website": "Web sitesi",
+      "save": "Kaydet"
+    },
+    "lock": {
+      "title": "Uygulama Kilidi",
+      "subtitle": "Uygulamaya girmek için parola zorunlu olsun.",
+      "enabled": "Açık",
+      "disabled": "Kapalı",
+      "current": "Mevcut parola",
+      "new": "Yeni parola",
+      "confirm": "Yeni parola (tekrar)",
+      "hint": "Parolanızı unutursanız destek ile iletişime geçin.",
+      "forgot": "Parolamı Unuttum",
+      "enable": "Etkinleştir",
+      "change": "Değiştir",
+      "disable": "Devre Dışı Bırak"
     },
     "languages": {
       "az": "AZ — Azərbaycan",

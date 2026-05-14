@@ -230,4 +230,13 @@ export const api = {
     writeLocal(data)
     return data.settings
   },
+  async updateSettings(patch: Partial<GarageLedgerSettings>): Promise<GarageLedgerSettings> {
+    if (window.GarageLedger) return window.GarageLedger.settings.update(patch)
+    const data = readLocal()
+    data.settings = { ...data.settings, ...patch }
+    if (patch.companyProfile) data.settings.companyProfile = { ...(data.settings.companyProfile ?? {}), ...patch.companyProfile }
+    if (patch.appLock) data.settings.appLock = { ...(data.settings.appLock ?? { enabled: false, passwordSalt: null, passwordHash: null }), ...patch.appLock }
+    writeLocal(data)
+    return data.settings
+  },
 }
