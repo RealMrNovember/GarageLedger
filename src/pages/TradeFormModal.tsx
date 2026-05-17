@@ -314,6 +314,9 @@ export function TradeFormModal({
         title={isEdit ? t('tradeForm.editTitle') : t('tradeForm.createTitle')}
         open={open}
         onClose={onClose}
+        draggable
+        maximizable
+        maxWidthClassName="max-w-5xl"
         footer={
           <div className="flex items-center justify-end gap-2">
             <Button variant="ghost" onClick={onClose}>
@@ -428,26 +431,29 @@ export function TradeFormModal({
         }
       >
       <div className="grid grid-cols-1 gap-4">
-        <div>
-          <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.brand')}</div>
-          <input
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            placeholder={t('tradeForm.fields.brandPlaceholder')}
-            className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
-          />
-        </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.brand')}</div>
+            <input
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              placeholder={t('tradeForm.fields.brandPlaceholder')}
+              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 dark:border-white/10 dark:bg-gray-900 dark:focus:border-white/30"
+            />
+          </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div>
             <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.model')}</div>
             <input
               value={model}
               onChange={(e) => setModel(e.target.value)}
               placeholder={t('tradeForm.fields.modelPlaceholder')}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 dark:border-white/10 dark:bg-gray-900 dark:focus:border-white/30"
             />
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.year')}</div>
             <input
@@ -455,7 +461,7 @@ export function TradeFormModal({
               value={year}
               onChange={(e) => setYear(e.target.value === '' ? '' : Number(e.target.value))}
               placeholder={t('tradeForm.fields.yearPlaceholder')}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 dark:border-white/10 dark:bg-gray-900 dark:focus:border-white/30"
             />
           </div>
           <div>
@@ -464,7 +470,7 @@ export function TradeFormModal({
               value={engine}
               onChange={(e) => setEngine(e.target.value)}
               placeholder={t('tradeForm.fields.enginePlaceholder')}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-slate-900/20"
+              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 dark:border-white/10 dark:bg-gray-900 dark:focus:border-white/30"
             />
           </div>
         </div>

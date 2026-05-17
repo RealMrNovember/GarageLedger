@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
+import { Modal } from '../components/Modal'
 import { formatMoney } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
 import { itemProfit, isInStock, reservedRemainingBalance } from '../lib/compute'
@@ -51,6 +52,7 @@ export function InventoryPage({
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<TradeItem | undefined>(undefined)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null)
 
   const [q, setQ] = useState('')
   const [category, setCategory] = useState<string>('__all__')
@@ -217,9 +219,9 @@ export function InventoryPage({
       </Card>
 
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="max-h-[70vh] overflow-auto">
           <table className="w-full min-w-[980px] text-left text-sm">
-            <thead className="bg-[var(--tf-surface)]/55">
+            <thead className="sticky top-0 z-10 bg-[var(--tf-bg)]/95 backdrop-blur">
               <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">
                 <th className="px-5 py-4">{t('inventory.table.vehicle')}</th>
                 <th className="px-5 py-4">{t('inventory.table.category')}</th>
@@ -247,7 +249,10 @@ export function InventoryPage({
                   const remaining = reservedRemainingBalance(item)
 
                   return (
-                    <tr key={item.id} className="bg-[var(--tf-surface)]/40 transition duration-200 hover:bg-black/3 dark:hover:bg-white/5">
+                    <tr
+                      key={item.id}
+                      className="bg-[var(--tf-surface)]/40 transition duration-200 hover:bg-black/4 dark:hover:bg-white/5"
+                    >
                       <td className="px-5 py-4">
                         <div className="font-medium text-[var(--tf-ink)]">{formatVehicle(item)}</div>
                         {item.status === 'reserved' ? (
@@ -288,18 +293,32 @@ export function InventoryPage({
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
+                          <button
+                            type="button"
+                            aria-label={t('inventory.actions.edit')}
+                            title={t('inventory.actions.edit')}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
                             onClick={() => {
                               setEditing(item)
                               setOpen(true)
                             }}
                           >
-                            {t('inventory.actions.edit')}
-                          </Button>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path
+                                d="M4 20h4l10.6-10.6a1.5 1.5 0 0 0 0-2.1L16.7 4.4a1.5 1.5 0 0 0-2.1 0L4 15v5z"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinejoin="round"
+                              />
+                              <path d="M13.5 5.5l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                            </svg>
+                          </button>
                           {inStock ? (
-                            <Button
-                              variant="ghost"
+                            <button
+                              type="button"
+                              aria-label={t('inventory.actions.markSold')}
+                              title={t('inventory.actions.markSold')}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
                               onClick={() => {
                                 setEditing({
                                   ...item,
@@ -312,19 +331,24 @@ export function InventoryPage({
                                 setOpen(true)
                               }}
                             >
-                              {t('inventory.actions.markSold')}
-                            </Button>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M20 7L10 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </button>
                           ) : (
-                            <Button
-                              variant="ghost"
-                              onClick={() => {
-                                const ok = window.confirm(t('inventory.actions.deleteConfirm'))
-                                if (!ok) return
-                                onRemove(item.id)
-                              }}
+                            <button
+                              type="button"
+                              aria-label={t('inventory.actions.delete')}
+                              title={t('inventory.actions.delete')}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 text-rose-700 transition duration-200 hover:-translate-y-[0.5px] hover:bg-rose-600/10 dark:text-rose-300 dark:hover:bg-rose-400/10"
+                              onClick={() => setDeleteTarget({ id: item.id, label: formatVehicle(item) })}
                             >
-                              {t('inventory.actions.delete')}
-                            </Button>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M6 7h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                                <path d="M10 7V5h4v2" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                                <path d="M8 7l1 14h6l1-14" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                              </svg>
+                            </button>
                           )}
                         </div>
                       </td>
@@ -346,6 +370,40 @@ export function InventoryPage({
         onSubmit={onUpsert}
         onUpsertContact={onUpsertContact}
       />
+
+      <Modal
+        title={t('inventory.actions.delete')}
+        open={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        maxWidthClassName="max-w-lg"
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <button
+              type="button"
+              className="rounded-2xl border border-[var(--tf-border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:bg-black/5 dark:bg-gray-950 dark:hover:bg-white/5"
+              onClick={() => setDeleteTarget(null)}
+            >
+              {t('common.close')}
+            </button>
+            <button
+              type="button"
+              className="rounded-2xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-[0.5px] hover:bg-rose-700 hover:shadow-md"
+              onClick={() => {
+                if (!deleteTarget) return
+                onRemove(deleteTarget.id)
+                setDeleteTarget(null)
+              }}
+            >
+              {t('inventory.actions.delete')}
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-2">
+          <div className="text-sm text-[var(--tf-ink)]">{t('inventory.actions.deleteConfirm')}</div>
+          {deleteTarget?.label ? <div className="text-xs text-[var(--tf-ink-muted)]">{deleteTarget.label}</div> : null}
+        </div>
+      </Modal>
     </div>
   )
 }

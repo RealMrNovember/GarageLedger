@@ -83,8 +83,22 @@ function migrateItem(raw: unknown): TradeItem | null {
     id: String(anyItem.id ?? ''),
     brand: String(brand ?? ''),
     model: String(model ?? ''),
+    package: String((anyItem.package as string | undefined) ?? ''),
     year,
     engine: String(engine ?? ''),
+    fuel: String((anyItem.fuel as string | undefined) ?? ''),
+    transmission: String((anyItem.transmission as string | undefined) ?? ''),
+    mileage:
+      anyItem.mileage == null ? null : Number.isFinite(Number(anyItem.mileage)) ? Number(anyItem.mileage) : null,
+    color: String((anyItem.color as string | undefined) ?? ''),
+    damage: String((anyItem.damage as string | undefined) ?? ''),
+    tramer: String((anyItem.tramer as string | undefined) ?? ''),
+    notes: String((anyItem.notes as string | undefined) ?? ''),
+    location: String((anyItem.location as string | undefined) ?? ''),
+    plate: String((anyItem.plate as string | undefined) ?? ''),
+    keyCount:
+      anyItem.keyCount == null ? null : Number.isFinite(Number(anyItem.keyCount)) ? Number(anyItem.keyCount) : null,
+    inspection: String((anyItem.inspection as string | undefined) ?? ''),
     vin: String(vin ?? ''),
     category: String(anyItem.category ?? 'Diğer'),
     purchaseDate: String(anyItem.purchaseDate ?? ''),
@@ -111,6 +125,8 @@ function migrateItem(raw: unknown): TradeItem | null {
     buyerPhone: String(buyerPhone ?? ''),
     sellDate: sellDate ? String(sellDate) : null,
     sellPrice: sellPrice == null ? null : Number(sellPrice),
+    tax: anyItem.tax == null ? null : Number.isFinite(Number(anyItem.tax)) ? Number(anyItem.tax) : null,
+    commission: anyItem.commission == null ? null : Number.isFinite(Number(anyItem.commission)) ? Number(anyItem.commission) : null,
     expenses,
   }
 }
@@ -180,17 +196,53 @@ function writeLocal(data: StoredData) {
   localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(data))
 }
 
+async function tryElectron<T>(fn: () => Promise<T>): Promise<T | null> {
+  try {
+    return await fn()
+  } catch {
+    return null
+  }
+}
+
 export const api = {
   async listItems(): Promise<TradeItem[]> {
-    if (window.GarageLedger) return window.GarageLedger.items.list()
+    const gl = window.GarageLedger
+    const getInitial = gl?.bootstrap?.getInitialData
+    if (getInitial) {
+      const res = await tryElectron(() => getInitial())
+      if (res && typeof res === 'object' && 'ok' in res && (res as { ok: boolean }).ok && 'items' in res) {
+        const anyRes = res as { items?: TradeItem[] }
+        if (Array.isArray(anyRes.items)) return anyRes.items
+      }
+    }
+    if (gl?.items?.list) {
+      const res = await tryElectron(() => gl.items.list())
+      if (Array.isArray(res)) return res
+    }
     return readLocal().items
   },
   async listContacts(): Promise<Contact[]> {
-    if (window.GarageLedger) return window.GarageLedger.contacts.list()
+    const gl = window.GarageLedger
+    const getInitial = gl?.bootstrap?.getInitialData
+    if (getInitial) {
+      const res = await tryElectron(() => getInitial())
+      if (res && typeof res === 'object' && 'ok' in res && (res as { ok: boolean }).ok && 'contacts' in res) {
+        const anyRes = res as { contacts?: Contact[] }
+        if (Array.isArray(anyRes.contacts)) return anyRes.contacts
+      }
+    }
+    if (gl?.contacts?.list) {
+      const res = await tryElectron(() => gl.contacts.list())
+      if (Array.isArray(res)) return res
+    }
     return readLocal().contacts
   },
   async upsertItem(item: TradeItem): Promise<TradeItem[]> {
-    if (window.GarageLedger) return window.GarageLedger.items.upsert(item)
+    const gl = window.GarageLedger
+    if (gl?.items?.upsert) {
+      const res = await tryElectron(() => gl.items.upsert(item))
+      if (Array.isArray(res)) return res
+    }
     const data = readLocal()
     const idx = data.items.findIndex((x) => x.id === item.id)
     if (idx >= 0) data.items[idx] = item
@@ -199,7 +251,11 @@ export const api = {
     return data.items
   },
   async upsertContact(contact: Contact): Promise<Contact[]> {
-    if (window.GarageLedger) return window.GarageLedger.contacts.upsert(contact)
+    const gl = window.GarageLedger
+    if (gl?.contacts?.upsert) {
+      const res = await tryElectron(() => gl.contacts.upsert(contact))
+      if (Array.isArray(res)) return res
+    }
     const data = readLocal()
     const idx = data.contacts.findIndex((x) => x.id === contact.id)
     if (idx >= 0) data.contacts[idx] = contact
@@ -208,32 +264,60 @@ export const api = {
     return data.contacts
   },
   async removeItem(id: string): Promise<TradeItem[]> {
-    if (window.GarageLedger) return window.GarageLedger.items.remove(id)
+    const gl = window.GarageLedger
+    if (gl?.items?.remove) {
+      const res = await tryElectron(() => gl.items.remove(id))
+      if (Array.isArray(res)) return res
+    }
     const data = readLocal()
     data.items = data.items.filter((x) => x.id !== id)
     writeLocal(data)
     return data.items
   },
   async removeContact(id: string): Promise<Contact[]> {
-    if (window.GarageLedger) return window.GarageLedger.contacts.remove(id)
+    const gl = window.GarageLedger
+    if (gl?.contacts?.remove) {
+      const res = await tryElectron(() => gl.contacts.remove(id))
+      if (Array.isArray(res)) return res
+    }
     const data = readLocal()
     data.contacts = data.contacts.filter((x) => x.id !== id)
     writeLocal(data)
     return data.contacts
   },
   async getSettings(): Promise<GarageLedgerSettings> {
-    if (window.GarageLedger) return window.GarageLedger.settings.get()
+    const gl = window.GarageLedger
+    const getInitial = gl?.bootstrap?.getInitialData
+    if (getInitial) {
+      const res = await tryElectron(() => getInitial())
+      if (res && typeof res === 'object' && 'ok' in res && (res as { ok: boolean }).ok && 'settings' in res) {
+        const anyRes = res as { settings?: GarageLedgerSettings }
+        if (anyRes.settings && typeof anyRes.settings === 'object') return anyRes.settings
+      }
+    }
+    if (gl?.settings?.get) {
+      const res = await tryElectron(() => gl.settings.get())
+      if (res && typeof res === 'object') return res as GarageLedgerSettings
+    }
     return readLocal().settings
   },
   async setCurrency(currency: CurrencyCode): Promise<GarageLedgerSettings> {
-    if (window.GarageLedger) return window.GarageLedger.settings.setCurrency(currency)
+    const gl = window.GarageLedger
+    if (gl?.settings?.setCurrency) {
+      const res = await tryElectron(() => gl.settings.setCurrency(currency))
+      if (res && typeof res === 'object') return res as GarageLedgerSettings
+    }
     const data = readLocal()
     data.settings.currency = currency
     writeLocal(data)
     return data.settings
   },
   async updateSettings(patch: Partial<GarageLedgerSettings>): Promise<GarageLedgerSettings> {
-    if (window.GarageLedger) return window.GarageLedger.settings.update(patch)
+    const gl = window.GarageLedger
+    if (gl?.settings?.update) {
+      const res = await tryElectron(() => gl.settings.update(patch))
+      if (res && typeof res === 'object') return res as GarageLedgerSettings
+    }
     const data = readLocal()
     data.settings = { ...data.settings, ...patch }
     if (patch.companyProfile) data.settings.companyProfile = { ...(data.settings.companyProfile ?? {}), ...patch.companyProfile }

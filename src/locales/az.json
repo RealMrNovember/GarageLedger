@@ -1,6 +1,8 @@
 {
   "common": {
-    "close": "Bağla"
+    "close": "Bağla",
+    "maximize": "Böyüt",
+    "restore": "Geri al"
   },
   "app": {
     "name": "GarageLedger",
@@ -12,7 +14,7 @@
     "reports": "Hesabatlar",
     "customers": "Müştərilər",
     "help": "Yardım",
-    "settings": "Ayarlar"
+    "settings": "Tənzimləmələr"
   },
   "topbar": {
     "currency": "Valyuta",
@@ -20,18 +22,18 @@
   },
   "dashboard": {
     "stats": {
-      "activeCount": "Aktiv Nəqliyyat Sayı",
-      "investment": "Ümumi İnvestisiya",
-      "monthProfit": "Bu Ayın Mənfəəti",
-      "purchasedCount": "Bu Ay Alınan Avto",
-      "monthInvestment": "Toplam Yatırım (Ödənən)",
-      "monthRevenue": "Ümumi Satış (Ciro)",
-      "monthNetProfit": "Net Kâr"
+      "activeCount": "Aktiv avtomobil sayı",
+      "investment": "Ümumi investisiya",
+      "monthProfit": "Bu ayın mənfəəti",
+      "purchasedCount": "Bu ay alınan avtomobil",
+      "monthInvestment": "Ümumi investisiya (ödənilən)",
+      "monthRevenue": "Ümumi satış (dövriyyə)",
+      "monthNetProfit": "Xalis mənfəət"
     },
     "charts": {
       "weekly": "Həftəlik Mənfəət/Zərər",
       "monthly": "Aylıq Mənfəət/Zərər",
-      "sixMonth": "Son 6 Ay: Satış Adedi & Kâr"
+      "sixMonth": "Son 6 ay: satış sayı və mənfəət"
     }
   },
   "inventory": {
@@ -44,11 +46,11 @@
     },
     "filters": {
       "title": "Filtrlər",
-      "searchPlaceholder": "Axtar: Marka / Model",
+      "searchPlaceholder": "Axtar: marka / model",
       "categoryAll": "Bütün kateqoriyalar",
       "statusAll": "Bütün statuslar",
-      "statusInStock": "Stokda",
-      "statusReserved": "Rezerve",
+      "statusInStock": "Anbarda",
+      "statusReserved": "Rezerv",
       "statusSold": "Satıldı",
       "profitAll": "Hamısı (Mənfəət/Zərər)",
       "profitProfit": "Yalnız mənfəət",
@@ -60,7 +62,7 @@
       "results": "{{count}} qeyd"
     },
     "table": {
-      "vehicle": "Avto Məlumatı",
+      "vehicle": "Avtomobil məlumatı",
       "category": "Kateqoriya",
       "purchaseDate": "Alış Tarixi",
       "saleDate": "Satış Tarixi",
@@ -75,8 +77,8 @@
       "deleteConfirm": "Bu qeydi qalıcı silmək istəyirsiniz?"
     },
     "badge": {
-      "inStock": "Stokda",
-      "reserved": "Rezerve",
+      "inStock": "Anbarda",
+      "reserved": "Rezerv",
       "sold": "Satıldı"
     }
   },
@@ -84,6 +86,25 @@
     "title": "Hesabatlar",
     "subtitle": "Xülasə hesabat yaradın və antetli PDF ixrac edin.",
     "export": "PDF İxrac",
+    "exportOptions": {
+      "title": "PDF İxrac Seçimləri",
+      "export": "PDF Yarat",
+      "language": "İxrac dili",
+      "currency": "İxrac valyutası",
+      "dateFormat": "Tarix formatı",
+      "dateFormatLocale": "Seçilmiş dilə görə",
+      "paper": "Kağız tipi",
+      "theme": "Theme",
+      "themeLight": "Light PDF",
+      "themeDark": "Dark PDF"
+    },
+    "pdf": {
+      "title": "Mühasibat Hesabatı",
+      "range": "Aralıq: {{from}} → {{to}}",
+      "currency": "Valyuta: {{currency}}",
+      "exportedAt": "İxrac vaxtı: {{value}}",
+      "pageXofY": "Səhifə {{x}} / {{y}}"
+    },
     "empty": "Seçilmiş tarix aralığında hərəkət tapılmadı.",
     "reservedLine": "Kapora: {{deposit}} · Şəxs: {{party}}",
     "filters": {
@@ -100,23 +121,24 @@
       }
     },
     "summary": {
-      "investment": "Toplam Yatırım",
-      "revenue": "Ciro",
-      "netProfit": "Net Kâr"
+      "investment": "İnvestisiya",
+      "revenue": "Dövriyyə",
+      "netProfit": "Xalis mənfəət"
     },
     "types": {
       "purchase": "Alış",
-      "reserved": "Rezerve",
+      "reserved": "Rezerv",
       "sold": "Satış"
     },
     "table": {
       "date": "Tarix",
       "type": "Növ",
-      "vehicle": "Avto",
+      "vehicle": "Avtomobil",
       "purchase": "Alış",
       "sale": "Satış",
-      "expenses": "Masraf",
-      "profit": "Kâr"
+      "expenses": "Xərc",
+      "expenseNotes": "Xərc qeydi",
+      "profit": "Mənfəət"
     }
   },
   "reminders": {
@@ -125,17 +147,17 @@
     "count": "{{count}} qeyd",
     "empty": "Yaxın ödəniş yoxdur.",
     "line": "Qalan: {{remaining}} · Növbəti: {{nextDate}} · Şəxs: {{party}}",
-    "collect": "Tahsil Et",
-    "collectPrompt": "Tahsil ediləcək məbləği daxil edin (qalan: {{remaining}}):",
-    "snooze1d": "Ertele 1G",
-    "snooze3d": "Ertele 3G",
-    "snooze1w": "Ertele 1H"
+    "collect": "Ödənişi qəbul et",
+    "collectPrompt": "Qəbul ediləcək məbləği daxil edin (qalan: {{remaining}}):",
+    "snooze1d": "Təxirə sal 1G",
+    "snooze3d": "Təxirə sal 3G",
+    "snooze1w": "Təxirə sal 1H"
   },
   "customers": {
     "title": "Müştərilər",
-    "subtitle": "Müstəqil CRM rehberi, cari profil və əməliyyat tarixçəsi.",
+    "subtitle": "Müstəqil CRM bələdçisi, cari profil və əməliyyat tarixçəsi.",
     "searchPlaceholder": "Ad və ya telefon ilə axtar…",
-    "listTitle": "Rehber",
+    "listTitle": "Bələdçi",
     "listCount": "{{count}} şəxs",
     "dealCount": "{{count}} əməliyyat",
     "empty": "Uyğun qeyd tapılmadı.",
@@ -153,7 +175,7 @@
       "cancel": "İmtina"
     },
     "profile": {
-      "volume": "Toplam Həcm",
+      "volume": "Ümumi həcm",
       "remaining": "Qalan Alacaq",
       "dealCount": "Əməliyyat Sayı",
       "noDeals": "Əməliyyat tapılmadı."
@@ -168,16 +190,16 @@
     "summary": {
       "investment": "Alış",
       "revenue": "Satış",
-      "netProfit": "Net Kâr"
+      "netProfit": "Xalis mənfəət"
     },
     "table": {
       "date": "Tarix",
       "role": "Rol",
-      "vehicle": "Avto",
+      "vehicle": "Avtomobil",
       "purchase": "Alış",
       "sale": "Satış",
-      "expenses": "Masraf",
-      "profit": "Kâr",
+      "expenses": "Xərc",
+      "profit": "Mənfəət",
       "remaining": "Qalan"
     }
   },
@@ -190,32 +212,32 @@
           "title": "Başlanğıc",
           "body": "GarageLedger, qalereya üçün offline işləyən ERP/CRM sistemidir. Məlumatlarınız kompüterinizdə saxlanır və tətbiq açıldıqda gündəlik avtomatik yedək yaradılır.",
           "bullets": [
-            "Ayarlar: dil, valyuta və tema seçimi",
+            "Tənzimləmələr: dil, valyuta və tema seçimi",
             "İnventar: alış / rezerve / satış əməliyyatları",
             "Hesabatlar: tarix aralığına görə PDF ixrac"
           ]
         },
         {
-          "title": "Avto əlavə et / dəyiş (İnventar)",
-          "body": "İnventar → Yeni Əməliyyat ilə yeni qeyd yaradın. Avto məlumatlarını, kateqoriyanı və alış detallarını daxil edib yadda saxlayın. Cədvəldən istənilən vaxt dəyişə bilərsiniz.",
+          "title": "Avtomobil əlavə et / dəyiş (İnventar)",
+          "body": "İnventar → Yeni Əməliyyat bölməsindən yeni qeyd yaradın. Avtomobil məlumatlarını, kateqoriyanı və alış detallarını daxil edib yadda saxlayın. Cədvəldən istənilən vaxt dəyişə bilərsiniz.",
           "bullets": [
-            "Avto: marka, model, il, motor",
+            "Avtomobil: marka, model, il, mühərrik",
             "Alış: tarix və alış qiyməti",
             "Şəxslər: satıcı/alıcıyı CRM-dən seçin və ya anında əlavə edin"
           ]
         },
         {
-          "title": "Statuslar: Stokda / Rezerve / Satıldı",
+          "title": "Statuslar: Anbarda / Rezerv / Satıldı",
           "body": "Hər əməliyyatın statusu tələb olunan sahələri və hesabatlara düşməsini müəyyən edir.",
           "bullets": [
-            "Stokda: yalnız alış qeydi, satış məlumatı yoxdur",
-            "Rezerve: rezerve tarixi + satış qiyməti + kapora (opsional)",
+            "Anbarda: yalnız alış qeydi, satış məlumatı yoxdur",
+            "Rezerv: rezerv tarixi + satış qiyməti + kapora (opsional)",
             "Satıldı: satış tarixi + ödəniş metodu və qalan balans izləmə"
           ]
         },
         {
           "title": "Satış: ödəniş metodları",
-          "body": "Avto satarkən Ödəniş Metodu seçin. Seçimə görə forma dinamik dəyişir.",
+          "body": "Avtomobil satarkən ödəniş metodunu seçin. Seçimə görə forma dinamik dəyişir.",
           "bullets": [
             "Peşin: tam məbləğ alınır, qalan balans 0 olur",
             "Taksitli: satış məbləği + peşinat + taksit sayı; qalan balans və aylıq məbləğ hesablanır",
@@ -224,7 +246,7 @@
         },
         {
           "title": "Takas (Barter): avtomatik stok əlavə etmə",
-          "body": "Takasla satış tamamlandıqda, takasa verilən avto avtomatik olaraq yeni Stokda qeyd kimi İnventar-a əlavə edilir.",
+          "body": "Takasla satış tamamlandıqda, takasa verilən avtomobil avtomatik olaraq yeni “Anbarda” qeyd kimi İnventar-a əlavə edilir.",
           "bullets": [
             "Takas bedeli yeni stok qeydinin alış qiyməti olur",
             "Takas avtosunun satıcısı satılan avtonun alıcısı kimi yazılır",
@@ -241,12 +263,12 @@
           ]
         },
         {
-          "title": "Masraflar və real mənfəət",
-          "body": "Masraflar bölməsində avto ilə bağlı bütün xərcləri daxil edin.",
+          "title": "Xərclər və real mənfəət",
+          "body": "Xərclər bölməsində avtomobil ilə bağlı bütün xərcləri daxil edin.",
           "bullets": [
-            "Hər masraf: tarix, açıqlama, məbləğ",
-            "Net Kâr (satıldı): Satış Qiyməti − (Alış Qiyməti + Toplam Masraf)",
-            "Dəqiq hesabat üçün masrafları ardıcıl daxil edin"
+            "Hər xərc: tarix, izah, məbləğ",
+            "Xalis mənfəət (satıldı): Satış qiyməti − (Alış qiyməti + ümumi xərc)",
+            "Dəqiq hesabat üçün xərcləri ardıcıl daxil edin"
           ]
         },
         {
@@ -254,7 +276,8 @@
           "body": "Hesabatlar səhifəsində hərəkətləri izləyin və şık PDF ixrac edin.",
           "bullets": [
             "Hazır aralıqlar: Bu gün, Bu həftə, Bu ay, Son 30 gün, Xüsusi",
-            "Xülasə: Toplam Yatırım, Ciro və Net Kâr (satılanlar üzrə)",
+            "Xülasə: investisiya, dövriyyə və xalis mənfəət (satılanlar üzrə)",
+            "İxrac seçimləri: dil, valyuta, tarix formatı, A4/Letter və Light/Dark PDF",
             "PDF footer’ında Cicibyte Corp imzası"
           ]
         },
@@ -271,8 +294,8 @@
           "title": "Yedəkləmə, geri yükləmə və yeniləmələr",
           "body": "GarageLedger məlumat təhlükəsizliyi üçün yedək yaradır və GitHub üzərindən auto-update ilə yenilənir.",
           "bullets": [
-            "Yedəklər: gündəlik avtomatik + Ayarlar’dan manual yedək/geri yüklə",
-            "Yeniləmələr: Ayarlar → Yeniləmələri Yoxla, endiriləndə yenidən başladın",
+            "Yedəklər: gündəlik avtomatik + Tənzimləmələrdən manuel yedək/geri yüklə",
+            "Yeniləmələr: Tənzimləmələr → Yeniləmələri yoxla, endiriləndə yenidən başladın",
             "Versiyadan geri qalmamaq üçün Setup (.exe) quraşdırmasını istifadə edin"
           ]
         }
@@ -293,17 +316,17 @@
     "save": "Yadda saxla",
     "sections": {
       "parties": "Şəxslər",
-      "expenses": "Masraflar",
-      "tradeIn": "Takas Avto"
+      "expenses": "Xərclər",
+      "tradeIn": "Takas avtomobili"
     },
     "actions": {
-      "addExpense": "Masraf Əlavə Et",
+      "addExpense": "Xərc Əlavə Et",
       "remove": "Sil",
       "addContact": "Şəxs Əlavə Et",
       "clearContact": "Təmizlə"
     },
     "addContactTitle": "Şəxs Əlavə Et",
-    "emptyExpenses": "Hələ masraf əlavə edilməyib.",
+    "emptyExpenses": "Hələ xərc əlavə edilməyib.",
     "emptyContacts": "Uyğun şəxs yoxdur.",
     "contact": {
       "fields": {
@@ -315,8 +338,8 @@
       }
     },
     "status": {
-      "inStock": "Stokda",
-      "reserved": "Rezerve",
+      "inStock": "Anbarda",
+      "reserved": "Rezerv",
       "sold": "Satıldı"
     },
     "paymentMethods": {
@@ -331,10 +354,10 @@
       "modelPlaceholder": "Məs: 520i",
       "year": "İl",
       "yearPlaceholder": "Məs: 2020",
-      "engine": "Motor",
+      "engine": "Mühərrik",
       "enginePlaceholder": "Məs: 2.0L",
       "status": "Status",
-      "reserveDate": "Rezerve Tarixi",
+      "reserveDate": "Rezerv Tarixi",
       "deposit": "Kapora",
       "paymentMethod": "Ödəniş Metodu",
       "downPayment": "Alınan Peşinat",
@@ -381,9 +404,18 @@
   "about": {
     "title": "Haqqında",
     "desc": "Çevrimdışı inventar və maliyyə izləmə tətbiqi.",
-    "logoPlaceholder": "Cicibyte Corp logo placeholder",
-    "createdBy": "Created By",
-    "close": "Bağla"
+    "createdBy": "Mikail tərəfindən • Cicibyte Corp",
+    "actions": {
+      "emailTitle": "E-poçt",
+      "emailDesc": "Dəstək və ya rəy üçün e-poçt göndərin.",
+      "emailCta": "E-poçt Göndər",
+      "githubTitle": "GitHub",
+      "githubDesc": "Repo və release qeydlərini açın.",
+      "githubCta": "Repositoriyanı Aç",
+      "whatsappTitle": "WhatsApp",
+      "whatsappDesc": "WhatsApp ilə dəstəkə yazın.",
+      "whatsappCta": "Dəstəyə Yaz"
+    }
   },
   "lock": {
     "title": "Tətbiq kilidlidir",
@@ -399,14 +431,14 @@
     "cta": "Başa düşdüm",
     "sections": [
       {
-        "title": "Müstəqil CRM (Rehber & Cari Profil)",
+        "title": "Müstəqil CRM (Bələdçi & Cari profil)",
         "body": "Müştərilər artıq yalnız tarixçə deyil; müstəqil şəxs qeydiyyatı və cari profil ekranı olan real CRM moduludur.",
         "bullets": ["Şəxsləri müstəqil əlavə et (ad, telefon, e-poçt, rol, qeydlər)", "Cari profildə ümumi həcm, qalan alacaq və əməliyyat siyahısı"]
       },
       {
         "title": "Satış Ödənişləri + Ağıllı Xatırlatma",
-        "body": "Avto satışı müxtəlif ödəniş metodlarını dəstəkləyir və qalan balansı izləyir.",
-        "bullets": ["Peşin / Taksitli / Takas (Barter)", "Dashboard xatırlatma: Tahsil Et və Ertele (növbəti ödəniş tarixi)"]
+        "body": "Avtomobil satışı müxtəlif ödəniş metodlarını dəstəkləyir və qalan balansı izləyir.",
+        "bullets": ["Peşin / Taksitli / Takas (Barter)", "Dashboard xatırlatma: Ödənişi qəbul et və təxirə sal (növbəti ödəniş tarixi)"]
       },
       {
         "title": "Hesabatlar & Antetli PDF",
@@ -419,15 +451,15 @@
         "bullets": ["Tema seçimi LocalStorage-da saxlanır", "Qaranlıq səthlərdə şık qızılı vurğular"]
       },
       {
-        "title": "Quiet Luxury UI Dokunuşları",
+        "title": "Quiet Luxury UI toxunuşları",
         "body": "Modallar, cədvəllər və mikro animasiyalar daha premium hiss üçün yeniləndi.",
         "bullets": ["Cam effekti: backdrop-blur", "Yumşaq kölgələr, modern cədvəllər, xüsusi scrollbar", "Yardım bölməsi daha detallı və peşəkar istifadə bələdçisi ilə genişləndirildi"]
       }
     ],
     "items": {
-      "vehicleSchema": "Avto qeyd ekranı Marka, Model, İl və Motor detallarına görə zənginləşdirildi.",
-      "analytics": "Gelişmiş maliyyə analitikası və son 6 ay mənfəət/zərər qrafiki əlavə olundu.",
-      "notifications": "Auto-update sonrası \"Nə Yenilik Var?\" bildiriş sistemi inteqrasiya edildi."
+      "vehicleSchema": "Avtomobil qeyd ekranı marka, model, il və mühərrik detallarına görə zənginləşdirildi.",
+      "analytics": "Təkmilləşdirilmiş maliyyə analitikası və son 6 ay mənfəət/zərər qrafiki əlavə olundu.",
+      "notifications": "Avtomatik yeniləmədən sonra “Nə yenilik var?” bildiriş sistemi inteqrasiya edildi."
     }
   },
   "updateModal": {
@@ -445,20 +477,21 @@
     "idleBody": "Hələ yeniləmə statusu yoxdur."
   },
   "settings": {
-    "title": "Ayarlar",
+    "title": "Tənzimləmələr",
     "language": "Dil",
     "sections": {
       "company": "ŞİRKƏT PROFİLİ",
       "security": "TƏHLÜKƏSİZLİK",
-      "local": "YERLİ AYARLAR",
-      "system": "SİSTEM"
+      "local": "REGİONAL",
+      "system": "SİSTEM",
+      "feedback": "GERİ BİLDİRİM (WHATSAPP)"
     },
     "fx": {
       "last": "Son məzənnə yenilənməsi: {{value}}",
       "refresh": "Məzənnələri Yenilə"
     },
     "feedback": {
-      "title": "Geri Bildirim",
+      "title": "Geri bildirim",
       "subtitle": "WhatsApp ilə təklif və ya problem bildirin.",
       "placeholder": "Mesajınızı yazın…",
       "send": "WhatsApp-a Göndər"
@@ -520,7 +553,7 @@
     "downloaded": "Yeniləmə hazırdır{{version}}. Yenidən başlatmaq üçün klikləyin.",
     "upToDate": "Siz ən son versiyanı{{version}} istifadə edirsiniz.",
     "error": "Yeniləmə xətası: {{message}}",
-    "dev": "Develop modunda auto-update deaktivdir."
+    "dev": "İnkişaf rejimində avtomatik yeniləmə deaktivdir."
   },
   "backups": {
     "title": "Yedəkləmə",

@@ -19,11 +19,10 @@ GarageLedger, “Quiet Luxury / Digital Boutique” tasarım yaklaşımını hed
 - Electron + electron-builder (Windows NSIS installer)
 - React + TypeScript + Vite
 - Tailwind CSS v4
-- **LowDB** (local JSON DB, Electron userData altında)
-  - İhtiyaç halinde SQLite/SQL tabanlı depolamaya taşınabilecek şekilde tasarlanmıştır
+- **Local JSON DB** (offline, Windows `%APPDATA%/GarageLedger/db.json`)
 - Recharts (analitik grafikler)
 - i18next / react-i18next (**AZ varsayılan** + TR/EN/RU)
-- jsPDF + jspdf-autotable (profesyonel PDF raporlama)
+- jsPDF + jspdf-autotable (profesyonel PDF raporlama + export seçenekleri)
 
 ## Ana Modüller & Özellikler
 
@@ -32,7 +31,7 @@ GarageLedger, “Quiet Luxury / Digital Boutique” tasarım yaklaşımını hed
 - **Finans & Analitik**: yatırım, ciro, net kâr; dashboard özetleri ve grafikler
 - **Cari CRM (Müşteriler/Rehber)**: kişi kaydı, rol (alıcı/satıcı), cari profil ve işlem geçmişi
 - **Şirket Profili (White‑Label)**: şirket adı/logo/adres/iletişim bilgileri ile kişiselleştirilmiş raporlar
-- **PDF Raporlama**: tarih aralığına göre antetli (logo + şirket bilgileri), tablo + özet içeren profesyonel PDF export
+- **PDF Raporlama**: antet + tablo + özet + sabit footer; dil/para birimi/tarih formatı/A4-Letter/tema seçenekleriyle premium PDF export
 - **Uygulama Kilidi**: parola ile giriş kilidi (unutma durumunda destek yönlendirmesi)
 - **Otomatik Güncelleme**: GitHub Releases üzerinden auto-update + uygulama içi güncelleme bildirimi
 - **Dark Mode**: yüksek kontrast, okunabilirlik odaklı “Midnight Onyx”
@@ -55,10 +54,10 @@ Important:
 
 ## Veri Depolama & Yedekler
 
-GarageLedger uses Electron userData storage.
+GarageLedger veriyi offline olarak Windows kullanıcı profilinde saklar:
 
-- Main DB file: `garageledger.json`
-- Backups folder: `backups/` (date-stamped JSON backups)
+- Main DB file: `%APPDATA%/GarageLedger/db.json`
+- Backups folder: `%APPDATA%/GarageLedger/backups/` (date-stamped JSON backups)
 
 You can manage backups inside the app:
 

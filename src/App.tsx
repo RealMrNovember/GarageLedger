@@ -40,12 +40,15 @@ export default function App() {
   const { ready, items, contacts, currency, settings, setCurrency, updateSettings, upsertItem, upsertContact, removeItem } = useGarageLedger()
   const categories = useMemo(() => uniqueCategories(items), [items])
   const [nav, setNav] = useState<NavKey>('dashboard')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => localStorage.getItem('garageledger.sidebarCollapsed') === '1')
   const [aboutOpen, setAboutOpen] = useState(false)
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
   const [whatsNewVersion, setWhatsNewVersion] = useState<string>('')
-  const [whatsNewDynamic, setWhatsNewDynamic] = useState<{ title: string; bullets: string[] } | null>(null)
+  const [releaseHistory, setReleaseHistory] = useState<
+    Array<{ version: string; date: string; phases: Array<{ title: string; bullets: string[] }> }>
+  >([])
   const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('garageledger.theme') === 'dark' ? 'dark' : 'light'))
-  const [, setFxTick] = useState(0)
+  const [fxTick, setFxTick] = useState(0)
   const [updateModalOpen, setUpdateModalOpen] = useState(false)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>({ state: 'idle' })
   const updateVersion = 'version' in updateStatus ? updateStatus.version : ''
@@ -57,48 +60,40 @@ export default function App() {
   const lockEnabled = Boolean(
     settings.appLock?.enabled && settings.appLock.passwordSalt && settings.appLock.passwordHash,
   )
-  const whatsNewSections = useMemo(() => {
-    const raw = t('whatsNew.sections', { returnObjects: true }) as unknown
-    if (!Array.isArray(raw)) return []
-    return raw
-      .filter((x) => x && typeof x === 'object')
-      .map((x) => {
-        const obj = x as Record<string, unknown>
-        return {
-          title: String(obj.title ?? ''),
-          body: String(obj.body ?? ''),
-          bullets: Array.isArray(obj.bullets) ? (obj.bullets as unknown[]).map((b) => String(b)) : [],
-        }
-      })
-      .filter((s) => s.title)
-  }, [t])
 
   useEffect(() => {
     if (!whatsNewOpen) return
-    setWhatsNewDynamic(null)
     const load = async () => {
-      const res = await window.GarageLedger?.whatsNew?.getLatestPhase?.()
-      if (!res?.ok) return
-      const title = String(res.title ?? '').trim()
-      const bullets = Array.isArray(res.bullets) ? res.bullets.map((b) => String(b)) : []
-      if (!title) return
-      setWhatsNewDynamic({ title, bullets })
+      const res = await window.GarageLedger?.whatsNew?.getHistory?.()
+      if (res?.ok && Array.isArray(res.releases)) {
+        setReleaseHistory(
+          res.releases
+            .map((r) => {
+              const version = String(r?.version ?? '').trim()
+              if (!version) return null
+              const date = String(r?.date ?? '').trim()
+              const phases = Array.isArray(r?.phases)
+                ? r.phases
+                    .map((p) => ({
+                      title: String(p?.title ?? '').trim(),
+                      bullets: Array.isArray(p?.bullets) ? p.bullets.map((b) => String(b)) : [],
+                    }))
+                    .filter((p) => p.title)
+                : []
+              return { version, date, phases }
+            })
+            .filter((x): x is { version: string; date: string; phases: Array<{ title: string; bullets: string[] }> } => Boolean(x)),
+        )
+        return
+      }
+      setReleaseHistory([])
     }
     void load()
   }, [whatsNewOpen])
 
-  const whatsNewRenderedSections = useMemo(() => {
-    if (whatsNewDynamic?.title) {
-      return [
-        {
-          title: whatsNewDynamic.title,
-          body: '',
-          bullets: whatsNewDynamic.bullets,
-        },
-      ]
-    }
-    return whatsNewSections
-  }, [whatsNewDynamic, whatsNewSections])
+  useEffect(() => {
+    localStorage.setItem('garageledger.sidebarCollapsed', sidebarCollapsed ? '1' : '0')
+  }, [sidebarCollapsed])
 
   useEffect(() => {
     const isDark = theme === 'dark'
@@ -205,8 +200,12 @@ export default function App() {
       <Sidebar
         active={nav}
         onNavigate={setNav}
+        collapsed={sidebarCollapsed}
+        onToggleCollapsed={() => setSidebarCollapsed((v) => !v)}
         theme={theme}
         onToggleTheme={() => setTheme((v) => (v === 'dark' ? 'light' : 'dark'))}
+        fxTick={fxTick}
+        onRefreshFx={() => void refreshFxRates().then(() => setFxTick(Date.now()))}
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -266,50 +265,110 @@ export default function App() {
       </div>
 
       <Modal title={t('about.title')} open={aboutOpen} onClose={() => setAboutOpen(false)}>
-        <div className="space-y-4">
-          <div className="flex items-start gap-4">
-            <Logo size={44} />
-            <div className="min-w-0">
-              <div className="text-sm font-semibold text-[var(--tf-ink)]">Cicibyte Corp</div>
-              <div className="mt-1 text-sm text-[var(--tf-ink-muted)]">{t('about.desc')}</div>
-              <div className="mt-2 text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('about.createdBy')}</div>
+        <div className="space-y-5">
+          <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
+            <div className="flex items-start gap-4">
+              <Logo size={46} />
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('app.name')}</div>
+                <div className="mt-1 text-sm text-[var(--tf-ink-muted)]">{t('about.desc')}</div>
+                <div className="mt-3 text-xs font-medium text-[var(--tf-ink-muted)]">{t('about.createdBy')}</div>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <a
-              href="https://github.com/RealMrNovember"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
-            >
-              <span>GitHub</span>
-              <span className="text-xs text-[var(--tf-ink-muted)]">RealMrNovember</span>
-            </a>
-            <a
-              href="mailto:mozkarci1991@gmail.com"
-              className="flex items-center justify-between rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
-            >
-              <span>Email</span>
-              <span className="text-xs text-[var(--tf-ink-muted)]">mozkarci1991@gmail.com</span>
-            </a>
-            <a
-              href="https://wa.me/905354895050"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
-            >
-              <span>WhatsApp</span>
-              <span className="text-xs text-[var(--tf-ink-muted)]">+90 535 489 50 50</span>
-            </a>
+          <div className="grid grid-cols-1 gap-3">
+            <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M4 6.5h16v11H4v-11z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                      <path d="M4.5 7l7.5 6l7.5-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('about.actions.emailTitle')}</div>
+                    <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('about.actions.emailDesc')}</div>
+                  </div>
+                </div>
+                <a
+                  href="mailto:mozkarci1991@gmail.com"
+                  className="inline-flex items-center justify-center rounded-2xl bg-[var(--tf-accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/90 hover:shadow-md dark:text-black dark:hover:bg-[#b89145]"
+                >
+                  {t('about.actions.emailCta')}
+                </a>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M9 19c-3 1-3-1-4-1m8 2v-2.2c0-.7.2-1.3.6-1.8c-2 .2-4.1-1-4.1-4.4c0-1 .3-1.8.9-2.5c-.1-.2-.4-1.2.1-2.4c0 0 .8-.2 2.6 1c.7-.2 1.5-.3 2.3-.3s1.6.1 2.3.3c1.8-1.2 2.6-1 2.6-1c.5 1.2.2 2.2.1 2.4c.6.7.9 1.5.9 2.5c0 3.4-2.1 4.6-4.1 4.4c.4.5.6 1.1.6 1.8V20"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('about.actions.githubTitle')}</div>
+                    <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('about.actions.githubDesc')}</div>
+                  </div>
+                </div>
+                <a
+                  href="https://github.com/RealMrNovember/GarageLedger"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
+                >
+                  {t('about.actions.githubCta')}
+                </a>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M16.6 14.4c-.2 0-.4 0-.6-.1c-1.2-.3-2.6-1.1-3.8-2.3c-1.2-1.2-2-2.6-2.3-3.8c-.2-.8.1-1.5.8-1.9l1.1-.6c.6-.3 1.3-.2 1.8.3l1 1.1c.4.5.5 1.2.2 1.8l-.3.6c.6 1 1.4 1.9 2.3 2.7c.9.9 1.8 1.7 2.7 2.3l.6-.3c.6-.3 1.3-.2 1.8.2l1.1 1c.5.5.6 1.2.3 1.8l-.6 1.1c-.3.6-.9.9-1.5.9c-.2 0-.3 0-.5 0c-1.3-.2-2.8-1-4.3-2.2"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path d="M7 4h10a3 3 0 0 1 3 3v10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('about.actions.whatsappTitle')}</div>
+                    <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('about.actions.whatsappDesc')}</div>
+                  </div>
+                </div>
+                <a
+                  href="https://wa.me/905354895050"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
+                >
+                  {t('about.actions.whatsappCta')}
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </Modal>
 
       {lockOpen ? (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/10 backdrop-blur-md dark:bg-black/60" />
-          <div className="relative w-full max-w-md rounded-3xl border border-[var(--tf-border)] bg-white/70 p-6 shadow-[var(--tf-shadow)] backdrop-blur-md dark:bg-[#1e1e1e]/80">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm dark:bg-black/80" />
+          <div className="relative w-full max-w-md rounded-3xl border border-[var(--tf-border)] bg-white p-6 shadow-[var(--tf-shadow)] dark:bg-gray-950">
             <div className="flex items-start gap-4">
               <Logo size={42} />
               <div className="min-w-0">
@@ -353,7 +412,7 @@ export default function App() {
       ) : null}
 
       <Modal
-        title={t('whatsNew.title', { version: `v${whatsNewVersion}` })}
+        title={t('whatsNew.title', { version: whatsNewVersion ? `v${whatsNewVersion}` : '' })}
         open={whatsNewOpen}
         onClose={() => {
           localStorage.setItem('garageledger.lastSeenVersion', whatsNewVersion)
@@ -376,40 +435,65 @@ export default function App() {
         }
       >
         <div className="space-y-5">
-          <div className="rounded-3xl border border-[var(--tf-border)] bg-gradient-to-br from-[var(--tf-accent)]/10 to-transparent p-5 dark:from-[var(--tf-accent)]/14">
+          <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 dark:bg-gray-950">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('whatsNew.subtitle')}</div>
-              <div className="rounded-full border border-[var(--tf-border)] bg-white/50 px-3 py-1 text-xs font-semibold text-[var(--tf-ink)] dark:bg-white/5">
+              <div className="text-sm font-semibold text-[var(--tf-ink)]">
+                {t('whatsNew.title', { version: whatsNewVersion ? `v${whatsNewVersion}` : '' })}
+              </div>
+              <div className="rounded-full border border-[var(--tf-border)] bg-white/60 px-3 py-1 text-xs font-semibold text-[var(--tf-ink)] dark:bg-white/10">
                 v{whatsNewVersion}
               </div>
             </div>
+            <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">{t('whatsNew.subtitle')}</div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {whatsNewRenderedSections.map((s) => (
-              <div
-                key={s.title}
-                className="rounded-3xl border border-[var(--tf-border)] bg-white/60 p-5 shadow-[var(--tf-shadow)] transition duration-200 hover:-translate-y-[0.5px] dark:bg-white/5"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--tf-accent)]" />
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-[var(--tf-ink)]">{s.title}</div>
-                    {s.body ? <div className="mt-2 text-sm leading-relaxed text-[var(--tf-ink)]">{s.body}</div> : null}
+          <div className="relative">
+            <div className="absolute left-[11px] top-0 h-full w-px bg-[var(--tf-border)]" />
+            <div className="max-h-[60vh] space-y-4 overflow-y-auto pr-2">
+              {(releaseHistory.length ? releaseHistory : []).map((r) => (
+                <div key={r.version} className="relative pl-10">
+                  <div className="absolute left-[6px] top-[6px] h-3 w-3 rounded-full border border-[var(--tf-border)] bg-[var(--tf-accent)]" />
+                  <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="text-sm font-semibold text-[var(--tf-ink)]">v{r.version}</div>
+                      {r.date ? <div className="text-xs font-semibold text-[var(--tf-ink-muted)]">{r.date}</div> : null}
+                    </div>
+
+                    {r.phases.length ? (
+                      <div className="mt-4 space-y-4">
+                        {r.phases.map((p) => (
+                          <div
+                            key={`${r.version}:${p.title}`}
+                            className="rounded-2xl border border-[var(--tf-border)] bg-white p-4 dark:bg-gray-900"
+                          >
+                            <div className="text-xs font-semibold text-[var(--tf-ink)]">{p.title}</div>
+                            {p.bullets.length ? (
+                              <ul className="mt-3 space-y-2 text-sm text-[var(--tf-ink-muted)]">
+                                {p.bullets.map((b) => (
+                                  <li key={`${r.version}:${p.title}:${b}`} className="flex items-start gap-2">
+                                    <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--tf-accent)]/70" />
+                                    <span className="min-w-0">{b}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">—</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-3 text-sm text-[var(--tf-ink-muted)]">—</div>
+                    )}
                   </div>
                 </div>
-                {s.bullets.length ? (
-                  <ul className="mt-4 space-y-2 text-sm text-[var(--tf-ink-muted)]">
-                    {s.bullets.map((b) => (
-                      <li key={b} className="flex items-start gap-2">
-                        <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--tf-accent)]/70" />
-                        <span className="min-w-0">{b}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </div>
-            ))}
+              ))}
+              {!releaseHistory.length ? (
+                <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 text-sm text-[var(--tf-ink-muted)] dark:bg-gray-950">
+                  Sürüm geçmişi alınamadı.
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </Modal>

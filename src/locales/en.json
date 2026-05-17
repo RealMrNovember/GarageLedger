@@ -1,6 +1,8 @@
 {
   "common": {
-    "close": "Close"
+    "close": "Close",
+    "maximize": "Maximize",
+    "restore": "Restore"
   },
   "app": {
     "name": "GarageLedger",
@@ -96,6 +98,25 @@
     "title": "Reports",
     "subtitle": "Generate summary reports and export a branded PDF.",
     "export": "Export PDF",
+    "exportOptions": {
+      "title": "PDF Export Options",
+      "export": "Generate PDF",
+      "language": "Export language",
+      "currency": "Export currency",
+      "dateFormat": "Date format",
+      "dateFormatLocale": "Use export language",
+      "paper": "Paper size",
+      "theme": "Theme",
+      "themeLight": "Light PDF",
+      "themeDark": "Dark PDF"
+    },
+    "pdf": {
+      "title": "Accounting Report",
+      "range": "Range: {{from}} → {{to}}",
+      "currency": "Currency: {{currency}}",
+      "exportedAt": "Exported: {{value}}",
+      "pageXofY": "Page {{x}} / {{y}}"
+    },
     "empty": "No movements found for the selected date range.",
     "reservedLine": "Deposit: {{deposit}} · Party: {{party}}",
     "filters": {
@@ -128,6 +149,7 @@
       "purchase": "Purchase",
       "sale": "Sale",
       "expenses": "Expenses",
+      "expenseNotes": "Expense Notes",
       "profit": "Profit"
     }
   },
@@ -255,6 +277,7 @@
           "bullets": [
             "Date presets: Today, This Week, This Month, Last 30 Days, Custom",
             "Summary includes total investment, revenue and net profit (for sold items)",
+            "Export options: language, currency, date format, A4/Letter and Light/Dark PDF",
             "PDF is branded with header and Cicibyte Corp footer"
           ]
         },
@@ -381,9 +404,18 @@
   "about": {
     "title": "About",
     "desc": "Offline inventory and finance tracking app.",
-    "logoPlaceholder": "Cicibyte Corp logo placeholder",
-    "createdBy": "Created by",
-    "close": "Close"
+    "createdBy": "Created by Mikail | Cicibyte Corp",
+    "actions": {
+      "emailTitle": "Email",
+      "emailDesc": "Send an email for support or feedback.",
+      "emailCta": "Send Email",
+      "githubTitle": "GitHub",
+      "githubDesc": "Open the repository and release notes.",
+      "githubCta": "Open Repository",
+      "whatsappTitle": "WhatsApp",
+      "whatsappDesc": "Contact support via WhatsApp.",
+      "whatsappCta": "Contact Support"
+    }
   },
   "lock": {
     "title": "App locked",
@@ -450,8 +482,9 @@
     "sections": {
       "company": "COMPANY PROFILE",
       "security": "SECURITY",
-      "local": "LOCAL",
-      "system": "SYSTEM"
+      "local": "REGIONAL",
+      "system": "SYSTEM",
+      "feedback": "FEEDBACK (WHATSAPP)"
     },
     "fx": {
       "last": "Last FX update: {{value}}",

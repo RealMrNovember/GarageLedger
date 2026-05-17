@@ -1,6 +1,8 @@
 {
   "common": {
-    "close": "Kapat"
+    "close": "Kapat",
+    "maximize": "Büyüt",
+    "restore": "Geri al"
   },
   "app": {
     "name": "GarageLedger",
@@ -96,6 +98,25 @@
     "title": "Raporlar",
     "subtitle": "Özet rapor oluşturun ve antetli PDF çıktısı alın.",
     "export": "PDF Al",
+    "exportOptions": {
+      "title": "PDF Export Seçenekleri",
+      "export": "PDF Oluştur",
+      "language": "Export dili",
+      "currency": "Export para birimi",
+      "dateFormat": "Tarih formatı",
+      "dateFormatLocale": "Seçili dile göre",
+      "paper": "Kağıt tipi",
+      "theme": "Theme",
+      "themeLight": "Light PDF",
+      "themeDark": "Dark PDF"
+    },
+    "pdf": {
+      "title": "Muhasebe Raporu",
+      "range": "Aralık: {{from}} → {{to}}",
+      "currency": "Para birimi: {{currency}}",
+      "exportedAt": "Oluşturma: {{value}}",
+      "pageXofY": "Sayfa {{x}} / {{y}}"
+    },
     "empty": "Seçili tarih aralığında hareket bulunamadı.",
     "reservedLine": "Kapora: {{deposit}} · Kişi: {{party}}",
     "filters": {
@@ -128,6 +149,7 @@
       "purchase": "Alış",
       "sale": "Satış",
       "expenses": "Masraf",
+      "expenseNotes": "Masraf Notu",
       "profit": "Kâr"
     }
   },
@@ -255,6 +277,7 @@
           "bullets": [
             "Hazır aralıklar: Bugün, Bu Hafta, Bu Ay, Son 30 Gün, Özel",
             "Özet: Toplam Yatırım, Ciro ve Net Kâr (satılanlar üzerinden)",
+            "Export seçenekleri: dil, para birimi, tarih formatı, A4/Letter ve Light/Dark PDF",
             "PDF footer’ında Cicibyte Corp imzası bulunur"
           ]
         },
@@ -381,9 +404,18 @@
   "about": {
     "title": "Hakkında",
     "desc": "Çevrimdışı envanter ve finans takip uygulaması.",
-    "logoPlaceholder": "Cicibyte Corp logo placeholder",
-    "createdBy": "Created By",
-    "close": "Kapat"
+    "createdBy": "Mikail tarafından • Cicibyte Corp",
+    "actions": {
+      "emailTitle": "E-posta",
+      "emailDesc": "Destek veya öneri için e-posta gönderin.",
+      "emailCta": "E-posta Gönder",
+      "githubTitle": "GitHub",
+      "githubDesc": "Kaynak kodu ve sürüm notlarını görüntüleyin.",
+      "githubCta": "Depoyu Aç",
+      "whatsappTitle": "WhatsApp",
+      "whatsappDesc": "Hızlı destek için WhatsApp üzerinden yazın.",
+      "whatsappCta": "Desteğe Yaz"
+    }
   },
   "lock": {
     "title": "Uygulama kilitli",
@@ -450,8 +482,9 @@
     "sections": {
       "company": "ŞİRKET PROFİLİ",
       "security": "GÜVENLİK",
-      "local": "YEREL AYARLAR",
-      "system": "SİSTEM"
+      "local": "BÖLGESEL",
+      "system": "SİSTEM",
+      "feedback": "GERİ BİLDİRİM (WHATSAPP)"
     },
     "fx": {
       "last": "Son kur güncellemesi: {{value}}",

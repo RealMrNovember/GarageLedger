@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('GarageLedger', {
+  bootstrap: {
+    getInitialData: () => ipcRenderer.invoke('garageledger:bootstrap:getInitialData'),
+  },
   items: {
     list: () => ipcRenderer.invoke('garageledger:items:list'),
     upsert: (item) => ipcRenderer.invoke('garageledger:items:upsert', item),
@@ -24,6 +27,7 @@ contextBridge.exposeInMainWorld('GarageLedger', {
   },
   whatsNew: {
     getLatestPhase: () => ipcRenderer.invoke('garageledger:whatsnew:getLatestPhase'),
+    getHistory: () => ipcRenderer.invoke('garageledger:whatsnew:getHistory'),
   },
   updates: {
     getStatus: () => ipcRenderer.invoke('garageledger:update:getStatus'),
@@ -41,6 +45,7 @@ contextBridge.exposeInMainWorld('GarageLedger', {
     create: () => ipcRenderer.invoke('garageledger:backup:create'),
     list: () => ipcRenderer.invoke('garageledger:backup:list'),
     openFolder: () => ipcRenderer.invoke('garageledger:backup:openFolder'),
+    cleanup: (keepLast) => ipcRenderer.invoke('garageledger:backup:cleanup', keepLast),
     restore: (fileName) => ipcRenderer.invoke('garageledger:backup:restore', fileName),
   },
 })

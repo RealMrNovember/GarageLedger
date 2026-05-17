@@ -1,0 +1,80 @@
+{
+  "releases": [
+    {
+      "version": "1.8.0",
+      "date": "2026-05-15",
+      "phases": [
+        {
+          "title": "Faz 1 — PDF Export (Profesyonel Rapor Motoru)",
+          "bullets": [
+            "Header/body/summary/footer alanları net ayrıldı; overlap ve spacing problemleri giderildi.",
+            "Dinamik layout + auto-wrap + sayfa taşması yönetimi iyileştirildi.",
+            "Footer sabitlendi; sayfa numarası ve export timestamp eklendi.",
+            "PDF Export Options eklendi: dil (AZ/TR/EN/RU), para birimi, tarih formatı, A4/Letter, Light/Dark PDF."
+          ]
+        },
+        {
+          "title": "Faz 2 — Premium Modal & Desktop UX",
+          "bullets": [
+            "Modal overlay opaklığı, shadow hiyerarşisi ve kontrast iyileştirildi (premium desktop hissi).",
+            "Modal için maximize ve sürükle-bırak (draggable) altyapısı eklendi; büyük formlarda genişlik artırıldı."
+          ]
+        },
+        {
+          "title": "Faz 3 — About + Sidebar + Inventory UX",
+          "bullets": [
+            "About ekranı tamamen i18next’e bağlandı; LinkedIn kaldırıldı; Email/GitHub/WhatsApp aksiyon kartları eklendi.",
+            "Sidebar footer yeniden tasarlandı: theme switch + son kur güncelleme zamanı + manuel refresh.",
+            "Envanter tablosu modernleştirildi: sticky header, icon action buttons, delete confirm modal."
+          ]
+        },
+        {
+          "title": "Faz 4 — Windows Taskbar Icon Fix",
+          "bullets": [
+            "Windows taskbar/executable icon senkronizasyonu için signAndEditExecutable etkinleştirildi.",
+            "AppUserModelID + BrowserWindow icon stratejisi korunarak Electron branding riski azaltıldı."
+          ]
+        }
+      ]
+    },
+    {
+      "version": "1.7.5",
+      "date": "2026-05-15",
+      "phases": [
+        {
+          "title": "Faz 1 — Database & IPC Köprüsü (Kritik)",
+          "bullets": [
+            "Electron IPC katmanı CommonJS (require) uyumlu hale getirildi (ipc/main/preload akışı).",
+            "Envanter kaydı için garageledger:items:upsert IPC hattı stabil hale getirildi.",
+            "db.json dosyası %APPDATA%/GarageLedger altında otomatik oluşturulur ve yazılabilirlik kontrolü yapılır."
+          ]
+        },
+        {
+          "title": "Faz 2 — Dark Mode & Modal Okunabilirlik",
+          "bullets": [
+            "Dark mode pop-up arka planları tam mat hale getirildi.",
+            "Modal içerik kontrastı artırıldı (dark: metin beyaz, yüzeyler koyu)."
+          ]
+        },
+        {
+          "title": "Faz 3 — About (Hakkında) Dijital Butik Kartı",
+          "bullets": [
+            "Hakkında ekranı minimal ‘Dijital Butik’ kart düzenine alındı.",
+            "E-posta adresi gizlendi; ikon + “E-poçt Göndər” butonu eklendi.",
+            "GitHub/LinkedIn bağlantıları modern ikon butonlarıyla sunuldu."
+          ]
+        }
+      ]
+    },
+    {
+      "version": "1.7.4",
+      "date": "",
+      "phases": [
+        {
+          "title": "Faz 1 — Genel",
+          "bullets": ["—"]
+        }
+      ]
+    }
+  ]
+}

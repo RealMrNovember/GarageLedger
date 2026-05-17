@@ -6,8 +6,20 @@ type TradeItem = {
   id: string
   brand: string
   model: string
+  package?: string
   year: number | null
   engine: string
+  fuel?: string
+  transmission?: string
+  mileage?: number | null
+  color?: string
+  damage?: string
+  tramer?: string
+  notes?: string
+  location?: string
+  plate?: string
+  keyCount?: number | null
+  inspection?: string
   vin: string
   category: string
   purchaseDate: string
@@ -38,6 +50,8 @@ type TradeItem = {
   sellDate: string | null
   purchasePrice: number
   sellPrice: number | null
+  tax?: number | null
+  commission?: number | null
   expenses: {
     id: string
     date: string
@@ -63,6 +77,19 @@ type GarageLedgerSettings = {
   currency: CurrencyCode
   lastBackupAt?: string | null
   lastUpdateCheckAt?: string | null
+  reminders?: {
+    enabled: boolean
+    notifyHour: number
+    daysBefore: number
+  }
+  fxUpdates?: {
+    provider: 'exchangerate-api'
+    mode: 'manual' | '15m' | '30m' | '1h'
+  }
+  backupSettings?: {
+    schedule: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'manual'
+    keepLast: number
+  }
   companyProfile?: {
     name?: string
     logoDataUrl?: string
@@ -80,6 +107,9 @@ type GarageLedgerSettings = {
 }
 
 type GarageLedgerApi = {
+  bootstrap?: {
+    getInitialData: () => Promise<{ ok: boolean; message?: string; items?: TradeItem[]; contacts?: Contact[]; settings?: GarageLedgerSettings }>
+  }
   items: {
     list: () => Promise<TradeItem[]>
     upsert: (item: TradeItem) => Promise<TradeItem[]>
@@ -103,6 +133,10 @@ type GarageLedgerApi = {
   }
   whatsNew: {
     getLatestPhase: () => Promise<{ ok: boolean; title?: string; bullets?: string[] }>
+    getHistory: () => Promise<{
+      ok: boolean
+      releases?: Array<{ version: string; date?: string; phases?: Array<{ title: string; bullets: string[] }> }>
+    }>
   }
   updates: {
     getStatus: () => Promise<unknown>
@@ -120,6 +154,7 @@ type GarageLedgerApi = {
       message?: string
     }>
     openFolder: () => Promise<{ ok: boolean; message?: string }>
+    cleanup: (keepLast?: number) => Promise<{ ok: boolean; result?: { deleted: number; kept: number }; message?: string }>
     restore: (fileName: string) => Promise<{ ok: boolean; result?: unknown; message?: string }>
   }
 }

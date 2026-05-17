@@ -5,7 +5,9 @@ export function itemProfit(item: TradeItem): number | null {
   if (item.status !== 'sold') return null
   if (!item.sellDate || item.sellPrice == null) return null
   const expenseTotal = (item.expenses ?? []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
-  return item.sellPrice - (item.purchasePrice + expenseTotal)
+  const tax = Number(item.tax ?? 0) || 0
+  const commission = Number(item.commission ?? 0) || 0
+  return item.sellPrice - (item.purchasePrice + expenseTotal + tax + commission)
 }
 
 export function isInStock(item: TradeItem): boolean {
@@ -13,7 +15,10 @@ export function isInStock(item: TradeItem): boolean {
 }
 
 export function totalExpenses(item: TradeItem): number {
-  return (item.expenses ?? []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
+  const base = (item.expenses ?? []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
+  const tax = Number(item.tax ?? 0) || 0
+  const commission = Number(item.commission ?? 0) || 0
+  return base + tax + commission
 }
 
 export function reservedRemainingBalance(item: TradeItem): number | null {

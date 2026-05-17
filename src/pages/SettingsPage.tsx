@@ -36,6 +36,19 @@ function bytesFromBase64(b64: string): Uint8Array {
   return out
 }
 
+function formatBytes(bytes: number): string {
+  const v = Number(bytes)
+  if (!Number.isFinite(v) || v <= 0) return '—'
+  const units = ['B', 'KB', 'MB', 'GB'] as const
+  let idx = 0
+  let n = v
+  while (n >= 1024 && idx < units.length - 1) {
+    n /= 1024
+    idx += 1
+  }
+  return `${n.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`
+}
+
 async function hashPassword(password: string, saltB64: string): Promise<string> {
   const enc = new TextEncoder()
   const key = await crypto.subtle.importKey('raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits'])
@@ -396,56 +409,6 @@ export function SettingsPage({
         </div>
       </Card>
 
-      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.local')}</div>
-      <Card className="p-5">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.language')}</div>
-            <select
-              value={current}
-              onChange={(e) => void i18n.changeLanguage(e.target.value)}
-              className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            >
-              {languages.map((lng) => (
-                <option key={lng} value={lng}>
-                  {t(`settings.languages.${lng}`)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.currency')}</div>
-            <select
-              value={(settings.currency ?? 'AZN') as CurrencyCode}
-              onChange={(e) => void onUpdateSettings({ currency: e.target.value as CurrencyCode })}
-              className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            >
-              {currencies.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-            <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">
-              {t('settings.fx.last', { value: fxFetchedAt ? new Date(fxFetchedAt).toLocaleString() : '—' })}
-            </div>
-            <div className="mt-3">
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  if (typeof navigator !== 'undefined' && !navigator.onLine) return
-                  const fx = await refreshFxRates()
-                  setFxFetchedAt(fx?.fetchedAt ?? null)
-                }}
-              >
-                {t('settings.fx.refresh')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.system')}</div>
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -562,11 +525,7 @@ export function SettingsPage({
             >
               {t('backups.refresh')}
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => void window.GarageLedger?.backups?.openFolder()}
-              disabled={!canBackup}
-            >
+            <Button variant="ghost" onClick={() => void window.GarageLedger?.backups?.openFolder()} disabled={!canBackup}>
               {t('backups.openFolder')}
             </Button>
           </div>
@@ -575,6 +534,81 @@ export function SettingsPage({
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <div className="text-xs text-[var(--tf-ink-muted)]">{t('backups.last', { value: lastBackupLabel })}</div>
           <div className="text-xs text-[var(--tf-ink-muted)]">{t('backups.count', { count: backupItems.length })}</div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('backups.schedule')}</div>
+            <select
+              value={settings.backupSettings?.schedule ?? 'daily'}
+              onChange={(e) =>
+                void onUpdateSettings({
+                  backupSettings: {
+                    schedule: e.target.value as NonNullable<GarageLedgerSettings['backupSettings']>['schedule'],
+                    keepLast: settings.backupSettings?.keepLast ?? 30,
+                  },
+                })
+              }
+              className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            >
+              <option value="daily">{t('backups.schedules.daily')}</option>
+              <option value="weekly">{t('backups.schedules.weekly')}</option>
+              <option value="monthly">{t('backups.schedules.monthly')}</option>
+              <option value="yearly">{t('backups.schedules.yearly')}</option>
+              <option value="manual">{t('backups.schedules.manual')}</option>
+            </select>
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('backups.keepLast')}</div>
+            <input
+              type="number"
+              min={1}
+              max={365}
+              value={Number(settings.backupSettings?.keepLast ?? 30)}
+              onChange={(e) =>
+                void onUpdateSettings({
+                  backupSettings: { schedule: settings.backupSettings?.schedule ?? 'daily', keepLast: Number(e.target.value) },
+                })
+              }
+              className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            />
+          </div>
+          <div className="flex items-end gap-2">
+            <Button
+              variant="ghost"
+              onClick={async () => {
+                setBackupBusy(true)
+                try {
+                  const keepLast = settings.backupSettings?.keepLast ?? 30
+                  await window.GarageLedger?.backups?.cleanup?.(keepLast)
+                  const list = await window.GarageLedger?.backups?.list?.()
+                  if (list?.ok) setBackupItems(list.items)
+                } finally {
+                  setBackupBusy(false)
+                }
+              }}
+              disabled={!canBackup || backupBusy}
+            >
+              {t('backups.cleanup')}
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+            <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('backups.lastSuccessful')}</div>
+            <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{backupItems[0]?.fileName ?? '—'}</div>
+          </div>
+          <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+            <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('backups.lastSize')}</div>
+            <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{formatBytes(backupItems[0]?.size ?? 0)}</div>
+          </div>
+          <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+            <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('backups.lastAt')}</div>
+            <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">
+              {backupItems[0]?.mtimeMs ? new Date(backupItems[0].mtimeMs).toLocaleString() : '—'}
+            </div>
+          </div>
         </div>
 
         <div className="mt-4 overflow-hidden rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/40">
@@ -586,7 +620,9 @@ export function SettingsPage({
                 <div key={b.fileName} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                   <div className="min-w-0">
                     <div className="truncate text-sm font-medium text-[var(--tf-ink)]">{b.fileName}</div>
-                    <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{new Date(b.mtimeMs).toLocaleString()}</div>
+                    <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">
+                      {new Date(b.mtimeMs).toLocaleString()} · {formatBytes(b.size)}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -621,6 +657,199 @@ export function SettingsPage({
         </div>
       </Card>
 
+      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.local')}</div>
+      <Card className="p-5">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.language')}</div>
+            <select
+              value={current}
+              onChange={(e) => void i18n.changeLanguage(e.target.value)}
+              className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            >
+              {languages.map((lng) => (
+                <option key={lng} value={lng}>
+                  {t(`settings.languages.${lng}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.currency')}</div>
+            <select
+              value={(settings.currency ?? 'AZN') as CurrencyCode}
+              onChange={(e) => void onUpdateSettings({ currency: e.target.value as CurrencyCode })}
+              className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            >
+              {currencies.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">
+              {t('settings.fx.last', { value: fxFetchedAt ? new Date(fxFetchedAt).toLocaleString() : '—' })}
+            </div>
+            <div className="mt-3">
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  if (typeof navigator !== 'undefined' && !navigator.onLine) return
+                  const fx = await refreshFxRates()
+                  setFxFetchedAt(fx?.fetchedAt ?? null)
+                }}
+              >
+                {t('settings.fx.refresh')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-5">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.reminders.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.reminders.subtitle')}</div>
+
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.reminders.enabled')}</div>
+              <button
+                type="button"
+                onClick={() =>
+                  void onUpdateSettings({
+                    reminders: {
+                      enabled: !Boolean(settings.reminders?.enabled),
+                      notifyHour: settings.reminders?.notifyHour ?? 10,
+                      daysBefore: settings.reminders?.daysBefore ?? 3,
+                    },
+                  })
+                }
+                className="relative inline-flex h-9 w-16 items-center rounded-full border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-1 transition duration-200 hover:bg-black/5 dark:hover:bg-white/5"
+              >
+                <span className="sr-only">{t('settings.reminders.enabled')}</span>
+                <span
+                  className={[
+                    'inline-block h-7 w-7 rounded-full bg-[var(--tf-accent)] shadow-sm transition duration-200',
+                    settings.reminders?.enabled ? 'translate-x-7' : 'translate-x-0',
+                  ].join(' ')}
+                />
+              </button>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.reminders.notifyHour')}</div>
+                <select
+                  value={String(settings.reminders?.notifyHour ?? 10)}
+                  onChange={(e) =>
+                    void onUpdateSettings({
+                      reminders: {
+                        enabled: Boolean(settings.reminders?.enabled),
+                        notifyHour: Number(e.target.value),
+                        daysBefore: settings.reminders?.daysBefore ?? 3,
+                      },
+                    })
+                  }
+                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+                >
+                  {Array.from({ length: 24 }, (_, h) => (
+                    <option key={h} value={String(h)}>
+                      {String(h).padStart(2, '0')}:00
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.reminders.daysBefore')}</div>
+                <input
+                  type="number"
+                  min={0}
+                  max={30}
+                  value={Number(settings.reminders?.daysBefore ?? 3)}
+                  onChange={(e) =>
+                    void onUpdateSettings({
+                      reminders: {
+                        enabled: Boolean(settings.reminders?.enabled),
+                        notifyHour: settings.reminders?.notifyHour ?? 10,
+                        daysBefore: Number(e.target.value),
+                      },
+                    })
+                  }
+                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.fxUpdates.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.subtitle')}</div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.provider')}</div>
+                <select
+                  value={settings.fxUpdates?.provider ?? 'exchangerate-api'}
+                  onChange={(e) =>
+                    void onUpdateSettings({
+                      fxUpdates: {
+                        provider: (e.target.value as 'exchangerate-api') || 'exchangerate-api',
+                        mode: settings.fxUpdates?.mode ?? '30m',
+                      },
+                    })
+                  }
+                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+                >
+                  <option value="exchangerate-api">exchangerate-api</option>
+                </select>
+              </div>
+              <div>
+                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.interval')}</div>
+                <select
+                  value={settings.fxUpdates?.mode ?? '30m'}
+                  onChange={(e) =>
+                    void onUpdateSettings({
+                      fxUpdates: { provider: settings.fxUpdates?.provider ?? 'exchangerate-api', mode: e.target.value as any },
+                    })
+                  }
+                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+                >
+                  <option value="15m">{t('settings.fxUpdates.intervals.m15')}</option>
+                  <option value="30m">{t('settings.fxUpdates.intervals.m30')}</option>
+                  <option value="1h">{t('settings.fxUpdates.intervals.h1')}</option>
+                  <option value="manual">{t('settings.fxUpdates.intervals.manual')}</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+                <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.internet')}</div>
+                <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">
+                  {typeof navigator !== 'undefined' && navigator.onLine ? t('settings.fxUpdates.online') : t('settings.fxUpdates.offline')}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+                <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.cache')}</div>
+                <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{fxFetchedAt ? t('common.yes') : t('common.no')}</div>
+              </div>
+              <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+                <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.cacheAt')}</div>
+                <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{fxFetchedAt ? new Date(fxFetchedAt).toLocaleString() : '—'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {Boolean(settings.reminders?.enabled) || (settings.fxUpdates?.mode ?? 'manual') !== 'manual' ? (
+          <div className="mt-6 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 p-4 text-sm text-[var(--tf-ink)]">
+            {t('settings.backgroundWarning')}
+          </div>
+        ) : null}
+      </Card>
+
+      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.feedback')}</div>
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

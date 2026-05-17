@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { jsPDF } from 'jspdf'
-import autoTable from 'jspdf-autotable'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { StatCard } from '../components/StatCard'
@@ -10,6 +8,15 @@ import { formatMoney } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
 import { parseIsoDate, startOfDay, toIsoDateInputValue } from '../lib/dates'
 import type { GarageLedgerSettings, TradeItem } from '../lib/types'
+import { Modal } from '../components/Modal'
+import { i18n } from '../i18n'
+import {
+  formatDatePdf,
+  formatMoneyPdf,
+  generateGarageLedgerPdf,
+  type PdfExportOptions,
+  type PdfMovementRow,
+} from '../lib/pdfReport'
 
 type PresetKey = 'today' | 'thisWeek' | 'thisMonth' | 'last30' | 'custom'
 type MovementType = 'purchase' | 'reserved' | 'sold'
@@ -73,17 +80,11 @@ function movementTypeLabel(type: MovementType, t: (key: string) => string): stri
   return t('reports.types.sold')
 }
 
-function formatMoneyPdf(value: number, currency: CurrencyCode): string {
-  const amount = Number.isFinite(value) ? value : 0
-  const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount)
-  return `${formatted} ${currency}`
-}
-
 function sanitizePdfText(value: string): string {
-  return value
-    .replaceAll('—', '-')
-    .replaceAll('·', '-')
-    .replaceAll('→', '->')
+  return String(value ?? '')
+    .replaceAll('\r\n', '\n')
+    .replaceAll('\r', '\n')
+    .replaceAll('\t', ' ')
     .trim()
 }
 
@@ -98,7 +99,11 @@ function expenseNotesText(item: TradeItem, currency: CurrencyCode): string {
       return `${formatMoneyPdf(amount, currency)} - ${desc}`
     })
     .filter(Boolean)
-  return lines.join('; ')
+  const tax = Number(item.tax ?? 0)
+  const commission = Number(item.commission ?? 0)
+  if (Number.isFinite(tax) && tax) lines.push(`${formatMoneyPdf(tax, currency)} - Tax`)
+  if (Number.isFinite(commission) && commission) lines.push(`${formatMoneyPdf(commission, currency)} - Commission`)
+  return lines.join('\n')
 }
 
 type CompanyProfile = NonNullable<GarageLedgerSettings['companyProfile']>
@@ -113,6 +118,12 @@ export function ReportsPage({
   companyProfile?: CompanyProfile
 }) {
   const { t } = useTranslation()
+  const [exportOptionsOpen, setExportOptionsOpen] = useState(false)
+  const [exportOpts, setExportOpts] = useState<PdfExportOptions>(() => {
+    const lng =
+      i18n.language === 'az' || i18n.language === 'tr' || i18n.language === 'en' || i18n.language === 'ru' ? i18n.language : 'az'
+    return { language: lng, currency, paper: 'a4', theme: 'light', dateFormat: 'iso' }
+  })
   const [preset, setPreset] = useState<PresetKey>('thisMonth')
   const initial = useMemo(() => presetRange('thisMonth'), [])
   const [from, setFrom] = useState<string>(initial.from)
@@ -120,8 +131,7 @@ export function ReportsPage({
 
   const resolvedRange = useMemo(() => {
     if (preset === 'custom') return { from, to }
-    const r = presetRange(preset)
-    return r
+    return presetRange(preset)
   }, [preset, from, to])
 
   const rows = useMemo(() => {
@@ -184,7 +194,7 @@ export function ReportsPage({
     }
 
     return out.sort((a, b) => b.date.localeCompare(a.date))
-  }, [items, currency, resolvedRange.from, resolvedRange.to])
+  }, [items, currency, resolvedRange.from, resolvedRange.to, t])
 
   const totals = useMemo(() => {
     const fromD = startOfDay(parseIsoDate(resolvedRange.from))
@@ -212,140 +222,32 @@ export function ReportsPage({
     return { investment, revenue, netProfit }
   }, [items, resolvedRange.from, resolvedRange.to])
 
-  const exportPdf = async () => {
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' })
-    const fontRes = await window.GarageLedger?.pdf?.getFont?.()
-    let fontFamily: string = 'helvetica'
-    if (fontRes?.ok && fontRes.base64 && fontRes.fileName) {
-      const fileName = fontRes.fileName
-      const base64 = fontRes.base64
-      fontFamily = 'GarageLedgerFont'
-      doc.addFileToVFS(fileName, base64)
-      doc.addFont(fileName, fontFamily, 'normal')
-      doc.setFont(fontFamily, 'normal')
-    }
-    const pageWidth = doc.internal.pageSize.getWidth()
-    const pageHeight = doc.internal.pageSize.getHeight()
+  const exportPdf = async (opts: PdfExportOptions) => {
+    const tr = (key: string, params?: Record<string, unknown>) => i18n.t(key, { ...(params ?? {}), lng: opts.language })
 
-    const title = 'GarageLedger — Report'
-    const rangeLabel = `${resolvedRange.from} - ${resolvedRange.to}`
-    const currencyLabel = `Currency: ${currency}`
-    const profile = companyProfile ?? {}
-    const profileLines = [profile.address, [profile.phone, profile.email, profile.website].filter(Boolean).join(' · ')]
-      .map((x) => String(x ?? '').trim())
-      .filter(Boolean)
-
-    const headerY = 44
-    const logo = String(profile.logoDataUrl ?? '').trim()
-    const headX = logo.startsWith('data:image/') ? 98 : 40
-    if (logo.startsWith('data:image/')) {
-      const mime = logo.slice(5, logo.indexOf(';'))
-      const fmt = mime === 'image/png' ? 'PNG' : mime === 'image/jpeg' ? 'JPEG' : null
-      if (fmt) {
-        doc.addImage(logo, fmt, 40, 28, 48, 48)
-      }
-    }
-
-    autoTable(doc, {
-      startY: 168,
-      head: [
-        [
-          'Date',
-          'Type',
-          'Vehicle',
-          'Purchase',
-          'Sale',
-          'Expenses',
-          'Expense Notes',
-          'Profit',
-        ],
-      ],
-      body: rows.map((r) => [
-        r.date,
-        r.type === 'purchase' ? 'Purchase' : r.type === 'reserved' ? 'Reserved' : 'Sold',
-        sanitizePdfText(r.vehicle),
-        formatMoneyPdf(r.purchasePrice, currency),
-        r.sellPrice == null ? '—' : formatMoneyPdf(r.sellPrice, currency),
-        r.expenses ? formatMoneyPdf(r.expenses, currency) : '—',
-        r.expenseNotes ? sanitizePdfText(r.expenseNotes) : '—',
-        r.profit == null ? '—' : formatMoneyPdf(r.profit, currency),
-      ]),
-      columnStyles: {
-        0: { cellWidth: 52, overflow: 'linebreak' },
-        1: { cellWidth: 52, overflow: 'linebreak' },
-        2: { cellWidth: 140, overflow: 'linebreak' },
-        3: { cellWidth: 'wrap', halign: 'right' },
-        4: { cellWidth: 'wrap', halign: 'right' },
-        5: { cellWidth: 'wrap', halign: 'right' },
-        6: { cellWidth: 'auto', overflow: 'linebreak' },
-        7: { cellWidth: 'wrap', halign: 'right' },
-      },
-      styles: {
-        font: fontFamily,
-        fontSize: 8.5,
-        textColor: [30, 41, 59],
-        cellPadding: 4,
-        overflow: 'linebreak',
-        cellWidth: 'wrap',
-      },
-      headStyles: {
-        fillColor: [245, 240, 232],
-        textColor: [15, 23, 42],
-        fontStyle: 'normal',
-      },
-      alternateRowStyles: { fillColor: [250, 250, 250] },
-      margin: { left: 40, right: 40 },
-      didDrawPage: (data) => {
-        const companyName = String(profile.name ?? '').trim()
-        doc.setFont(fontFamily, 'normal')
-        doc.setFontSize(16)
-        doc.text(companyName || title, headX, headerY)
-
-        doc.setFont(fontFamily, 'normal')
-        doc.setFontSize(10)
-        doc.text(title, headX, headerY + 16)
-        doc.setFontSize(9)
-        doc.text(rangeLabel, headX, headerY + 32)
-        doc.text(currencyLabel, headX, headerY + 46)
-
-        if (profileLines.length) {
-          doc.setFontSize(9)
-          doc.text(profileLines[0] ?? '', 40, 92)
-          if (profileLines[1]) doc.text(profileLines[1], 40, 106)
-        }
-        doc.setFontSize(9)
-        doc.text(
-          `Investment: ${formatMoneyPdf(totals.investment, currency)}`,
-          40,
-          98,
-        )
-        doc.text(
-          `Revenue: ${formatMoneyPdf(totals.revenue, currency)}`,
-          40,
-          112,
-        )
-        doc.text(
-          `Net Profit: ${formatMoneyPdf(totals.netProfit, currency)}`,
-          40,
-          126,
-        )
-
-        doc.setFont(fontFamily, 'normal')
-        doc.setFontSize(10)
-        doc.text('GarageLedger | Cicibyte Corp', pageWidth - 40, pageHeight - 22, { align: 'right' })
-        doc.setFont(fontFamily, 'normal')
-        doc.setFontSize(9)
-        doc.text(`Page ${data.pageNumber}`, 40, pageHeight - 22)
-
-        doc.setDrawColor(226, 232, 240)
-        doc.line(40, 144, pageWidth - 40, 144)
-        doc.line(40, pageHeight - 32, pageWidth - 40, pageHeight - 32)
-      },
-    })
+    const pdfRows: PdfMovementRow[] = rows.map((r) => ({
+      date: formatDatePdf(r.date, opts.language, opts.dateFormat),
+      typeLabel: movementTypeLabel(r.type, tr),
+      vehicle: sanitizePdfText(r.vehicle),
+      purchasePrice: formatMoneyPdf(r.purchasePrice, opts.currency),
+      sellPrice: r.sellPrice == null ? '—' : formatMoneyPdf(r.sellPrice, opts.currency),
+      expenses: r.expenses ? formatMoneyPdf(r.expenses, opts.currency) : '—',
+      expenseNotes: r.expenseNotes ? sanitizePdfText(r.expenseNotes) : '—',
+      profit: r.profit == null ? '—' : formatMoneyPdf(r.profit, opts.currency),
+    }))
 
     const safeFrom = resolvedRange.from.replaceAll(':', '-')
     const safeTo = resolvedRange.to.replaceAll(':', '-')
-    doc.save(`GarageLedger_Report_${safeFrom}_${safeTo}.pdf`)
+
+    await generateGarageLedgerPdf({
+      opts,
+      tr,
+      range: resolvedRange,
+      totals,
+      rows: pdfRows,
+      companyProfile,
+      fileName: `GarageLedger_Report_${safeFrom}_${safeTo}.pdf`,
+    })
   }
 
   return (
@@ -357,12 +259,139 @@ export function ReportsPage({
         </div>
         <Button
           onClick={() => {
-            void exportPdf()
+            setExportOpts((prev) => ({ ...prev, currency }))
+            setExportOptionsOpen(true)
           }}
         >
           {t('reports.export')}
         </Button>
       </div>
+
+      <Modal
+        title={t('reports.exportOptions.title')}
+        open={exportOptionsOpen}
+        onClose={() => setExportOptionsOpen(false)}
+        maxWidthClassName="max-w-2xl"
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <button
+              type="button"
+              className="rounded-2xl border border-[var(--tf-border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:bg-black/5 dark:bg-gray-950 dark:hover:bg-white/5"
+              onClick={() => setExportOptionsOpen(false)}
+            >
+              {t('common.close')}
+            </button>
+            <button
+              type="button"
+              className="rounded-2xl bg-[var(--tf-accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/90 hover:shadow-md dark:text-black dark:hover:bg-[#b89145]"
+              onClick={() => {
+                setExportOptionsOpen(false)
+                void exportPdf(exportOpts)
+              }}
+            >
+              {t('reports.exportOptions.export')}
+            </button>
+          </div>
+        }
+      >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('reports.exportOptions.language')}</div>
+            <select
+              value={exportOpts.language}
+              onChange={(e) => {
+                const v = e.target.value
+                if (v === 'az' || v === 'tr' || v === 'en' || v === 'ru') setExportOpts((p) => ({ ...p, language: v }))
+              }}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            >
+              <option value="az">AZ</option>
+              <option value="tr">TR</option>
+              <option value="en">EN</option>
+              <option value="ru">RU</option>
+            </select>
+          </div>
+
+          <div>
+            <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('reports.exportOptions.currency')}</div>
+            <select
+              value={exportOpts.currency}
+              onChange={(e) => {
+                const v = e.target.value
+                if (v === 'AZN' || v === 'USD' || v === 'EUR' || v === 'TRY') setExportOpts((p) => ({ ...p, currency: v }))
+              }}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            >
+              <option value="AZN">AZN</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="TRY">TRY</option>
+            </select>
+          </div>
+
+          <div>
+            <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('reports.exportOptions.dateFormat')}</div>
+            <select
+              value={exportOpts.dateFormat}
+              onChange={(e) => {
+                const v = e.target.value
+                if (v === 'iso' || v === 'dmy' || v === 'mdy' || v === 'locale') setExportOpts((p) => ({ ...p, dateFormat: v }))
+              }}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            >
+              <option value="iso">YYYY-MM-DD</option>
+              <option value="dmy">DD.MM.YYYY</option>
+              <option value="mdy">MM/DD/YYYY</option>
+              <option value="locale">{t('reports.exportOptions.dateFormatLocale')}</option>
+            </select>
+          </div>
+
+          <div>
+            <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('reports.exportOptions.paper')}</div>
+            <select
+              value={exportOpts.paper}
+              onChange={(e) => {
+                const v = e.target.value
+                if (v === 'a4' || v === 'letter') setExportOpts((p) => ({ ...p, paper: v }))
+              }}
+              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+            >
+              <option value="a4">A4</option>
+              <option value="letter">Letter</option>
+            </select>
+          </div>
+
+          <div className="sm:col-span-2">
+            <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('reports.exportOptions.theme')}</div>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                className={[
+                  'rounded-2xl border border-[var(--tf-border)] px-4 py-3 text-left text-sm font-semibold transition duration-200',
+                  exportOpts.theme === 'light'
+                    ? 'bg-[var(--tf-accent)] text-white dark:text-black'
+                    : 'bg-[var(--tf-surface)]/70 text-[var(--tf-ink)] hover:bg-black/5 dark:hover:bg-white/5',
+                ].join(' ')}
+                onClick={() => setExportOpts((p) => ({ ...p, theme: 'light' }))}
+              >
+                {t('reports.exportOptions.themeLight')}
+              </button>
+              <button
+                type="button"
+                className={[
+                  'rounded-2xl border border-[var(--tf-border)] px-4 py-3 text-left text-sm font-semibold transition duration-200',
+                  exportOpts.theme === 'dark'
+                    ? 'bg-[var(--tf-accent)] text-white dark:text-black'
+                    : 'bg-[var(--tf-surface)]/70 text-[var(--tf-ink)] hover:bg-black/5 dark:hover:bg-white/5',
+                ].join(' ')}
+                onClick={() => setExportOpts((p) => ({ ...p, theme: 'dark' }))}
+              >
+                {t('reports.exportOptions.themeDark')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
 
       <Card className="p-5">
         <div className="flex flex-col gap-4">

@@ -17,8 +17,20 @@ export type TradeItem = {
   id: string
   brand: string
   model: string
+  package?: string
   year: number | null
   engine: string
+  fuel?: string
+  transmission?: string
+  mileage?: number | null
+  color?: string
+  damage?: string
+  tramer?: string
+  notes?: string
+  location?: string
+  plate?: string
+  keyCount?: number | null
+  inspection?: string
   vin: string
   category: string
   purchaseDate: string
@@ -49,6 +61,8 @@ export type TradeItem = {
   sellDate: string | null
   purchasePrice: number
   sellPrice: number | null
+  tax?: number | null
+  commission?: number | null
   expenses: {
     id: string
     date: string
@@ -61,6 +75,19 @@ export type GarageLedgerSettings = {
   currency: CurrencyCode
   lastBackupAt?: string | null
   lastUpdateCheckAt?: string | null
+  reminders?: {
+    enabled: boolean
+    notifyHour: number
+    daysBefore: number
+  }
+  fxUpdates?: {
+    provider: 'exchangerate-api'
+    mode: 'manual' | '15m' | '30m' | '1h'
+  }
+  backupSettings?: {
+    schedule: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'manual'
+    keepLast: number
+  }
   companyProfile?: {
     name?: string
     logoDataUrl?: string

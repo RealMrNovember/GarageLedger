@@ -11,12 +11,16 @@ export function useGarageLedger() {
   const [ready, setReady] = useState(false)
 
   const refresh = useCallback(async () => {
-    const [nextItems, nextContacts, settings] = await Promise.all([api.listItems(), api.listContacts(), api.getSettings()])
-    setItems(nextItems)
-    setContacts(nextContacts)
-    setCurrencyState(settings.currency)
-    setSettings(settings)
-    setReady(true)
+    try {
+      const [nextItems, nextContacts, settings] = await Promise.all([api.listItems(), api.listContacts(), api.getSettings()])
+      setItems(nextItems)
+      setContacts(nextContacts)
+      setCurrencyState(settings.currency)
+      setSettings(settings)
+      setReady(true)
+    } catch {
+      setReady(true)
+    }
   }, [])
 
   useEffect(() => {

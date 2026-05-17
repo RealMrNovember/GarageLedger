@@ -1,6 +1,8 @@
 {
   "common": {
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "maximize": "Развернуть",
+    "restore": "Вернуть"
   },
   "app": {
     "name": "GarageLedger",
@@ -84,6 +86,25 @@
     "title": "Отчёты",
     "subtitle": "Создавайте сводные отчёты и экспортируйте брендированный PDF.",
     "export": "Экспорт PDF",
+    "exportOptions": {
+      "title": "Параметры экспорта PDF",
+      "export": "Сгенерировать PDF",
+      "language": "Язык экспорта",
+      "currency": "Валюта экспорта",
+      "dateFormat": "Формат даты",
+      "dateFormatLocale": "По языку экспорта",
+      "paper": "Формат бумаги",
+      "theme": "Тема",
+      "themeLight": "Светлый PDF",
+      "themeDark": "Тёмный PDF"
+    },
+    "pdf": {
+      "title": "Бухгалтерский отчёт",
+      "range": "Диапазон: {{from}} → {{to}}",
+      "currency": "Валюта: {{currency}}",
+      "exportedAt": "Экспорт: {{value}}",
+      "pageXofY": "Стр. {{x}} / {{y}}"
+    },
     "empty": "Для выбранного диапазона дат нет операций.",
     "reservedLine": "Задаток: {{deposit}} · Сторона: {{party}}",
     "filters": {
@@ -116,6 +137,7 @@
       "purchase": "Покупка",
       "sale": "Продажа",
       "expenses": "Расходы",
+      "expenseNotes": "Примечание (расходы)",
       "profit": "Прибыль"
     }
   },
@@ -255,6 +277,7 @@
           "bullets": [
             "Пресеты: Сегодня, Неделя, Месяц, Последние 30 дней, Пользовательский",
             "Итоги: инвестиции, выручка и чистая прибыль (по проданным)",
+            "Параметры экспорта: язык, валюта, формат даты, A4/Letter и светлая/тёмная тема PDF",
             "PDF с брендингом и подписью Cicibyte Corp в футере"
           ]
         },
@@ -381,9 +404,18 @@
   "about": {
     "title": "О программе",
     "desc": "Оффлайн-приложение для учёта инвентаря и финансов.",
-    "logoPlaceholder": "Cicibyte Corp logo placeholder",
-    "createdBy": "Created By",
-    "close": "Закрыть"
+    "createdBy": "Автор: Mikail • Cicibyte Corp",
+    "actions": {
+      "emailTitle": "Email",
+      "emailDesc": "Напишите письмо для поддержки или обратной связи.",
+      "emailCta": "Написать письмо",
+      "githubTitle": "GitHub",
+      "githubDesc": "Открыть репозиторий и release notes.",
+      "githubCta": "Открыть репозиторий",
+      "whatsappTitle": "WhatsApp",
+      "whatsappDesc": "Связаться с поддержкой в WhatsApp.",
+      "whatsappCta": "Написать в поддержку"
+    }
   },
   "lock": {
     "title": "Приложение заблокировано",
@@ -450,8 +482,9 @@
     "sections": {
       "company": "ПРОФИЛЬ КОМПАНИИ",
       "security": "БЕЗОПАСНОСТЬ",
-      "local": "ЛОКАЛЬНЫЕ",
-      "system": "СИСТЕМА"
+      "local": "РЕГИОНАЛЬНОЕ",
+      "system": "СИСТЕМА",
+      "feedback": "ОБРАТНАЯ СВЯЗЬ (WHATSAPP)"
     },
     "fx": {
       "last": "Последнее обновление курсов: {{value}}",
