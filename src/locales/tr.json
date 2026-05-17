@@ -315,7 +315,9 @@
     "cancel": "Vazgeç",
     "save": "Kaydet",
     "sections": {
+      "vehicle": "Araç bilgileri",
       "parties": "Kişiler",
+      "finance": "Finans ve durum",
       "expenses": "Masraflar",
       "tradeIn": "Takas Aracı"
     },

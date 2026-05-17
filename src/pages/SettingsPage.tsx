@@ -174,7 +174,7 @@ export function SettingsPage({
   }, [lastUpdateCheckAt, t])
 
   return (
-    <div className="space-y-4">
+    <div className="mx-auto max-w-6xl space-y-4">
       <div>
         <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.title')}</div>
       </div>

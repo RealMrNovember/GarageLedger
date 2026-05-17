@@ -64,7 +64,7 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
   }, [open])
 
   return (
-    <Modal title={t('about.title')} open={open} onClose={onClose} maxWidthClassName="max-w-2xl">
+    <Modal title={t('about.title')} open={open} onClose={onClose} size="lg">
       <div className="space-y-4">
         <div className="rounded-2xl border border-[var(--tf-modal-border)] bg-[var(--tf-modal-surface-raised)] p-6 shadow-sm">
           <div className="flex items-start gap-4">

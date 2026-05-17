@@ -375,7 +375,7 @@ export function InventoryPage({
         title={t('inventory.actions.delete')}
         open={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
-        maxWidthClassName="max-w-lg"
+        size="sm"
         footer={
           <div className="flex items-center justify-end gap-2">
             <button

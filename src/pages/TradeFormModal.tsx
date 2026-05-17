@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/Button'
 import { Modal } from '../components/Modal'
+import { ModalSection } from '../components/ModalSection'
+import { modalLabelClass } from '../lib/uiClasses'
 import { addDays, parseIsoDate, toIsoDateInputValue } from '../lib/dates'
 import type { Contact, ContactRole, TradeItem } from '../lib/types'
 
@@ -314,9 +316,9 @@ export function TradeFormModal({
         title={isEdit ? t('tradeForm.editTitle') : t('tradeForm.createTitle')}
         open={open}
         onClose={onClose}
+        size="workspace"
         draggable
         maximizable
-        maxWidthClassName="max-w-5xl"
         footer={
           <div className="flex items-center justify-end gap-2">
             <Button variant="ghost" onClick={onClose}>
@@ -430,7 +432,8 @@ export function TradeFormModal({
           </div>
         }
       >
-      <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-5">
+        <ModalSection title={t('tradeForm.sections.vehicle')}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.brand')}</div>
@@ -524,10 +527,10 @@ export function TradeFormModal({
             </button>
           </div>
         </div>
+        </ModalSection>
 
-        <div className="rounded-2xl border border-[var(--tf-border)] bg-white/50 p-4">
-          <div className="text-xs font-semibold text-slate-700">{t('tradeForm.sections.parties')}</div>
-          <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <ModalSection title={t('tradeForm.sections.parties')}>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <div className="flex items-center justify-between gap-3">
                 <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.seller')}</div>
@@ -702,11 +705,12 @@ export function TradeFormModal({
               </div>
             </div>
           )}
-        </div>
+        </ModalSection>
 
+        <ModalSection title={t('tradeForm.sections.finance')}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('tradeForm.fields.category')}</div>
+            <div className={modalLabelClass}>{t('tradeForm.fields.category')}</div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -987,10 +991,11 @@ export function TradeFormModal({
             )}
           </div>
         ) : null}
+        </ModalSection>
 
-        <div className="rounded-2xl border border-[var(--tf-border)] bg-white/50 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-xs font-semibold text-slate-700">{t('tradeForm.sections.expenses')}</div>
+        <ModalSection
+          title={t('tradeForm.sections.expenses')}
+          actions={
             <Button
               variant="ghost"
               onClick={() => {
@@ -1002,8 +1007,8 @@ export function TradeFormModal({
             >
               {t('tradeForm.actions.addExpense')}
             </Button>
-          </div>
-
+          }
+        >
           {expenses.length === 0 ? (
             <div className="mt-3 text-xs text-slate-500">{t('tradeForm.emptyExpenses')}</div>
           ) : (
@@ -1056,7 +1061,7 @@ export function TradeFormModal({
               ))}
             </div>
           )}
-        </div>
+        </ModalSection>
       </div>
     </Modal>
 
@@ -1064,6 +1069,8 @@ export function TradeFormModal({
       title={t('tradeForm.addContactTitle')}
       open={contactModalOpen}
       onClose={() => setContactModalOpen(false)}
+      size="md"
+      draggable
       footer={
         <div className="flex items-center justify-end gap-2">
           <Button variant="ghost" onClick={() => setContactModalOpen(false)}>

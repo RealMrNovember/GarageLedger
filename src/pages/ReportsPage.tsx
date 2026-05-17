@@ -271,7 +271,7 @@ export function ReportsPage({
         title={t('reports.exportOptions.title')}
         open={exportOptionsOpen}
         onClose={() => setExportOptionsOpen(false)}
-        maxWidthClassName="max-w-2xl"
+        size="lg"
         footer={
           <div className="flex items-center justify-end gap-2">
             <button

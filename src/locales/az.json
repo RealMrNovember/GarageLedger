@@ -315,7 +315,9 @@
     "cancel": "İmtina",
     "save": "Yadda saxla",
     "sections": {
+      "vehicle": "Avtomobil məlumatları",
       "parties": "Şəxslər",
+      "finance": "Maliyyə və status",
       "expenses": "Xərclər",
       "tradeIn": "Takas avtomobili"
     },

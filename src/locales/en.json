@@ -315,7 +315,9 @@
     "cancel": "Cancel",
     "save": "Save",
     "sections": {
+      "vehicle": "Vehicle details",
       "parties": "Parties",
+      "finance": "Finance & status",
       "expenses": "Expenses",
       "tradeIn": "Trade-in Vehicle"
     },
