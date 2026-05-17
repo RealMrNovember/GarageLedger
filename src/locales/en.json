@@ -404,6 +404,7 @@
   "about": {
     "title": "About",
     "desc": "Offline inventory and finance tracking app.",
+    "version": "v{{version}}",
     "createdBy": "Created by Mikail | Cicibyte Corp",
     "actions": {
       "emailTitle": "Email",

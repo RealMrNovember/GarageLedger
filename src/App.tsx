@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Footer } from './components/Footer'
 import { Logo } from './components/Logo'
+import { AboutModal } from './components/AboutModal'
 import { Modal } from './components/Modal'
 import { Sidebar, type NavKey } from './components/Sidebar'
 import { Topbar } from './components/Topbar'
@@ -264,106 +265,7 @@ export default function App() {
         <Footer />
       </div>
 
-      <Modal title={t('about.title')} open={aboutOpen} onClose={() => setAboutOpen(false)}>
-        <div className="space-y-5">
-          <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
-            <div className="flex items-start gap-4">
-              <Logo size={46} />
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('app.name')}</div>
-                <div className="mt-1 text-sm text-[var(--tf-ink-muted)]">{t('about.desc')}</div>
-                <div className="mt-3 text-xs font-medium text-[var(--tf-ink-muted)]">{t('about.createdBy')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3">
-            <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M4 6.5h16v11H4v-11z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-                      <path d="M4.5 7l7.5 6l7.5-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('about.actions.emailTitle')}</div>
-                    <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('about.actions.emailDesc')}</div>
-                  </div>
-                </div>
-                <a
-                  href="mailto:mozkarci1991@gmail.com"
-                  className="inline-flex items-center justify-center rounded-2xl bg-[var(--tf-accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/90 hover:shadow-md dark:text-black dark:hover:bg-[#b89145]"
-                >
-                  {t('about.actions.emailCta')}
-                </a>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M9 19c-3 1-3-1-4-1m8 2v-2.2c0-.7.2-1.3.6-1.8c-2 .2-4.1-1-4.1-4.4c0-1 .3-1.8.9-2.5c-.1-.2-.4-1.2.1-2.4c0 0 .8-.2 2.6 1c.7-.2 1.5-.3 2.3-.3s1.6.1 2.3.3c1.8-1.2 2.6-1 2.6-1c.5 1.2.2 2.2.1 2.4c.6.7.9 1.5.9 2.5c0 3.4-2.1 4.6-4.1 4.4c.4.5.6 1.1.6 1.8V20"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('about.actions.githubTitle')}</div>
-                    <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('about.actions.githubDesc')}</div>
-                  </div>
-                </div>
-                <a
-                  href="https://github.com/RealMrNovember/GarageLedger"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
-                >
-                  {t('about.actions.githubCta')}
-                </a>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M16.6 14.4c-.2 0-.4 0-.6-.1c-1.2-.3-2.6-1.1-3.8-2.3c-1.2-1.2-2-2.6-2.3-3.8c-.2-.8.1-1.5.8-1.9l1.1-.6c.6-.3 1.3-.2 1.8.3l1 1.1c.4.5.5 1.2.2 1.8l-.3.6c.6 1 1.4 1.9 2.3 2.7c.9.9 1.8 1.7 2.7 2.3l.6-.3c.6-.3 1.3-.2 1.8.2l1.1 1c.5.5.6 1.2.3 1.8l-.6 1.1c-.3.6-.9.9-1.5.9c-.2 0-.3 0-.5 0c-1.3-.2-2.8-1-4.3-2.2"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path d="M7 4h10a3 3 0 0 1 3 3v10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                    </svg>
-                  </span>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('about.actions.whatsappTitle')}</div>
-                    <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('about.actions.whatsappDesc')}</div>
-                  </div>
-                </div>
-                <a
-                  href="https://wa.me/905354895050"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
-                >
-                  {t('about.actions.whatsappCta')}
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
 
       {lockOpen ? (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -477,20 +379,20 @@ export default function App() {
                                 ))}
                               </ul>
                             ) : (
-                              <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">—</div>
+                              <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">â€”</div>
                             )}
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="mt-3 text-sm text-[var(--tf-ink-muted)]">—</div>
+                      <div className="mt-3 text-sm text-[var(--tf-ink-muted)]">â€”</div>
                     )}
                   </div>
                 </div>
               ))}
               {!releaseHistory.length ? (
                 <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 text-sm text-[var(--tf-ink-muted)] dark:bg-gray-950">
-                  Sürüm geçmişi alınamadı.
+                  SÃ¼rÃ¼m geÃ§miÅŸi alÄ±namadÄ±.
                 </div>
               ) : null}
             </div>

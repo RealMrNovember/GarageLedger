@@ -404,6 +404,7 @@
   "about": {
     "title": "Hakkında",
     "desc": "Çevrimdışı envanter ve finans takip uygulaması.",
+    "version": "v{{version}}",
     "createdBy": "Mikail tarafından • Cicibyte Corp",
     "actions": {
       "emailTitle": "E-posta",

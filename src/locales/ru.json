@@ -404,6 +404,7 @@
   "about": {
     "title": "О программе",
     "desc": "Оффлайн-приложение для учёта инвентаря и финансов.",
+    "version": "v{{version}}",
     "createdBy": "Автор: Mikail • Cicibyte Corp",
     "actions": {
       "emailTitle": "Email",

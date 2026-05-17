@@ -404,6 +404,7 @@
   "about": {
     "title": "Haqqında",
     "desc": "Çevrimdışı inventar və maliyyə izləmə tətbiqi.",
+    "version": "v{{version}}",
     "createdBy": "Mikail tərəfindən • Cicibyte Corp",
     "actions": {
       "emailTitle": "E-poçt",
