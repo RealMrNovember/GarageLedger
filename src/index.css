@@ -9,6 +9,11 @@
   --tf-accent: #111827;
   --tf-border: rgba(15, 23, 42, 0.08);
   --tf-shadow: 0 18px 40px -30px rgba(15, 23, 42, 0.35);
+  --tf-modal-overlay: rgba(15, 23, 42, 0.42);
+  --tf-modal-surface: #ffffff;
+  --tf-modal-surface-raised: #fafafa;
+  --tf-modal-border: rgba(15, 23, 42, 0.12);
+  --tf-modal-shadow: 0 28px 80px -32px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(15, 23, 42, 0.06);
 
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
     Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
@@ -25,6 +30,11 @@
   --tf-accent: #c8a45a;
   --tf-border: rgba(55, 65, 81, 0.9);
   --tf-shadow: 0 22px 60px -42px rgba(0, 0, 0, 0.75);
+  --tf-modal-overlay: rgba(2, 6, 14, 0.88);
+  --tf-modal-surface: #0f1419;
+  --tf-modal-surface-raised: #151b24;
+  --tf-modal-border: rgba(148, 163, 184, 0.28);
+  --tf-modal-shadow: 0 28px 80px -24px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 html,
@@ -50,6 +60,63 @@ textarea {
 .dark textarea {
   background-color: rgba(255, 255, 255, 0.06) !important;
   color: var(--tf-ink);
+}
+
+.gl-modal-overlay {
+  background: var(--tf-modal-overlay);
+  backdrop-filter: blur(4px);
+}
+
+.dark .gl-modal-overlay {
+  backdrop-filter: blur(8px);
+}
+
+.gl-modal-panel {
+  background: var(--tf-modal-surface);
+  border: 1px solid var(--tf-modal-border);
+  box-shadow: var(--tf-modal-shadow);
+}
+
+.gl-modal-header,
+.gl-modal-footer {
+  background: var(--tf-modal-surface-raised);
+  border-color: var(--tf-modal-border);
+}
+
+.gl-modal-field {
+  border-color: var(--tf-modal-border);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--tf-ink);
+}
+
+.dark .gl-modal-field {
+  background: #1a222d;
+  border-color: rgba(148, 163, 184, 0.32);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.gl-modal-field:focus,
+.gl-modal-root input:focus,
+.gl-modal-root select:focus,
+.gl-modal-root textarea:focus {
+  border-color: var(--tf-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(200, 164, 90, 0.18);
+}
+
+.dark .gl-modal-root input:not(.gl-modal-field),
+.dark .gl-modal-root select:not(.gl-modal-field),
+.dark .gl-modal-root textarea:not(.gl-modal-field) {
+  background-color: #1a222d !important;
+  border-color: rgba(148, 163, 184, 0.32) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.dark .gl-modal-root input:focus,
+.dark .gl-modal-root select:focus,
+.dark .gl-modal-root textarea:focus {
+  border-color: var(--tf-accent) !important;
+  box-shadow: 0 0 0 3px rgba(200, 164, 90, 0.2) !important;
 }
 
 .dark option {

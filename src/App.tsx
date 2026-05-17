@@ -269,8 +269,8 @@ export default function App() {
 
       {lockOpen ? (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm dark:bg-black/80" />
-          <div className="relative w-full max-w-md rounded-3xl border border-[var(--tf-border)] bg-white p-6 shadow-[var(--tf-shadow)] dark:bg-gray-950">
+          <div className="gl-modal-overlay absolute inset-0" aria-hidden="true" />
+          <div className="gl-modal-panel relative w-full max-w-md rounded-2xl p-6">
             <div className="flex items-start gap-4">
               <Logo size={42} />
               <div className="min-w-0">
@@ -279,7 +279,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-5">
+            <div className="mt-5 gl-modal-root">
               <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('lock.password')}</div>
               <input
                 value={lockPassword}
@@ -288,7 +288,7 @@ export default function App() {
                   if (e.key === 'Enter') void unlock()
                 }}
                 type="password"
-                className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+                className="gl-modal-field mt-2"
               />
               {lockError ? <div className="mt-2 text-xs font-semibold text-rose-600">{lockError}</div> : null}
             </div>

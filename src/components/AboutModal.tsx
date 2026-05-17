@@ -23,7 +23,7 @@ function ContactCard({
   primary?: boolean
 }) {
   return (
-    <div className="group rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/40 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[var(--tf-accent)]/25 hover:shadow-md dark:bg-gray-900/80">
+    <div className="group rounded-2xl border border-[var(--tf-modal-border)] bg-[var(--tf-modal-surface-raised)] p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[var(--tf-accent)]/30 hover:shadow-md">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-white text-[var(--tf-ink)] shadow-sm dark:bg-gray-950">
@@ -66,7 +66,7 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
   return (
     <Modal title={t('about.title')} open={open} onClose={onClose} maxWidthClassName="max-w-2xl">
       <div className="space-y-4">
-        <div className="rounded-2xl border border-[var(--tf-border)] bg-gradient-to-br from-[var(--tf-surface)]/80 to-white p-6 shadow-sm dark:from-gray-900 dark:to-gray-950">
+        <div className="rounded-2xl border border-[var(--tf-modal-border)] bg-[var(--tf-modal-surface-raised)] p-6 shadow-sm">
           <div className="flex items-start gap-4">
             <Logo size={52} />
             <div className="min-w-0 flex-1">
