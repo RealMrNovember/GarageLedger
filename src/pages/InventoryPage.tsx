@@ -373,6 +373,7 @@ export function InventoryPage({
         onClose={() => setOpen(false)}
         categories={categories}
         contacts={contacts}
+        currency={currency}
         initial={editing}
         onSubmit={onUpsert}
         onUpsertContact={onUpsertContact}

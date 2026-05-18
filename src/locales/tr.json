@@ -339,7 +339,10 @@
       "parties": "Kişiler",
       "finance": "Finans ve durum",
       "expenses": "Masraflar",
-      "tradeIn": "Takas Aracı"
+      "tradeIn": "Takas Aracı",
+      "basic": "Temel bilgiler",
+      "status": "Durum ve satış",
+      "optional": "Opsiyonel detaylar"
     },
     "actions": {
       "addExpense": "Masraf Ekle",
@@ -413,7 +416,34 @@
       "sold": "Satıldı",
       "saleDate": "Satış Tarihi",
       "salePrice": "Satış Fiyatı",
-      "expenseDescPlaceholder": "Açıklama (örn: Boya, ekspertiz, bakım)"
+      "expenseDescPlaceholder": "Açıklama (örn: Boya, ekspertiz, bakım)",
+      "plate": "Plaka",
+      "platePlaceholder": "örn. 34 ABC 123",
+      "package": "Paket / donanım",
+      "fuel": "Yakıt",
+      "transmission": "Vites",
+      "mileage": "Kilometre",
+      "color": "Renk",
+      "damage": "Hasar notu",
+      "tramer": "Tramer / sigorta",
+      "notes": "Notlar",
+      "location": "Konum",
+      "keyCount": "Anahtar sayısı",
+      "inspection": "Ekspertiz",
+      "tax": "Vergi",
+      "commission": "Komisyon"
+    },
+    "optional": {
+      "subtitle": "Paket, kilometre, notlar ve diğer isteğe bağlı alanlar."
+    },
+    "profit": {
+      "kicker": "Canlı",
+      "title": "Tahmini net kâr",
+      "subtitle": "Fiyat, durum ve masraflar değiştikçe güncellenir.",
+      "amount": "Net kâr",
+      "hintInStock": "Tahmin için durumu Rezerve veya Satıldı yapın ve satış fiyatı girin.",
+      "hintNeedPrice": "Tahmin için geçerli bir satış fiyatı girin.",
+      "formula": "Satış − (alış + masraflar + vergi + komisyon)"
     }
   },
   "vinDecoder": {

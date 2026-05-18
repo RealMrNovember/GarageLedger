@@ -3,9 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '../components/Button'
 import { Modal } from '../components/Modal'
 import { ModalSection } from '../components/ModalSection'
-import { modalLabelClass } from '../lib/uiClasses'
+import { TradeFormAccordion } from '../components/TradeFormAccordion'
+import { TradeFormProfitCard } from '../components/TradeFormProfitCard'
+import { estimateNetProfit } from '../lib/compute'
+import type { CurrencyCode } from '../lib/currency'
+import { modalFieldClass, modalLabelClass } from '../lib/uiClasses'
 import { addDays, parseIsoDate, toIsoDateInputValue } from '../lib/dates'
 import type { Contact, ContactRole, TradeItem } from '../lib/types'
+
+const fieldClass = modalFieldClass
 
 function newId(): string {
   if (crypto.randomUUID) return crypto.randomUUID()
@@ -18,6 +24,7 @@ export function TradeFormModal({
   categories,
   contacts,
   initial,
+  currency = 'AZN',
   onSubmit,
   onUpsertContact,
 }: {
@@ -26,6 +33,7 @@ export function TradeFormModal({
   categories: string[]
   contacts: Contact[]
   initial?: TradeItem
+  currency?: CurrencyCode
   onSubmit: (item: TradeItem) => void
   onUpsertContact: (contact: Contact) => void
 }) {
@@ -36,6 +44,21 @@ export function TradeFormModal({
   const [model, setModel] = useState('')
   const [year, setYear] = useState<number | ''>('')
   const [engine, setEngine] = useState('')
+  const [plate, setPlate] = useState('')
+  const [vehiclePackage, setVehiclePackage] = useState('')
+  const [fuel, setFuel] = useState('')
+  const [transmission, setTransmission] = useState('')
+  const [mileage, setMileage] = useState<number | ''>('')
+  const [color, setColor] = useState('')
+  const [damage, setDamage] = useState('')
+  const [tramer, setTramer] = useState('')
+  const [notes, setNotes] = useState('')
+  const [location, setLocation] = useState('')
+  const [keyCount, setKeyCount] = useState<number | ''>('')
+  const [inspection, setInspection] = useState('')
+  const [tax, setTax] = useState<number | ''>('')
+  const [commission, setCommission] = useState<number | ''>('')
+  const [optionalOpen, setOptionalOpen] = useState(false)
   const [vin, setVin] = useState('')
   const [vinLoading, setVinLoading] = useState(false)
   const [vinToast, setVinToast] = useState<string | null>(null)
@@ -85,6 +108,21 @@ export function TradeFormModal({
       setModel('')
       setYear('')
       setEngine('')
+      setPlate('')
+      setVehiclePackage('')
+      setFuel('')
+      setTransmission('')
+      setMileage('')
+      setColor('')
+      setDamage('')
+      setTramer('')
+      setNotes('')
+      setLocation('')
+      setKeyCount('')
+      setInspection('')
+      setTax('')
+      setCommission('')
+      setOptionalOpen(false)
       setVin('')
       setVinLoading(false)
       setVinToast(null)
@@ -133,6 +171,38 @@ export function TradeFormModal({
     setModel(initial.model ?? '')
     setYear(initial.year ?? '')
     setEngine(initial.engine ?? '')
+    setPlate(initial.plate ?? '')
+    setVehiclePackage(initial.package ?? '')
+    setFuel(initial.fuel ?? '')
+    setTransmission(initial.transmission ?? '')
+    setMileage(initial.mileage ?? '')
+    setColor(initial.color ?? '')
+    setDamage(initial.damage ?? '')
+    setTramer(initial.tramer ?? '')
+    setNotes(initial.notes ?? '')
+    setLocation(initial.location ?? '')
+    setKeyCount(initial.keyCount ?? '')
+    setInspection(initial.inspection ?? '')
+    setTax(initial.tax ?? '')
+    setCommission(initial.commission ?? '')
+    setOptionalOpen(
+      Boolean(
+        initial.plate ||
+          initial.package ||
+          initial.fuel ||
+          initial.transmission ||
+          initial.mileage ||
+          initial.color ||
+          initial.damage ||
+          initial.tramer ||
+          initial.notes ||
+          initial.location ||
+          initial.keyCount != null ||
+          initial.inspection ||
+          initial.tax ||
+          initial.commission,
+      ),
+    )
     setVin(initial.vin ?? '')
     setVinLoading(false)
     setVinToast(null)
@@ -220,7 +290,7 @@ export function TradeFormModal({
       .slice(0, 8)
   }, [contacts, buyerQuery])
 
-  const canSubmitBase = brand.trim().length > 0 && purchaseDate.trim().length > 0 && Number.isFinite(purchasePrice)
+  const canSubmitBase = brand.trim().length > 0 && purchaseDate.trim().length > 0
   const installmentRemaining = useMemo(() => Math.max(0, Number(sellPrice) - Number(downPayment || 0)), [sellPrice, downPayment])
   const installmentMonthly = useMemo(() => {
     const c = Number(installmentCount || 0)
@@ -228,6 +298,20 @@ export function TradeFormModal({
     return installmentRemaining / c
   }, [installmentRemaining, installmentCount])
   const barterTotal = useMemo(() => Number(barterCash || 0) + Number(tradeInValue || 0), [barterCash, tradeInValue])
+  const estimatedProfit = useMemo(
+    () =>
+      estimateNetProfit({
+        status,
+        purchasePrice: Number(purchasePrice) || 0,
+        sellPrice: status === 'reserved' || status === 'sold' ? Number(sellPrice) : null,
+        expenses,
+        tax: tax === '' ? 0 : Number(tax),
+        commission: commission === '' ? 0 : Number(commission),
+        paymentMethod,
+        barterTotal,
+      }),
+    [status, purchasePrice, sellPrice, expenses, tax, commission, paymentMethod, barterTotal],
+  )
   const canSubmit =
     canSubmitBase &&
     (status === 'in_stock' ||
@@ -340,6 +424,20 @@ export function TradeFormModal({
                 model: model.trim(),
                 year: year === '' ? null : Number(year),
                 engine: engine.trim(),
+                package: vehiclePackage.trim() || undefined,
+                fuel: fuel.trim() || undefined,
+                transmission: transmission.trim() || undefined,
+                mileage: mileage === '' ? null : Number(mileage),
+                color: color.trim() || undefined,
+                damage: damage.trim() || undefined,
+                tramer: tramer.trim() || undefined,
+                notes: notes.trim() || undefined,
+                location: location.trim() || undefined,
+                plate: plate.trim() || undefined,
+                keyCount: keyCount === '' ? null : Number(keyCount),
+                inspection: inspection.trim() || undefined,
+                tax: tax === '' ? null : Number(tax),
+                commission: commission === '' ? null : Number(commission),
                 vin: vin.trim(),
                 category: resolvedCategory,
                 purchaseDate,
@@ -432,70 +530,78 @@ export function TradeFormModal({
           </div>
         }
       >
-      <div className="space-y-5">
-        <ModalSection title={t('tradeForm.sections.vehicle')}>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.brand')}</div>
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-12 xl:items-start">
+        <div className="space-y-5 xl:col-span-8">
+        <ModalSection title={t('tradeForm.sections.basic')}>
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-12 sm:col-span-6">
+            <div className={modalLabelClass}>{t('tradeForm.fields.brand')}</div>
             <input
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
               placeholder={t('tradeForm.fields.brandPlaceholder')}
-              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 dark:border-white/10 dark:bg-gray-900 dark:focus:border-white/30"
+              className={`${fieldClass} mt-2`}
             />
           </div>
 
-          <div>
-            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.model')}</div>
+          <div className="col-span-12 sm:col-span-6">
+            <div className={modalLabelClass}>{t('tradeForm.fields.model')}</div>
             <input
               value={model}
               onChange={(e) => setModel(e.target.value)}
               placeholder={t('tradeForm.fields.modelPlaceholder')}
-              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 dark:border-white/10 dark:bg-gray-900 dark:focus:border-white/30"
+              className={`${fieldClass} mt-2`}
             />
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.year')}</div>
+          <div className="col-span-12 sm:col-span-4">
+            <div className={modalLabelClass}>{t('tradeForm.fields.year')}</div>
             <input
               type="number"
               value={year}
               onChange={(e) => setYear(e.target.value === '' ? '' : Number(e.target.value))}
               placeholder={t('tradeForm.fields.yearPlaceholder')}
-              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 dark:border-white/10 dark:bg-gray-900 dark:focus:border-white/30"
+              className={`${fieldClass} mt-2`}
             />
           </div>
-          <div>
-            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.engine')}</div>
+          <div className="col-span-12 sm:col-span-4">
+            <div className={modalLabelClass}>{t('tradeForm.fields.engine')}</div>
             <input
               value={engine}
               onChange={(e) => setEngine(e.target.value)}
               placeholder={t('tradeForm.fields.enginePlaceholder')}
-              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 dark:border-white/10 dark:bg-gray-900 dark:focus:border-white/30"
+              className={`${fieldClass} mt-2`}
             />
           </div>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-xs font-medium text-slate-600">{t('vinDecoder.vinLabel')}</div>
-            {vinToast ? <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{vinToast}</div> : null}
+          <div className="col-span-12 sm:col-span-4">
+            <div className={modalLabelClass}>{t('tradeForm.fields.plate')}</div>
+            <input
+              value={plate}
+              onChange={(e) => setPlate(e.target.value)}
+              placeholder={t('tradeForm.fields.platePlaceholder')}
+              className={`${fieldClass} mt-2`}
+            />
           </div>
-          <div className="mt-2 flex items-stretch gap-2">
+
+          <div className="col-span-12 lg:col-span-10">
+            <div className="flex items-center justify-between gap-3">
+              <div className={modalLabelClass}>{t('vinDecoder.vinLabel')}</div>
+              {vinToast ? <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{vinToast}</div> : null}
+            </div>
             <input
               value={vin}
               onChange={(e) => setVin(e.target.value)}
               placeholder={t('vinDecoder.vinPlaceholder')}
-              className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none placeholder:text-[var(--tf-ink-muted)] focus:border-black/20 dark:focus:border-white/20"
+              className={`${fieldClass} mt-2`}
             />
+          </div>
+          <div className="col-span-12 flex items-end lg:col-span-2">
             <button
               type="button"
               onClick={() => void decodeVin()}
               disabled={vinLoading || vin.trim().length < 5}
               className={[
-                'inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border px-4 text-sm font-semibold transition duration-200',
+                'inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-2xl border text-sm font-semibold transition duration-200',
                 'border-[var(--tf-border)] bg-[var(--tf-surface)]/60 text-[var(--tf-ink)] hover:bg-black/5 dark:hover:bg-white/5',
                 'disabled:cursor-not-allowed disabled:opacity-60',
               ].join(' ')}
@@ -529,6 +635,7 @@ export function TradeFormModal({
         </div>
         </ModalSection>
 
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <ModalSection title={t('tradeForm.sections.parties')}>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
@@ -773,24 +880,29 @@ export function TradeFormModal({
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.purchasePrice')}</div>
+            <div className={modalLabelClass}>{t('tradeForm.fields.purchasePrice')}</div>
             <input
               type="number"
               value={Number.isFinite(purchasePrice) ? purchasePrice : 0}
               onChange={(e) => setPurchasePrice(Number(e.target.value))}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
+              className={`${fieldClass} mt-2`}
             />
           </div>
+        </div>
+        </ModalSection>
+        </div>
 
+        <ModalSection title={t('tradeForm.sections.status')}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <div className="text-xs font-medium text-slate-600">{t('tradeForm.fields.status')}</div>
+            <div className={modalLabelClass}>{t('tradeForm.fields.status')}</div>
             <select
               value={status}
               onChange={(e) => {
                 const v = e.target.value
                 if (v === 'in_stock' || v === 'reserved' || v === 'sold') setStatus(v)
               }}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-white/70 px-4 py-3 text-sm outline-none"
+              className={`${fieldClass} mt-2`}
             >
               <option value="in_stock">{t('tradeForm.status.inStock')}</option>
               <option value="reserved">{t('tradeForm.status.reserved')}</option>
@@ -993,6 +1105,88 @@ export function TradeFormModal({
         ) : null}
         </ModalSection>
 
+        <TradeFormAccordion
+          title={t('tradeForm.sections.optional')}
+          description={t('tradeForm.optional.subtitle')}
+          open={optionalOpen}
+          onToggle={() => setOptionalOpen((v) => !v)}
+        >
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.package')}</div>
+              <input value={vehiclePackage} onChange={(e) => setVehiclePackage(e.target.value)} className={`${fieldClass} mt-2`} />
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.fuel')}</div>
+              <input value={fuel} onChange={(e) => setFuel(e.target.value)} className={`${fieldClass} mt-2`} />
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.transmission')}</div>
+              <input value={transmission} onChange={(e) => setTransmission(e.target.value)} className={`${fieldClass} mt-2`} />
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.mileage')}</div>
+              <input
+                type="number"
+                value={mileage}
+                onChange={(e) => setMileage(e.target.value === '' ? '' : Number(e.target.value))}
+                className={`${fieldClass} mt-2`}
+              />
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.color')}</div>
+              <input value={color} onChange={(e) => setColor(e.target.value)} className={`${fieldClass} mt-2`} />
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.location')}</div>
+              <input value={location} onChange={(e) => setLocation(e.target.value)} className={`${fieldClass} mt-2`} />
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.tax')}</div>
+              <input
+                type="number"
+                value={tax}
+                onChange={(e) => setTax(e.target.value === '' ? '' : Number(e.target.value))}
+                className={`${fieldClass} mt-2`}
+              />
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.commission')}</div>
+              <input
+                type="number"
+                value={commission}
+                onChange={(e) => setCommission(e.target.value === '' ? '' : Number(e.target.value))}
+                className={`${fieldClass} mt-2`}
+              />
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.keyCount')}</div>
+              <input
+                type="number"
+                value={keyCount}
+                onChange={(e) => setKeyCount(e.target.value === '' ? '' : Number(e.target.value))}
+                className={`${fieldClass} mt-2`}
+              />
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.inspection')}</div>
+              <input value={inspection} onChange={(e) => setInspection(e.target.value)} className={`${fieldClass} mt-2`} />
+            </div>
+            <div className="col-span-12">
+              <div className={modalLabelClass}>{t('tradeForm.fields.damage')}</div>
+              <input value={damage} onChange={(e) => setDamage(e.target.value)} className={`${fieldClass} mt-2`} />
+            </div>
+            <div className="col-span-12">
+              <div className={modalLabelClass}>{t('tradeForm.fields.tramer')}</div>
+              <input value={tramer} onChange={(e) => setTramer(e.target.value)} className={`${fieldClass} mt-2`} />
+            </div>
+            <div className="col-span-12">
+              <div className={modalLabelClass}>{t('tradeForm.fields.notes')}</div>
+              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className={`${fieldClass} mt-2 resize-none`} />
+            </div>
+          </div>
+        </TradeFormAccordion>
+
         <ModalSection
           title={t('tradeForm.sections.expenses')}
           actions={
@@ -1062,6 +1256,12 @@ export function TradeFormModal({
             </div>
           )}
         </ModalSection>
+        </div>
+        <div className="xl:col-span-4">
+          <div className="xl:sticky xl:top-2">
+            <TradeFormProfitCard profit={estimatedProfit} currency={currency} status={status} />
+          </div>
+        </div>
       </div>
     </Modal>
 

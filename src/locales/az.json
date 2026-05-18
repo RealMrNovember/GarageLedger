@@ -339,7 +339,10 @@
       "parties": "Şəxslər",
       "finance": "Maliyyə və status",
       "expenses": "Xərclər",
-      "tradeIn": "Takas avtomobili"
+      "tradeIn": "Takas avtomobili",
+      "basic": "Əsas məlumat",
+      "status": "Status və satış",
+      "optional": "Opsional detallar"
     },
     "actions": {
       "addExpense": "Xərc Əlavə Et",
@@ -413,7 +416,34 @@
       "sold": "Satıldı",
       "saleDate": "Satış Tarixi",
       "salePrice": "Satış Qiyməti",
-      "expenseDescPlaceholder": "Açıqlama (məs: boya, ekspertiza, servis)"
+      "expenseDescPlaceholder": "Açıqlama (məs: boya, ekspertiza, servis)",
+      "plate": "Nömrə",
+      "platePlaceholder": "məs. 10-XX-000",
+      "package": "Paket",
+      "fuel": "Yanacaq",
+      "transmission": "Ötürücü",
+      "mileage": "Yürüş (km)",
+      "color": "Rəng",
+      "damage": "Zərər qeydi",
+      "tramer": "Sığorta / tramer",
+      "notes": "Qeydlər",
+      "location": "Yerləşmə",
+      "keyCount": "Açar sayı",
+      "inspection": "Ekspertiza",
+      "tax": "Vergi",
+      "commission": "Komissiya"
+    },
+    "optional": {
+      "subtitle": "Paket, yürüş, qeydlər və digər istəyə bağlı sahələr."
+    },
+    "profit": {
+      "kicker": "Canlı",
+      "title": "Təxmini xalis mənfəət",
+      "subtitle": "Qiymət, status və xərclər dəyişdikcə yenilənir.",
+      "amount": "Xalis mənfəət",
+      "hintInStock": "Təxmin üçün statusu Rezerv və ya Satılıb edin və satış qiyməti daxil edin.",
+      "hintNeedPrice": "Təxmin üçün etibarlı satış qiyməti daxil edin.",
+      "formula": "Satış − (alış + xərclər + vergi + komissiya)"
     }
   },
   "vinDecoder": {

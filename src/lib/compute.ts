@@ -10,6 +10,36 @@ export function itemProfit(item: TradeItem): number | null {
   return item.sellPrice - (item.purchasePrice + expenseTotal + tax + commission)
 }
 
+export function estimateNetProfit(input: {
+  status: TradeItem['status']
+  purchasePrice: number
+  sellPrice: number | null
+  expenses: { amount: number }[]
+  tax?: number | null
+  commission?: number | null
+  paymentMethod?: TradeItem['paymentMethod']
+  barterTotal?: number
+}): number | null {
+  const expenseTotal = (input.expenses ?? []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0)
+  const tax = Number(input.tax ?? 0) || 0
+  const commission = Number(input.commission ?? 0) || 0
+  const costs = (Number(input.purchasePrice) || 0) + expenseTotal + tax + commission
+
+  let revenue: number | null = null
+  if (input.status === 'reserved' && input.sellPrice != null && Number.isFinite(input.sellPrice)) {
+    revenue = Number(input.sellPrice)
+  } else if (input.status === 'sold') {
+    if (input.paymentMethod === 'barter' && input.barterTotal != null && Number.isFinite(input.barterTotal)) {
+      revenue = Number(input.barterTotal)
+    } else if (input.sellPrice != null && Number.isFinite(input.sellPrice)) {
+      revenue = Number(input.sellPrice)
+    }
+  }
+
+  if (revenue == null) return null
+  return revenue - costs
+}
+
 export function isInStock(item: TradeItem): boolean {
   return item.status !== 'sold'
 }

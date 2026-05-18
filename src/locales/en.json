@@ -339,7 +339,10 @@
       "parties": "Parties",
       "finance": "Finance & status",
       "expenses": "Expenses",
-      "tradeIn": "Trade-in Vehicle"
+      "tradeIn": "Trade-in Vehicle",
+      "basic": "Basic information",
+      "status": "Status & sale",
+      "optional": "Optional details"
     },
     "actions": {
       "addExpense": "Add Expense",
@@ -413,7 +416,34 @@
       "sold": "Sold",
       "saleDate": "Sale Date",
       "salePrice": "Sale Price",
-      "expenseDescPlaceholder": "Description (e.g. paint, inspection, service)"
+      "expenseDescPlaceholder": "Description (e.g. paint, inspection, service)",
+      "plate": "Plate",
+      "platePlaceholder": "e.g. 10-XX-000",
+      "package": "Package / trim",
+      "fuel": "Fuel",
+      "transmission": "Transmission",
+      "mileage": "Mileage (km)",
+      "color": "Color",
+      "damage": "Damage notes",
+      "tramer": "Insurance / Tramer",
+      "notes": "Notes",
+      "location": "Location",
+      "keyCount": "Key count",
+      "inspection": "Inspection",
+      "tax": "Tax",
+      "commission": "Commission"
+    },
+    "optional": {
+      "subtitle": "Package, mileage, notes and other fields you can fill later."
+    },
+    "profit": {
+      "kicker": "Live",
+      "title": "Estimated net profit",
+      "subtitle": "Updates as you change prices, status and expenses.",
+      "amount": "Net profit",
+      "hintInStock": "Set status to Reserved or Sold and enter a sale price to estimate profit.",
+      "hintNeedPrice": "Enter a valid sale price to see an estimate.",
+      "formula": "Sale − (purchase + expenses + tax + commission)"
     }
   },
   "vinDecoder": {
