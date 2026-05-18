@@ -4,8 +4,8 @@ import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { SettingsDivider, SettingsSectionTitle } from '../components/SettingsSection'
 import { i18n } from '../i18n'
-import { refreshFxRates } from '../lib/currency'
-import type { CurrencyCode } from '../lib/currency'
+import { formatFxDisplayTime, refreshFxRates, type CurrencyCode, type FxUpdateMode } from '../lib/currency'
+import { useFxSync } from '../lib/useFxSync'
 import type { GarageLedgerSettings } from '../lib/types'
 
 const languages = ['az', 'tr', 'en', 'ru'] as const
@@ -89,7 +89,9 @@ export function SettingsPage({
   const [lockNew, setLockNew] = useState('')
   const [lockConfirm, setLockConfirm] = useState('')
   const [supportCode, setSupportCode] = useState('')
-  const [fxFetchedAt, setFxFetchedAt] = useState<string | null>(null)
+  const fx = useFxSync()
+  const fxFetchedAt = fx?.fetchedAt ?? null
+  const fxMode = (settings.fxUpdates?.mode ?? '30m') as FxUpdateMode
   const [feedbackText, setFeedbackText] = useState('')
 
   useEffect(() => {
@@ -120,17 +122,6 @@ export function SettingsPage({
     }
 
     void load()
-  }, [])
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('garageledger.fxRates.v1')
-      if (!raw) return
-      const parsed = JSON.parse(raw) as { fetchedAt?: string }
-      if (parsed?.fetchedAt) setFxFetchedAt(String(parsed.fetchedAt))
-    } catch {
-      return
-    }
   }, [])
 
   useEffect(() => {
@@ -829,54 +820,31 @@ export function SettingsPage({
       <SettingsDivider />
       <SettingsSectionTitle>{t('settings.sections.fx')}</SettingsSectionTitle>
       <Card className="p-5">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.language')}</div>
-            <select
-              value={current}
-              onChange={(e) => void i18n.changeLanguage(e.target.value)}
-              className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            >
-              {languages.map((lng) => (
-                <option key={lng} value={lng}>
-                  {t(`settings.languages.${lng}`)}
-                </option>
-              ))}
-            </select>
+        <div className="max-w-md">
+          <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.currency')}</div>
+          <select
+            value={(settings.currency ?? 'AZN') as CurrencyCode}
+            onChange={(e) => void onUpdateSettings({ currency: e.target.value as CurrencyCode })}
+            className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+          >
+            {currencies.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">
+            {t('settings.fx.last', {
+              value: fxFetchedAt ? formatFxDisplayTime(fxFetchedAt, i18n.language) : '—',
+            })}
           </div>
-          <div>
-            <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.currency')}</div>
-            <select
-              value={(settings.currency ?? 'AZN') as CurrencyCode}
-              onChange={(e) => void onUpdateSettings({ currency: e.target.value as CurrencyCode })}
-              className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-            >
-              {currencies.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-            <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">
-              {t('settings.fx.last', { value: fxFetchedAt ? new Date(fxFetchedAt).toLocaleString() : '—' })}
-            </div>
-            <div className="mt-3">
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  if (typeof navigator !== 'undefined' && !navigator.onLine) return
-                  const fx = await refreshFxRates()
-                  setFxFetchedAt(fx?.fetchedAt ?? null)
-                }}
-              >
-                {t('settings.fx.refresh')}
-              </Button>
-            </div>
+          <div className="mt-3">
+            <Button variant="ghost" onClick={() => void refreshFxRates({ force: true, mode: fxMode })}>
+              {t('settings.fx.refresh')}
+            </Button>
           </div>
         </div>
       </Card>
-
-
 
       <SettingsDivider />
       <SettingsSectionTitle>{t('settings.sections.feedback')}</SettingsSectionTitle>

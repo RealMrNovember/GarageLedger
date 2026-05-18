@@ -7,7 +7,9 @@
       "toggle": "Filter",
       "hide": "Hide filters",
       "active": "{{count}} active"
-    }
+    },
+    "yes": "Yes",
+    "no": "No"
   },
   "app": {
     "name": "GarageLedger",
@@ -441,27 +443,43 @@
       {
         "title": "Independent CRM (Directory & Profiles)",
         "body": "Customers is now a real CRM module with standalone people records and a profile view.",
-        "bullets": ["Add people independently (name, phone, email, role, notes)", "Open a profile to see total volume, remaining receivable and transactions"]
+        "bullets": [
+          "Add people independently (name, phone, email, role, notes)",
+          "Open a profile to see total volume, remaining receivable and transactions"
+        ]
       },
       {
         "title": "Sales Payments + Smart Reminders",
         "body": "Selling a vehicle supports multiple payment methods and tracks remaining receivables.",
-        "bullets": ["Cash / Installment / Trade-in (Barter)", "Dashboard reminders: collect payments and snooze next payment date"]
+        "bullets": [
+          "Cash / Installment / Trade-in (Barter)",
+          "Dashboard reminders: collect payments and snooze next payment date"
+        ]
       },
       {
         "title": "Reports & Branded PDF Export",
         "body": "Generate date-based summary reports and export an elegant PDF with a movements table.",
-        "bullets": ["Date presets (Today, This Week, This Month, etc.)", "Branded footer: Cicibyte Corp"]
+        "bullets": [
+          "Date presets (Today, This Week, This Month, etc.)",
+          "Branded footer: Cicibyte Corp"
+        ]
       },
       {
         "title": "Midnight Onyx (Dark Mode)",
         "body": "A new dark theme brings a premium SaaS feel without using pure black.",
-        "bullets": ["Theme toggle stored in LocalStorage", "Soft gold accents on dark surfaces"]
+        "bullets": [
+          "Theme toggle stored in LocalStorage",
+          "Soft gold accents on dark surfaces"
+        ]
       },
       {
         "title": "Quiet Luxury UI Polish",
         "body": "Modals, tables and micro-interactions were refined for a more premium experience.",
-        "bullets": ["Glassmorphism modal backdrop blur", "Softer shadows, refined tables and custom scrollbar", "Help Center handbook expanded and professionalized"]
+        "bullets": [
+          "Glassmorphism modal backdrop blur",
+          "Softer shadows, refined tables and custom scrollbar",
+          "Help Center handbook expanded and professionalized"
+        ]
       }
     ],
     "items": {
@@ -500,7 +518,11 @@
     },
     "fx": {
       "last": "Last FX update: {{value}}",
-      "refresh": "Refresh Rates"
+      "refresh": "Refresh Rates",
+      "never": "Rates not loaded",
+      "sidebarUpdated": "FX · {{time}}",
+      "sidebarCached": "Cached · {{time}}",
+      "sidebarStale": "Stale · {{time}}"
     },
     "feedback": {
       "title": "Feedback",
@@ -549,7 +571,32 @@
       "tr": "TR — Türkçe",
       "en": "EN — English",
       "ru": "RU — Русский"
-    }
+    },
+    "reminders": {
+      "title": "Payment reminders",
+      "subtitle": "Notify before installment due dates.",
+      "enabled": "Enable reminders",
+      "notifyHour": "Notification hour",
+      "daysBefore": "Days before due"
+    },
+    "fxUpdates": {
+      "title": "Currency update",
+      "subtitle": "How often exchange rates refresh when online.",
+      "provider": "Provider",
+      "interval": "Update interval",
+      "intervals": {
+        "m15": "Every 15 minutes",
+        "m30": "Every 30 minutes",
+        "h1": "Every hour",
+        "manual": "Manual only"
+      },
+      "internet": "Internet",
+      "online": "Online",
+      "offline": "Offline",
+      "cache": "Cached rates",
+      "cacheAt": "Cache time"
+    },
+    "backgroundWarning": "Payment reminders and automatic FX updates may run in the background while the app is open."
   },
   "updates": {
     "title": "Updates",

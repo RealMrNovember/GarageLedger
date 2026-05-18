@@ -7,7 +7,9 @@
       "toggle": "Filtrele",
       "hide": "Filtreleri gizle",
       "active": "{{count}} aktif"
-    }
+    },
+    "yes": "Evet",
+    "no": "Hayır"
   },
   "app": {
     "name": "GarageLedger",
@@ -441,27 +443,43 @@
       {
         "title": "Bağımsız CRM (Rehber & Cari Profil)",
         "body": "Müşteriler artık sadece işlem geçmişi değil; bağımsız kişi kaydı ve cari profil ekranı olan gerçek bir CRM modülü.",
-        "bullets": ["Kişileri bağımsız ekleme (ad, telefon, e-posta, rol, not)", "Cari profilde toplam hacim, kalan alacak ve işlem listesi"]
+        "bullets": [
+          "Kişileri bağımsız ekleme (ad, telefon, e-posta, rol, not)",
+          "Cari profilde toplam hacim, kalan alacak ve işlem listesi"
+        ]
       },
       {
         "title": "Satış Ödemeleri + Akıllı Hatırlatıcı",
         "body": "Araç satışı farklı ödeme yöntemlerini destekler ve kalan bakiyeyi takip eder.",
-        "bullets": ["Peşin / Taksitli / Takas (Barter)", "Dashboard hatırlatıcı: Tahsil Et ve Ertele (sonraki ödeme tarihi)"]
+        "bullets": [
+          "Peşin / Taksitli / Takas (Barter)",
+          "Dashboard hatırlatıcı: Tahsil Et ve Ertele (sonraki ödeme tarihi)"
+        ]
       },
       {
         "title": "Raporlar & Antetli PDF",
         "body": "Tarih aralığına göre özet rapor üretin ve şık PDF çıktısı alın.",
-        "bullets": ["Hazır aralıklar (Bugün, Bu Hafta, Bu Ay, vb.)", "Footer imzası: Cicibyte Corp"]
+        "bullets": [
+          "Hazır aralıklar (Bugün, Bu Hafta, Bu Ay, vb.)",
+          "Footer imzası: Cicibyte Corp"
+        ]
       },
       {
         "title": "Midnight Onyx (Dark Mode)",
         "body": "Saf siyah kullanmadan premium SaaS hissi veren karanlık tema eklendi.",
-        "bullets": ["Tema seçimi LocalStorage’da saklanır", "Karanlık yüzeylerde şık altın vurgular"]
+        "bullets": [
+          "Tema seçimi LocalStorage’da saklanır",
+          "Karanlık yüzeylerde şık altın vurgular"
+        ]
       },
       {
         "title": "Quiet Luxury UI Dokunuşları",
         "body": "Modal, tablo ve mikro etkileşimler daha modern ve yumuşak bir hissiyat için elden geçirildi.",
-        "bullets": ["Cam efekti: backdrop-blur", "Yumuşak gölgeler, modern tablolar, özel scrollbar", "Yardım menüsü daha detaylı ve profesyonel kullanım kılavuzu ile genişletildi"]
+        "bullets": [
+          "Cam efekti: backdrop-blur",
+          "Yumuşak gölgeler, modern tablolar, özel scrollbar",
+          "Yardım menüsü daha detaylı ve profesyonel kullanım kılavuzu ile genişletildi"
+        ]
       }
     ],
     "items": {
@@ -500,7 +518,11 @@
     },
     "fx": {
       "last": "Son kur güncellemesi: {{value}}",
-      "refresh": "Kurları Güncelle"
+      "refresh": "Kurları Güncelle",
+      "never": "Kur yüklenmedi",
+      "sidebarUpdated": "Kur · {{time}}",
+      "sidebarCached": "Önbellek · {{time}}",
+      "sidebarStale": "Eski · {{time}}"
     },
     "feedback": {
       "title": "Geri Bildirim",
@@ -549,7 +571,32 @@
       "tr": "TR — Türkçe",
       "en": "EN — English",
       "ru": "RU — Русский"
-    }
+    },
+    "reminders": {
+      "title": "Ödeme hatırlatıcıları",
+      "subtitle": "Taksit vadesinden önce bildirim gönder.",
+      "enabled": "Hatırlatıcıları aç",
+      "notifyHour": "Bildirim saati",
+      "daysBefore": "Kaç gün önce"
+    },
+    "fxUpdates": {
+      "title": "Kur güncelleme",
+      "subtitle": "Çevrimiçiyken döviz kurlarının ne sıklıkla yenileneceği.",
+      "provider": "Sağlayıcı",
+      "interval": "Güncelleme aralığı",
+      "intervals": {
+        "m15": "Her 15 dakika",
+        "m30": "Her 30 dakika",
+        "h1": "Her saat",
+        "manual": "Yalnızca manuel"
+      },
+      "internet": "İnternet",
+      "online": "Çevrimiçi",
+      "offline": "Çevrimdışı",
+      "cache": "Önbellekte kur",
+      "cacheAt": "Önbellek zamanı"
+    },
+    "backgroundWarning": "Ödeme hatırlatıcıları ve otomatik kur güncellemeleri uygulama açıkken arka planda çalışabilir."
   },
   "updates": {
     "title": "Güncellemeler",

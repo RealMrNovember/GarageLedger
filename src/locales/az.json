@@ -7,7 +7,9 @@
       "toggle": "Filtrlə",
       "hide": "Filtrləri gizlət",
       "active": "{{count}} aktiv"
-    }
+    },
+    "yes": "Bəli",
+    "no": "Xeyr"
   },
   "app": {
     "name": "GarageLedger",
@@ -441,27 +443,43 @@
       {
         "title": "Müstəqil CRM (Bələdçi & Cari profil)",
         "body": "Müştərilər artıq yalnız tarixçə deyil; müstəqil şəxs qeydiyyatı və cari profil ekranı olan real CRM moduludur.",
-        "bullets": ["Şəxsləri müstəqil əlavə et (ad, telefon, e-poçt, rol, qeydlər)", "Cari profildə ümumi həcm, qalan alacaq və əməliyyat siyahısı"]
+        "bullets": [
+          "Şəxsləri müstəqil əlavə et (ad, telefon, e-poçt, rol, qeydlər)",
+          "Cari profildə ümumi həcm, qalan alacaq və əməliyyat siyahısı"
+        ]
       },
       {
         "title": "Satış Ödənişləri + Ağıllı Xatırlatma",
         "body": "Avtomobil satışı müxtəlif ödəniş metodlarını dəstəkləyir və qalan balansı izləyir.",
-        "bullets": ["Peşin / Taksitli / Takas (Barter)", "Dashboard xatırlatma: Ödənişi qəbul et və təxirə sal (növbəti ödəniş tarixi)"]
+        "bullets": [
+          "Peşin / Taksitli / Takas (Barter)",
+          "Dashboard xatırlatma: Ödənişi qəbul et və təxirə sal (növbəti ödəniş tarixi)"
+        ]
       },
       {
         "title": "Hesabatlar & Antetli PDF",
         "body": "Tarix aralığına görə xülasə hesabat yaradın və şık PDF ixrac edin.",
-        "bullets": ["Hazır aralıqlar (Bu gün, Bu həftə, Bu ay, və s.)", "Footer imzası: Cicibyte Corp"]
+        "bullets": [
+          "Hazır aralıqlar (Bu gün, Bu həftə, Bu ay, və s.)",
+          "Footer imzası: Cicibyte Corp"
+        ]
       },
       {
         "title": "Midnight Onyx (Dark Mode)",
         "body": "Saf qara istifadə etmədən premium SaaS hissi verən qaranlıq tema əlavə edildi.",
-        "bullets": ["Tema seçimi LocalStorage-da saxlanır", "Qaranlıq səthlərdə şık qızılı vurğular"]
+        "bullets": [
+          "Tema seçimi LocalStorage-da saxlanır",
+          "Qaranlıq səthlərdə şık qızılı vurğular"
+        ]
       },
       {
         "title": "Quiet Luxury UI toxunuşları",
         "body": "Modallar, cədvəllər və mikro animasiyalar daha premium hiss üçün yeniləndi.",
-        "bullets": ["Cam effekti: backdrop-blur", "Yumşaq kölgələr, modern cədvəllər, xüsusi scrollbar", "Yardım bölməsi daha detallı və peşəkar istifadə bələdçisi ilə genişləndirildi"]
+        "bullets": [
+          "Cam effekti: backdrop-blur",
+          "Yumşaq kölgələr, modern cədvəllər, xüsusi scrollbar",
+          "Yardım bölməsi daha detallı və peşəkar istifadə bələdçisi ilə genişləndirildi"
+        ]
       }
     ],
     "items": {
@@ -500,7 +518,11 @@
     },
     "fx": {
       "last": "Son məzənnə yenilənməsi: {{value}}",
-      "refresh": "Məzənnələri Yenilə"
+      "refresh": "Məzənnələri Yenilə",
+      "never": "Məzənnə yüklənməyib",
+      "sidebarUpdated": "Kur · {{time}}",
+      "sidebarCached": "Keş · {{time}}",
+      "sidebarStale": "Köhnə · {{time}}"
     },
     "feedback": {
       "title": "Geri bildirim",
@@ -549,7 +571,32 @@
       "tr": "TR — Türkçe",
       "en": "EN — English",
       "ru": "RU — Русский"
-    }
+    },
+    "reminders": {
+      "title": "Ödəniş xatırladıcıları",
+      "subtitle": "Taksit tarixindən əvvəl bildiriş göndər.",
+      "enabled": "Xatırladıcıları aktiv et",
+      "notifyHour": "Bildiriş saatı",
+      "daysBefore": "Neçə gün əvvəl"
+    },
+    "fxUpdates": {
+      "title": "Məzənnə yeniləməsi",
+      "subtitle": "Onlayn olanda məzənnələrin nə tez-tez yenilənəcəyi.",
+      "provider": "Provayder",
+      "interval": "Yeniləmə intervalı",
+      "intervals": {
+        "m15": "Hər 15 dəqiqə",
+        "m30": "Hər 30 dəqiqə",
+        "h1": "Hər saat",
+        "manual": "Yalnız əl ilə"
+      },
+      "internet": "İnternet",
+      "online": "Onlayn",
+      "offline": "Oflayn",
+      "cache": "Keşdə məzənnə",
+      "cacheAt": "Keş vaxtı"
+    },
+    "backgroundWarning": "Ödəniş xatırladıcıları və avtomatik məzənnə yeniləmələri tətbiq açıq olanda arxa fonda işləyə bilər."
   },
   "updates": {
     "title": "Yeniləmələr",

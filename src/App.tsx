@@ -9,7 +9,7 @@ import { Sidebar, type NavKey } from './components/Sidebar'
 import { Topbar } from './components/Topbar'
 import { uniqueCategories } from './lib/compute'
 import { useGarageLedger } from './lib/useGarageLedger'
-import { refreshFxRates } from './lib/currency'
+import { fxModeToMs, refreshFxRates, type FxUpdateMode } from './lib/currency'
 import { DashboardPage } from './pages/DashboardPage'
 import { CustomersPage } from './pages/CustomersPage'
 import { InventoryPage } from './pages/InventoryPage'
@@ -62,6 +62,8 @@ export default function App() {
     settings.appLock?.enabled && settings.appLock.passwordSalt && settings.appLock.passwordHash,
   )
 
+  const fxMode = (settings.fxUpdates?.mode ?? '30m') as FxUpdateMode
+
   useEffect(() => {
     if (!whatsNewOpen) return
     const load = async () => {
@@ -103,8 +105,21 @@ export default function App() {
   }, [theme])
 
   useEffect(() => {
-    void refreshFxRates().then(() => setFxTick(Date.now()))
-  }, [])
+    void refreshFxRates({ mode: fxMode }).then((fx) => {
+      if (fx) setFxTick(Date.now())
+    })
+  }, [fxMode])
+
+  useEffect(() => {
+    const intervalMs = fxModeToMs(fxMode)
+    if (!intervalMs) return
+    const id = window.setInterval(() => {
+      void refreshFxRates({ mode: fxMode }).then((fx) => {
+        if (fx) setFxTick(Date.now())
+      })
+    }, intervalMs)
+    return () => window.clearInterval(id)
+  }, [fxMode])
 
   useEffect(() => {
     if (!ready) return
@@ -206,7 +221,12 @@ export default function App() {
         theme={theme}
         onToggleTheme={() => setTheme((v) => (v === 'dark' ? 'light' : 'dark'))}
         fxTick={fxTick}
-        onRefreshFx={() => void refreshFxRates().then(() => setFxTick(Date.now()))}
+        fxMode={fxMode}
+        onRefreshFx={() =>
+          void refreshFxRates({ force: true, mode: fxMode }).then((fx) => {
+            if (fx) setFxTick(Date.now())
+          })
+        }
       />
 
       <div className="flex min-w-0 flex-1 flex-col">

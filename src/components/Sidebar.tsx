@@ -1,6 +1,9 @@
 import { Logo } from './Logo'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useState, type ReactNode } from 'react'
+import { formatFxDisplayTime, isFxStale, type FxUpdateMode } from '../lib/currency'
+import { useFxSync } from '../lib/useFxSync'
+import { i18n } from '../i18n'
 
 export type NavKey = 'dashboard' | 'inventory' | 'reports' | 'customers' | 'help' | 'settings'
 
@@ -12,6 +15,7 @@ export function Sidebar({
   theme,
   onToggleTheme,
   fxTick,
+  fxMode,
   onRefreshFx,
 }: {
   active: NavKey
@@ -21,24 +25,40 @@ export function Sidebar({
   theme: 'light' | 'dark'
   onToggleTheme: () => void
   fxTick: number
+  fxMode: FxUpdateMode
   onRefreshFx: () => void
 }) {
   const { t } = useTranslation()
-  const [fxFetchedAt, setFxFetchedAt] = useState<string | null>(null)
+  const fx = useFxSync(fxTick)
+  const fxFetchedAt = fx?.fetchedAt ?? null
+  const [online, setOnline] = useState(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true,
+  )
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('garageledger.fxRates.v1')
-      if (!raw) {
-        setFxFetchedAt(null)
-        return
-      }
-      const parsed = JSON.parse(raw) as { fetchedAt?: string }
-      setFxFetchedAt(parsed?.fetchedAt ? String(parsed.fetchedAt) : null)
-    } catch {
-      setFxFetchedAt(null)
+    const sync = () => setOnline(navigator.onLine)
+    window.addEventListener('online', sync)
+    window.addEventListener('offline', sync)
+    return () => {
+      window.removeEventListener('online', sync)
+      window.removeEventListener('offline', sync)
     }
-  }, [fxTick])
+  }, [])
+
+  const stale = isFxStale(fxFetchedAt, fxMode)
+  const timeLabel = formatFxDisplayTime(fxFetchedAt, i18n.language)
+  const fxStatusClass = !fxFetchedAt
+    ? 'text-[var(--tf-ink-muted)]'
+    : !online || stale
+      ? 'text-amber-600 dark:text-amber-400'
+      : 'text-[var(--tf-ink-muted)]'
+  const fxStatusText = !fxFetchedAt
+    ? t('settings.fx.never')
+    : !online
+      ? t('settings.fx.sidebarCached', { time: timeLabel })
+      : stale
+        ? t('settings.fx.sidebarStale', { time: timeLabel })
+        : t('settings.fx.sidebarUpdated', { time: timeLabel })
 
   const itemBase =
     'w-full rounded-2xl px-3 py-2 text-left text-sm font-medium transition duration-200 hover:bg-black/5 active:translate-y-[0.5px]'
@@ -179,49 +199,43 @@ export function Sidebar({
 
       <div className="mt-auto">
         <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)] p-3 shadow-[var(--tf-shadow)]">
-          <div className="flex items-center justify-between gap-3">
-            {!collapsed ? (
-              <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.theme.title')}</div>
-            ) : (
-              <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.theme.title')}</div>
-            )}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => void onRefreshFx()}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-white/50 text-[var(--tf-ink)] transition duration-200 hover:bg-black/5 dark:bg-white/5 dark:hover:bg-white/10"
-                aria-label={t('settings.fx.refresh')}
-                title={t('settings.fx.refresh')}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                  <path d="M20 5v4h-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M4 19v-4h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={onToggleTheme}
-                className="relative inline-flex h-9 w-16 items-center rounded-full border border-[var(--tf-border)] bg-white/50 px-1 transition duration-200 hover:bg-black/5 dark:bg-white/5 dark:hover:bg-white/10"
-              >
-                <span className="sr-only">{t('settings.theme.toggle')}</span>
-                <span
-                  className={[
-                    'inline-block h-7 w-7 rounded-full bg-[var(--tf-accent)] shadow-sm transition duration-200',
-                    theme === 'dark' ? 'translate-x-7' : 'translate-x-0',
-                  ].join(' ')}
-                />
-              </button>
-            </div>
-          </div>
           {!collapsed ? (
-            <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">
-              {fxFetchedAt ? t('settings.fx.last', { value: new Date(fxFetchedAt).toLocaleString() }) : t('settings.fx.last', { value: '—' })}
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--tf-ink-muted)]">
+                {t('settings.theme.title')}
+              </span>
+              <span className={`truncate text-[11px] font-medium ${fxStatusClass}`} title={fxStatusText}>
+                {fxStatusText}
+              </span>
+            </div>
+          ) : null}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void onRefreshFx()}
+              className="inline-flex h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--tf-border)] bg-white/50 px-2 text-[var(--tf-ink)] transition duration-200 hover:bg-black/5 dark:bg-white/5 dark:hover:bg-white/10"
+              aria-label={t('settings.fx.refresh')}
+              title={t('settings.fx.refresh')}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                <path d="M20 5v4h-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 19v-4h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              {!collapsed ? <span className="truncate text-xs font-medium">{t('settings.fx.refresh')}</span> : null}
+            </button>
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              className="relative inline-flex h-9 w-14 shrink-0 items-center rounded-full border border-[var(--tf-border)] bg-white/50 px-1 transition duration-200 hover:bg-black/5 dark:bg-white/5 dark:hover:bg-white/10"
+            >
+              <span className="sr-only">{t('settings.theme.toggle')}</span>
+              <span className={['inline-block h-7 w-7 rounded-full bg-[var(--tf-accent)] shadow-sm transition duration-200', theme === 'dark' ? 'translate-x-5' : 'translate-x-0'].join(' ')} />
+            </button>
+          </div>
+          {collapsed ? (
+            <div className={`mt-2 text-center text-[10px] font-medium ${fxStatusClass}`} title={fxStatusText}>
+              {fxFetchedAt ? timeLabel : '—'}
             </div>
           ) : null}
         </div>
