@@ -490,7 +490,11 @@
     "sections": {
       "company": "ŞİRKƏT PROFİLİ",
       "security": "TƏHLÜKƏSİZLİK",
-      "local": "REGİONAL",
+      "local": "DİL",
+      "reminders": "XATIRLADICI TƏNZİMLƏMƏLƏRİ",
+      "updates": "YENİLƏMƏ",
+      "backup": "EHTİYAT NÜSXƏ",
+      "fx": "MƏZƏNNƏ & VALYUTA",
       "system": "SİSTEM",
       "feedback": "GERİ BİLDİRİM (WHATSAPP)"
     },

@@ -490,7 +490,11 @@
     "sections": {
       "company": "ŞİRKET PROFİLİ",
       "security": "GÜVENLİK",
-      "local": "BÖLGESEL",
+      "local": "DİL",
+      "reminders": "HATIRLATICI AYARLARI",
+      "updates": "GÜNCELLEME",
+      "backup": "YEDEKLEME",
+      "fx": "KUR & DÖVİZ",
       "system": "SİSTEM",
       "feedback": "GERİ BİLDİRİM (WHATSAPP)"
     },

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
+import { SettingsDivider, SettingsSectionTitle } from '../components/SettingsSection'
 import { i18n } from '../i18n'
 import { refreshFxRates } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
@@ -174,12 +175,30 @@ export function SettingsPage({
   }, [lastUpdateCheckAt, t])
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4">
+    <div className="mx-auto max-w-6xl space-y-5">
       <div>
         <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.title')}</div>
       </div>
 
-      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.company')}</div>
+      <SettingsSectionTitle>{t('settings.sections.local')}</SettingsSectionTitle>
+      <Card className="p-5">
+        <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.language')}</div>
+        <select
+          value={current}
+          onChange={(e) => void i18n.changeLanguage(e.target.value)}
+          className="mt-3 w-full max-w-sm rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+        >
+          {languages.map((lng) => (
+            <option key={lng} value={lng}>
+              {t(`settings.languages.${lng}`)}
+            </option>
+          ))}
+        </select>
+      </Card>
+
+      <SettingsDivider />
+      <SettingsSectionTitle>{t('settings.sections.company')}</SettingsSectionTitle>
+
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -280,8 +299,154 @@ export function SettingsPage({
           </div>
         </div>
       </Card>
+      <SettingsDivider />
+      <SettingsSectionTitle>{t('settings.sections.reminders')}</SettingsSectionTitle>
+      <Card className="p-5">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.reminders.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.reminders.subtitle')}</div>
 
-      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.security')}</div>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.reminders.enabled')}</div>
+              <button
+                type="button"
+                onClick={() =>
+                  void onUpdateSettings({
+                    reminders: {
+                      enabled: !Boolean(settings.reminders?.enabled),
+                      notifyHour: settings.reminders?.notifyHour ?? 10,
+                      daysBefore: settings.reminders?.daysBefore ?? 3,
+                    },
+                  })
+                }
+                className="relative inline-flex h-9 w-16 items-center rounded-full border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-1 transition duration-200 hover:bg-black/5 dark:hover:bg-white/5"
+              >
+                <span className="sr-only">{t('settings.reminders.enabled')}</span>
+                <span
+                  className={[
+                    'inline-block h-7 w-7 rounded-full bg-[var(--tf-accent)] shadow-sm transition duration-200',
+                    settings.reminders?.enabled ? 'translate-x-7' : 'translate-x-0',
+                  ].join(' ')}
+                />
+              </button>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.reminders.notifyHour')}</div>
+                <select
+                  value={String(settings.reminders?.notifyHour ?? 10)}
+                  onChange={(e) =>
+                    void onUpdateSettings({
+                      reminders: {
+                        enabled: Boolean(settings.reminders?.enabled),
+                        notifyHour: Number(e.target.value),
+                        daysBefore: settings.reminders?.daysBefore ?? 3,
+                      },
+                    })
+                  }
+                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+                >
+                  {Array.from({ length: 24 }, (_, h) => (
+                    <option key={h} value={String(h)}>
+                      {String(h).padStart(2, '0')}:00
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.reminders.daysBefore')}</div>
+                <input
+                  type="number"
+                  min={0}
+                  max={30}
+                  value={Number(settings.reminders?.daysBefore ?? 3)}
+                  onChange={(e) =>
+                    void onUpdateSettings({
+                      reminders: {
+                        enabled: Boolean(settings.reminders?.enabled),
+                        notifyHour: settings.reminders?.notifyHour ?? 10,
+                        daysBefore: Number(e.target.value),
+                      },
+                    })
+                  }
+                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.fxUpdates.title')}</div>
+            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.subtitle')}</div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.provider')}</div>
+                <select
+                  value={settings.fxUpdates?.provider ?? 'exchangerate-api'}
+                  onChange={(e) =>
+                    void onUpdateSettings({
+                      fxUpdates: {
+                        provider: (e.target.value as 'exchangerate-api') || 'exchangerate-api',
+                        mode: settings.fxUpdates?.mode ?? '30m',
+                      },
+                    })
+                  }
+                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+                >
+                  <option value="exchangerate-api">exchangerate-api</option>
+                </select>
+              </div>
+              <div>
+                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.interval')}</div>
+                <select
+                  value={settings.fxUpdates?.mode ?? '30m'}
+                  onChange={(e) =>
+                    void onUpdateSettings({
+                      fxUpdates: { provider: settings.fxUpdates?.provider ?? 'exchangerate-api', mode: e.target.value as any },
+                    })
+                  }
+                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+                >
+                  <option value="15m">{t('settings.fxUpdates.intervals.m15')}</option>
+                  <option value="30m">{t('settings.fxUpdates.intervals.m30')}</option>
+                  <option value="1h">{t('settings.fxUpdates.intervals.h1')}</option>
+                  <option value="manual">{t('settings.fxUpdates.intervals.manual')}</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+                <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.internet')}</div>
+                <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">
+                  {typeof navigator !== 'undefined' && navigator.onLine ? t('settings.fxUpdates.online') : t('settings.fxUpdates.offline')}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+                <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.cache')}</div>
+                <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{fxFetchedAt ? t('common.yes') : t('common.no')}</div>
+              </div>
+              <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+                <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.cacheAt')}</div>
+                <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{fxFetchedAt ? new Date(fxFetchedAt).toLocaleString() : '—'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {Boolean(settings.reminders?.enabled) || (settings.fxUpdates?.mode ?? 'manual') !== 'manual' ? (
+          <div className="mt-6 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 p-4 text-sm text-[var(--tf-ink)]">
+            {t('settings.backgroundWarning')}
+          </div>
+        ) : null}
+      </Card>
+
+
+      <SettingsDivider />
+      <SettingsSectionTitle>{t('settings.sections.security')}</SettingsSectionTitle>
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -409,6 +574,8 @@ export function SettingsPage({
         </div>
       </Card>
 
+      <SettingsDivider />
+      <SettingsSectionTitle>{t('settings.sections.updates')}</SettingsSectionTitle>
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -477,6 +644,8 @@ export function SettingsPage({
         </div>
       </Card>
 
+      <SettingsDivider />
+      <SettingsSectionTitle>{t('settings.sections.backup')}</SettingsSectionTitle>
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -657,7 +826,8 @@ export function SettingsPage({
         </div>
       </Card>
 
-      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.local')}</div>
+      <SettingsDivider />
+      <SettingsSectionTitle>{t('settings.sections.fx')}</SettingsSectionTitle>
       <Card className="p-5">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div>
@@ -706,150 +876,10 @@ export function SettingsPage({
         </div>
       </Card>
 
-      <Card className="p-5">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div>
-            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.reminders.title')}</div>
-            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.reminders.subtitle')}</div>
 
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.reminders.enabled')}</div>
-              <button
-                type="button"
-                onClick={() =>
-                  void onUpdateSettings({
-                    reminders: {
-                      enabled: !Boolean(settings.reminders?.enabled),
-                      notifyHour: settings.reminders?.notifyHour ?? 10,
-                      daysBefore: settings.reminders?.daysBefore ?? 3,
-                    },
-                  })
-                }
-                className="relative inline-flex h-9 w-16 items-center rounded-full border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-1 transition duration-200 hover:bg-black/5 dark:hover:bg-white/5"
-              >
-                <span className="sr-only">{t('settings.reminders.enabled')}</span>
-                <span
-                  className={[
-                    'inline-block h-7 w-7 rounded-full bg-[var(--tf-accent)] shadow-sm transition duration-200',
-                    settings.reminders?.enabled ? 'translate-x-7' : 'translate-x-0',
-                  ].join(' ')}
-                />
-              </button>
-            </div>
 
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.reminders.notifyHour')}</div>
-                <select
-                  value={String(settings.reminders?.notifyHour ?? 10)}
-                  onChange={(e) =>
-                    void onUpdateSettings({
-                      reminders: {
-                        enabled: Boolean(settings.reminders?.enabled),
-                        notifyHour: Number(e.target.value),
-                        daysBefore: settings.reminders?.daysBefore ?? 3,
-                      },
-                    })
-                  }
-                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-                >
-                  {Array.from({ length: 24 }, (_, h) => (
-                    <option key={h} value={String(h)}>
-                      {String(h).padStart(2, '0')}:00
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.reminders.daysBefore')}</div>
-                <input
-                  type="number"
-                  min={0}
-                  max={30}
-                  value={Number(settings.reminders?.daysBefore ?? 3)}
-                  onChange={(e) =>
-                    void onUpdateSettings({
-                      reminders: {
-                        enabled: Boolean(settings.reminders?.enabled),
-                        notifyHour: settings.reminders?.notifyHour ?? 10,
-                        daysBefore: Number(e.target.value),
-                      },
-                    })
-                  }
-                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.fxUpdates.title')}</div>
-            <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.subtitle')}</div>
-
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.provider')}</div>
-                <select
-                  value={settings.fxUpdates?.provider ?? 'exchangerate-api'}
-                  onChange={(e) =>
-                    void onUpdateSettings({
-                      fxUpdates: {
-                        provider: (e.target.value as 'exchangerate-api') || 'exchangerate-api',
-                        mode: settings.fxUpdates?.mode ?? '30m',
-                      },
-                    })
-                  }
-                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-                >
-                  <option value="exchangerate-api">exchangerate-api</option>
-                </select>
-              </div>
-              <div>
-                <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.interval')}</div>
-                <select
-                  value={settings.fxUpdates?.mode ?? '30m'}
-                  onChange={(e) =>
-                    void onUpdateSettings({
-                      fxUpdates: { provider: settings.fxUpdates?.provider ?? 'exchangerate-api', mode: e.target.value as any },
-                    })
-                  }
-                  className="mt-3 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
-                >
-                  <option value="15m">{t('settings.fxUpdates.intervals.m15')}</option>
-                  <option value="30m">{t('settings.fxUpdates.intervals.m30')}</option>
-                  <option value="1h">{t('settings.fxUpdates.intervals.h1')}</option>
-                  <option value="manual">{t('settings.fxUpdates.intervals.manual')}</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-              <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
-                <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.internet')}</div>
-                <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">
-                  {typeof navigator !== 'undefined' && navigator.onLine ? t('settings.fxUpdates.online') : t('settings.fxUpdates.offline')}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
-                <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.cache')}</div>
-                <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{fxFetchedAt ? t('common.yes') : t('common.no')}</div>
-              </div>
-              <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
-                <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('settings.fxUpdates.cacheAt')}</div>
-                <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{fxFetchedAt ? new Date(fxFetchedAt).toLocaleString() : '—'}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {Boolean(settings.reminders?.enabled) || (settings.fxUpdates?.mode ?? 'manual') !== 'manual' ? (
-          <div className="mt-6 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 p-4 text-sm text-[var(--tf-ink)]">
-            {t('settings.backgroundWarning')}
-          </div>
-        ) : null}
-      </Card>
-
-      <div className="text-xs font-semibold tracking-wide text-[var(--tf-ink)]">{t('settings.sections.feedback')}</div>
+      <SettingsDivider />
+      <SettingsSectionTitle>{t('settings.sections.feedback')}</SettingsSectionTitle>
       <Card className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

@@ -490,7 +490,11 @@
     "sections": {
       "company": "COMPANY PROFILE",
       "security": "SECURITY",
-      "local": "REGIONAL",
+      "local": "LANGUAGE",
+      "reminders": "PAYMENT REMINDERS",
+      "updates": "AUTO-UPDATE",
+      "backup": "BACKUP & RESTORE",
+      "fx": "CURRENCY & FX RATES",
       "system": "SYSTEM",
       "feedback": "FEEDBACK (WHATSAPP)"
     },
