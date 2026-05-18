@@ -460,10 +460,14 @@ export function ReportsPage({
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <StatCard label={t('reports.summary.investment')} value={formatMoney(totals.investment, currency)} />
         <StatCard label={t('reports.summary.revenue')} value={formatMoney(totals.revenue, currency)} />
-        <StatCard label={t('reports.summary.netProfit')} value={formatMoney(totals.netProfit, currency)} />
+        <StatCard
+          label={t('reports.summary.netProfit')}
+          value={formatMoney(totals.netProfit, currency)}
+          tone="profit"
+        />
       </div>
 
       <Card className="overflow-hidden">

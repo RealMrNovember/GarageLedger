@@ -55,11 +55,15 @@ export function DashboardPage({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
-        <StatCard label={t('dashboard.stats.purchasedCount')} value={String(purchasedCount)} />
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StatCard label={t('dashboard.stats.purchasedCount')} value={String(purchasedCount)} tone="count" />
         <StatCard label={t('dashboard.stats.monthInvestment')} value={formatMoney(investment, currency)} />
         <StatCard label={t('dashboard.stats.monthRevenue')} value={formatMoney(revenue, currency)} />
-        <StatCard label={t('dashboard.stats.monthNetProfit')} value={formatMoney(netProfit, currency)} />
+        <StatCard
+          label={t('dashboard.stats.monthNetProfit')}
+          value={formatMoney(netProfit, currency)}
+          tone="profit"
+        />
       </div>
 
       <Card className="p-5">
