@@ -214,7 +214,7 @@
     "title": "Yardım & Əlaqə",
     "subtitle": "GarageLedger üçün detallı istifadə bələdçisi və dəstək məlumatları.",
     "booklet": {
-      "sections": [
+      "guide": [
         {
           "title": "Başlanğıc",
           "body": "GarageLedger, qalereya üçün offline işləyən ERP/CRM sistemidir. Məlumatlarınız kompüterinizdə saxlanır və tətbiq açıldıqda gündəlik avtomatik yedək yaradılır.",
@@ -268,7 +268,9 @@
             "Ertele: növbəti ödəniş tarixini 1 gün, 3 gün və ya 1 həftə irəli alır",
             "Növbəti ödəniş tarixi ilə heç bir alacağı qaçırmayın"
           ]
-        },
+        }
+      ],
+      "faq": [
         {
           "title": "Xərclər və real mənfəət",
           "body": "Xərclər bölməsində avtomobil ilə bağlı bütün xərcləri daxil edin.",
@@ -313,7 +315,18 @@
       "developer": "Geliştirici",
       "github": "GitHub",
       "email": "E-poçt",
-      "whatsapp": "WhatsApp"
+      "whatsapp": "WhatsApp",
+      "kicker": "Dəstək"
+    },
+    "guide": {
+      "kicker": "Bələdçi",
+      "title": "Addım-addım",
+      "subtitle": "Tövsiyə olunan ardıcıllıqla əsas iş axınları."
+    },
+    "faq": {
+      "kicker": "SSS",
+      "title": "Mövzular və cavablar",
+      "subtitle": "Maliyyə, hesabat, CRM və sistem istinadı."
     }
   },
   "tradeForm": {

@@ -214,7 +214,7 @@
     "title": "Help & Contact",
     "subtitle": "Quick guide to using GarageLedger and support information.",
     "booklet": {
-      "sections": [
+      "guide": [
         {
           "title": "Getting started",
           "body": "GarageLedger is an offline-first garage/auto trading system. Your data is stored locally on your PC and is backed up automatically (daily) when the app is opened.",
@@ -268,7 +268,9 @@
             "Snooze: move the next payment date by 1 day, 3 days or 1 week",
             "Use next payment date to keep receivables visible and never miss a collection"
           ]
-        },
+        }
+      ],
+      "faq": [
         {
           "title": "Expenses & true profit",
           "body": "Use the Expenses section inside a trade to record all operational costs related to a vehicle.",
@@ -313,7 +315,18 @@
       "developer": "Developer",
       "github": "GitHub",
       "email": "Email",
-      "whatsapp": "WhatsApp"
+      "whatsapp": "WhatsApp",
+      "kicker": "Support"
+    },
+    "guide": {
+      "kicker": "Guide",
+      "title": "Step-by-step",
+      "subtitle": "Core workflows in the recommended order."
+    },
+    "faq": {
+      "kicker": "FAQ",
+      "title": "Topics & answers",
+      "subtitle": "Finance, reporting, CRM and system reference."
     }
   },
   "tradeForm": {
