@@ -431,7 +431,9 @@
       "keyCount": "Açar sayı",
       "inspection": "Ekspertiza",
       "tax": "Vergi",
-      "commission": "Komissiya"
+      "commission": "Komissiya",
+      "powertrain": "Ötürücü tipi",
+      "fuelDetail": "Yanacaq növü (VIN / qeyd)"
     },
     "optional": {
       "subtitle": "Paket, yürüş, qeydlər və digər istəyə bağlı sahələr."
@@ -444,6 +446,15 @@
       "hintInStock": "Təxmin üçün statusu Rezerv və ya Satılıb edin və satış qiyməti daxil edin.",
       "hintNeedPrice": "Təxmin üçün etibarlı satış qiyməti daxil edin.",
       "formula": "Satış − (alış + xərclər + vergi + komissiya)"
+    },
+    "powertrain": {
+      "petrol": "Benzin",
+      "diesel": "Dizel",
+      "hybrid": "Hibrid (HEV)",
+      "phev": "Şarj olunan hibrid (PHEV)",
+      "electric": "Elektrik (BEV)",
+      "lpg": "LPG / CNG",
+      "other": "Digər"
     }
   },
   "vinDecoder": {
@@ -451,7 +462,9 @@
     "vinPlaceholder": "VIN daxil edin",
     "fetch": "Məlumatları Gətir",
     "loading": "Gətirilir…",
-    "notFound": "Məlumat tapılmadı, zəhmət olmasa manual daxil edin."
+    "notFound": "Məlumat tapılmadı, zəhmət olmasa manual daxil edin.",
+    "success": "VIN ilə {{count}} sahə dolduruldu",
+    "invalid": "Düzgün VIN daxil edin (11–17 simvol)"
   },
   "about": {
     "title": "Haqqında",

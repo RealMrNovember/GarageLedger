@@ -10,8 +10,23 @@ import type { CurrencyCode } from '../lib/currency'
 import { modalFieldClass, modalLabelClass } from '../lib/uiClasses'
 import { addDays, parseIsoDate, toIsoDateInputValue } from '../lib/dates'
 import type { Contact, ContactRole, TradeItem } from '../lib/types'
+import { decodeVinFromNhtsa, type PowertrainType } from '../lib/vinDecoder'
 
 const fieldClass = modalFieldClass
+
+const POWERTRAIN_OPTIONS: PowertrainType[] = ['petrol', 'diesel', 'hybrid', 'phev', 'electric', 'lpg', 'other']
+
+function inferPowertrainFromFuel(fuelText: string): PowertrainType {
+  const f = fuelText.toLowerCase()
+  if (!f) return ''
+  if (f.includes('plug-in') || f.includes('plugin') || f.includes('phev')) return 'phev'
+  if (f.includes('hybrid') || f.includes('hev') || f.includes('hibrit')) return 'hybrid'
+  if (f.includes('electric') || f.includes('bev') || f.includes('elektrik')) return 'electric'
+  if (f.includes('diesel') || f.includes('dizel')) return 'diesel'
+  if (f.includes('lpg') || f.includes('cng')) return 'lpg'
+  if (f.includes('gasoline') || f.includes('petrol') || f.includes('benzin') || f.includes('gas')) return 'petrol'
+  return ''
+}
 
 function newId(): string {
   if (crypto.randomUUID) return crypto.randomUUID()
@@ -46,6 +61,7 @@ export function TradeFormModal({
   const [engine, setEngine] = useState('')
   const [plate, setPlate] = useState('')
   const [vehiclePackage, setVehiclePackage] = useState('')
+  const [powertrain, setPowertrain] = useState<PowertrainType>('')
   const [fuel, setFuel] = useState('')
   const [transmission, setTransmission] = useState('')
   const [mileage, setMileage] = useState<number | ''>('')
@@ -62,6 +78,7 @@ export function TradeFormModal({
   const [vin, setVin] = useState('')
   const [vinLoading, setVinLoading] = useState(false)
   const [vinToast, setVinToast] = useState<string | null>(null)
+  const [vinToastOk, setVinToastOk] = useState(false)
   const [sellerContactId, setSellerContactId] = useState<string | null>(null)
   const [sellerName, setSellerName] = useState('')
   const [sellerPhone, setSellerPhone] = useState('')
@@ -110,6 +127,7 @@ export function TradeFormModal({
       setEngine('')
       setPlate('')
       setVehiclePackage('')
+      setPowertrain('')
       setFuel('')
       setTransmission('')
       setMileage('')
@@ -126,6 +144,7 @@ export function TradeFormModal({
       setVin('')
       setVinLoading(false)
       setVinToast(null)
+      setVinToastOk(false)
       setSellerContactId(null)
       setSellerName('')
       setSellerPhone('')
@@ -173,6 +192,8 @@ export function TradeFormModal({
     setEngine(initial.engine ?? '')
     setPlate(initial.plate ?? '')
     setVehiclePackage(initial.package ?? '')
+    const pt = (initial.powertrain as PowertrainType) || inferPowertrainFromFuel(initial.fuel ?? '')
+    setPowertrain(POWERTRAIN_OPTIONS.includes(pt) ? pt : inferPowertrainFromFuel(initial.fuel ?? ''))
     setFuel(initial.fuel ?? '')
     setTransmission(initial.transmission ?? '')
     setMileage(initial.mileage ?? '')
@@ -189,6 +210,7 @@ export function TradeFormModal({
       Boolean(
         initial.plate ||
           initial.package ||
+          initial.powertrain ||
           initial.fuel ||
           initial.transmission ||
           initial.mileage ||
@@ -206,6 +228,7 @@ export function TradeFormModal({
     setVin(initial.vin ?? '')
     setVinLoading(false)
     setVinToast(null)
+    setVinToastOk(false)
     setSellerContactId(initial.sellerContactId ?? null)
     setSellerName(initial.sellerName ?? '')
     setSellerPhone(initial.sellerPhone ?? '')
@@ -337,56 +360,53 @@ export function TradeFormModal({
   const canSaveContact = contactName.trim().length > 0 || contactPhone.trim().length > 0
 
   const showVinToast = (key: string) => {
+    setVinToastOk(false)
     setVinToast(t(key))
-    window.setTimeout(() => setVinToast(null), 2800)
+    window.setTimeout(() => {
+      setVinToast(null)
+      setVinToastOk(false)
+    }, 2800)
   }
 
   const decodeVin = async () => {
     const v = vin.trim().toUpperCase()
-    if (!v) return
+    if (v.length < 11) {
+      showVinToast('vinDecoder.invalid')
+      return
+    }
+    setVin(v)
     setVinToast(null)
+    setVinToastOk(false)
     setVinLoading(true)
     try {
       const ctrl = new AbortController()
-      const timeout = window.setTimeout(() => ctrl.abort(), 9000)
-      const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(v)}?format=json`, {
-        signal: ctrl.signal,
-      })
+      const timeout = window.setTimeout(() => ctrl.abort(), 12000)
+      const decoded = await decodeVinFromNhtsa(v, ctrl.signal)
       window.clearTimeout(timeout)
-      if (!res.ok) {
-        showVinToast('vinDecoder.notFound')
-        return
-      }
-      const json = (await res.json()) as { Results?: Array<Record<string, string | null | undefined>> }
-      const r = json?.Results?.[0]
-      if (!r || typeof r !== 'object') {
+      if (!decoded) {
         showVinToast('vinDecoder.notFound')
         return
       }
 
-      const make = String(r.Make ?? '').trim()
-      const nextModel = String(r.Model ?? '').trim()
-      const yearRaw = String(r.ModelYear ?? '').trim()
-      const displacement = String(r.DisplacementL ?? '').trim()
-      const fuel = String(r.FuelTypePrimary ?? '').trim()
+      if (decoded.brand) setBrand(decoded.brand)
+      if (decoded.model) setModel(decoded.model)
+      if (decoded.year != null) setYear(decoded.year)
+      if (decoded.engine) setEngine(decoded.engine)
+      if (decoded.fuel) setFuel(decoded.fuel)
+      if (decoded.powertrain) setPowertrain(decoded.powertrain)
+      if (decoded.transmission) setTransmission(decoded.transmission)
+      if (decoded.vehiclePackage) setVehiclePackage(decoded.vehiclePackage)
 
-      const parsedYear = Number(yearRaw)
-      const yearValue = Number.isFinite(parsedYear) && parsedYear > 1900 ? parsedYear : null
-
-      const hasAny = Boolean(make || nextModel || yearValue || displacement || fuel)
-      if (!hasAny) {
-        showVinToast('vinDecoder.notFound')
-        return
+      if (decoded.powertrain || decoded.fuel || decoded.transmission || decoded.vehiclePackage) {
+        setOptionalOpen(true)
       }
 
-      if (make) setBrand(make)
-      if (nextModel) setModel(nextModel)
-      if (yearValue != null) setYear(yearValue)
-
-      const dispPart = displacement ? `${displacement}L` : ''
-      const fuelPart = fuel ? fuel : ''
-      const combined = [dispPart, fuelPart].filter(Boolean).join(' · ')
-      if (combined) setEngine(combined)
+      setVinToastOk(true)
+      setVinToast(t('vinDecoder.success', { count: decoded.filledCount }))
+      window.setTimeout(() => {
+        setVinToast(null)
+        setVinToastOk(false)
+      }, 3200)
     } catch {
       showVinToast('vinDecoder.notFound')
     } finally {
@@ -425,6 +445,7 @@ export function TradeFormModal({
                 year: year === '' ? null : Number(year),
                 engine: engine.trim(),
                 package: vehiclePackage.trim() || undefined,
+                powertrain: powertrain || undefined,
                 fuel: fuel.trim() || undefined,
                 transmission: transmission.trim() || undefined,
                 mileage: mileage === '' ? null : Number(mileage),
@@ -586,7 +607,16 @@ export function TradeFormModal({
           <div className="col-span-12 lg:col-span-10">
             <div className="flex items-center justify-between gap-3">
               <div className={modalLabelClass}>{t('vinDecoder.vinLabel')}</div>
-              {vinToast ? <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{vinToast}</div> : null}
+              {vinToast ? (
+                <div
+                  className={[
+                    'text-xs font-medium',
+                    vinToastOk ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
+                  ].join(' ')}
+                >
+                  {vinToast}
+                </div>
+              ) : null}
             </div>
             <input
               value={vin}
@@ -599,7 +629,7 @@ export function TradeFormModal({
             <button
               type="button"
               onClick={() => void decodeVin()}
-              disabled={vinLoading || vin.trim().length < 5}
+              disabled={vinLoading || vin.trim().length < 11}
               className={[
                 'inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-2xl border text-sm font-semibold transition duration-200',
                 'border-[var(--tf-border)] bg-[var(--tf-surface)]/60 text-[var(--tf-ink)] hover:bg-black/5 dark:hover:bg-white/5',
@@ -1117,7 +1147,22 @@ export function TradeFormModal({
               <input value={vehiclePackage} onChange={(e) => setVehiclePackage(e.target.value)} className={`${fieldClass} mt-2`} />
             </div>
             <div className="col-span-12 sm:col-span-6">
-              <div className={modalLabelClass}>{t('tradeForm.fields.fuel')}</div>
+              <div className={modalLabelClass}>{t('tradeForm.fields.powertrain')}</div>
+              <select
+                value={powertrain}
+                onChange={(e) => setPowertrain(e.target.value as PowertrainType)}
+                className={`${fieldClass} mt-2`}
+              >
+                <option value="">—</option>
+                {POWERTRAIN_OPTIONS.map((pt) => (
+                  <option key={pt} value={pt}>
+                    {t(`tradeForm.powertrain.${pt}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-span-12 sm:col-span-6">
+              <div className={modalLabelClass}>{t('tradeForm.fields.fuelDetail')}</div>
               <input value={fuel} onChange={(e) => setFuel(e.target.value)} className={`${fieldClass} mt-2`} />
             </div>
             <div className="col-span-12 sm:col-span-6">

@@ -431,7 +431,9 @@
       "keyCount": "Anahtar sayısı",
       "inspection": "Ekspertiz",
       "tax": "Vergi",
-      "commission": "Komisyon"
+      "commission": "Komisyon",
+      "powertrain": "Güç aktarımı",
+      "fuelDetail": "Yakıt tipi (VIN / not)"
     },
     "optional": {
       "subtitle": "Paket, kilometre, notlar ve diğer isteğe bağlı alanlar."
@@ -444,6 +446,15 @@
       "hintInStock": "Tahmin için durumu Rezerve veya Satıldı yapın ve satış fiyatı girin.",
       "hintNeedPrice": "Tahmin için geçerli bir satış fiyatı girin.",
       "formula": "Satış − (alış + masraflar + vergi + komisyon)"
+    },
+    "powertrain": {
+      "petrol": "Benzin",
+      "diesel": "Dizel",
+      "hybrid": "Hibrit (HEV)",
+      "phev": "Şarj edilebilir hibrit (PHEV)",
+      "electric": "Elektrik (BEV)",
+      "lpg": "LPG / CNG",
+      "other": "Diğer"
     }
   },
   "vinDecoder": {
@@ -451,7 +462,9 @@
     "vinPlaceholder": "VIN girin",
     "fetch": "Bilgileri Getir",
     "loading": "Getiriliyor…",
-    "notFound": "Bilgi bulunamadı, lütfen manuel giriniz."
+    "notFound": "Bilgi bulunamadı, lütfen manuel giriniz.",
+    "success": "VIN ile {{count}} alan dolduruldu",
+    "invalid": "Geçerli VIN girin (11–17 karakter)"
   },
   "about": {
     "title": "Hakkında",

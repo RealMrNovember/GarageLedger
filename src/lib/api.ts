@@ -86,6 +86,7 @@ function migrateItem(raw: unknown): TradeItem | null {
     package: String((anyItem.package as string | undefined) ?? ''),
     year,
     engine: String(engine ?? ''),
+    powertrain: String((anyItem.powertrain as string | undefined) ?? ''),
     fuel: String((anyItem.fuel as string | undefined) ?? ''),
     transmission: String((anyItem.transmission as string | undefined) ?? ''),
     mileage:

@@ -431,7 +431,9 @@
       "keyCount": "Key count",
       "inspection": "Inspection",
       "tax": "Tax",
-      "commission": "Commission"
+      "commission": "Commission",
+      "powertrain": "Powertrain",
+      "fuelDetail": "Fuel type (from VIN / notes)"
     },
     "optional": {
       "subtitle": "Package, mileage, notes and other fields you can fill later."
@@ -444,6 +446,15 @@
       "hintInStock": "Set status to Reserved or Sold and enter a sale price to estimate profit.",
       "hintNeedPrice": "Enter a valid sale price to see an estimate.",
       "formula": "Sale − (purchase + expenses + tax + commission)"
+    },
+    "powertrain": {
+      "petrol": "Petrol / Gasoline",
+      "diesel": "Diesel",
+      "hybrid": "Hybrid (HEV)",
+      "phev": "Plug-in hybrid (PHEV)",
+      "electric": "Electric (BEV)",
+      "lpg": "LPG / CNG",
+      "other": "Other"
     }
   },
   "vinDecoder": {
@@ -451,7 +462,9 @@
     "vinPlaceholder": "Enter VIN",
     "fetch": "Fetch details",
     "loading": "Fetching…",
-    "notFound": "No info found, please enter manually."
+    "notFound": "No info found, please enter manually.",
+    "success": "{{count}} fields filled from VIN",
+    "invalid": "Enter a valid VIN (11–17 characters)"
   },
   "about": {
     "title": "About",

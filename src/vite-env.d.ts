@@ -9,6 +9,7 @@ type TradeItem = {
   package?: string
   year: number | null
   engine: string
+  powertrain?: string
   fuel?: string
   transmission?: string
   mileage?: number | null
