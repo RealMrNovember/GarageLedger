@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
+import { CollapsibleFilterPanel } from '../components/CollapsibleFilterPanel'
 import { Modal } from '../components/Modal'
 import { formatMoney } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
@@ -95,6 +96,26 @@ export function InventoryPage({
       .sort((a, b) => b.purchaseDate.localeCompare(a.purchaseDate))
   }, [items, q, category, status, profitFilter, purchaseFrom, purchaseTo])
 
+  const activeFilterCount = useMemo(() => {
+    let n = 0
+    if (q.trim()) n++
+    if (category !== '__all__') n++
+    if (status !== '__all__') n++
+    if (profitFilter !== '__all__') n++
+    if (purchaseFrom) n++
+    if (purchaseTo) n++
+    return n
+  }, [q, category, status, profitFilter, purchaseFrom, purchaseTo])
+
+  const clearFilters = () => {
+    setQ('')
+    setCategory('__all__')
+    setStatus('__all__')
+    setProfitFilter('__all__')
+    setPurchaseFrom('')
+    setPurchaseTo('')
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -112,29 +133,16 @@ export function InventoryPage({
         </Button>
       </div>
 
-      <Card className="p-5">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('inventory.filters.title')}</div>
-            <div className="flex items-center gap-2">
-              <div className="text-xs text-[var(--tf-ink-muted)]">{t('inventory.filters.results', { count: filtered.length })}</div>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setQ('')
-                  setCategory('__all__')
-                  setStatus('__all__')
-                  setProfitFilter('__all__')
-                  setPurchaseFrom('')
-                  setPurchaseTo('')
-                }}
-              >
-                {t('inventory.filters.clear')}
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
+      <CollapsibleFilterPanel
+        activeCount={activeFilterCount}
+        summary={t('inventory.filters.results', { count: filtered.length })}
+        actions={
+          <Button variant="ghost" onClick={clearFilters}>
+            {t('inventory.filters.clear')}
+          </Button>
+        }
+      >
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
             <div className="lg:col-span-4">
               <input
                 value={q}
@@ -215,11 +223,10 @@ export function InventoryPage({
               </label>
             </div>
           </div>
-        </div>
-      </Card>
+      </CollapsibleFilterPanel>
 
       <Card className="overflow-hidden">
-        <div className="max-h-[70vh] overflow-auto">
+        <div className="max-h-[calc(100vh-12rem)] overflow-auto">
           <table className="w-full min-w-[980px] text-left text-sm">
             <thead className="sticky top-0 z-10 bg-[var(--tf-bg)]/95 backdrop-blur">
               <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">

@@ -2,7 +2,12 @@
   "common": {
     "close": "Bağla",
     "maximize": "Böyüt",
-    "restore": "Geri al"
+    "restore": "Geri al",
+    "filters": {
+      "toggle": "Filtrlə",
+      "hide": "Filtrləri gizlət",
+      "active": "{{count}} aktiv"
+    }
   },
   "app": {
     "name": "GarageLedger",

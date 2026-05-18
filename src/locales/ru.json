@@ -2,7 +2,12 @@
   "common": {
     "close": "Закрыть",
     "maximize": "Развернуть",
-    "restore": "Вернуть"
+    "restore": "Вернуть",
+    "filters": {
+      "toggle": "Фильтр",
+      "hide": "Скрыть фильтры",
+      "active": "{{count}} активно"
+    }
   },
   "app": {
     "name": "GarageLedger",

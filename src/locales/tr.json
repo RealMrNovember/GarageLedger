@@ -2,7 +2,12 @@
   "common": {
     "close": "Kapat",
     "maximize": "Büyüt",
-    "restore": "Geri al"
+    "restore": "Geri al",
+    "filters": {
+      "toggle": "Filtrele",
+      "hide": "Filtreleri gizle",
+      "active": "{{count}} aktif"
+    }
   },
   "app": {
     "name": "GarageLedger",

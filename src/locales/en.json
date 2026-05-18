@@ -2,7 +2,12 @@
   "common": {
     "close": "Close",
     "maximize": "Maximize",
-    "restore": "Restore"
+    "restore": "Restore",
+    "filters": {
+      "toggle": "Filter",
+      "hide": "Hide filters",
+      "active": "{{count}} active"
+    }
   },
   "app": {
     "name": "GarageLedger",

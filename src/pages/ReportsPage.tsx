@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
+import { CollapsibleFilterPanel } from '../components/CollapsibleFilterPanel'
 import { StatCard } from '../components/StatCard'
 import { itemProfit, totalExpenses } from '../lib/compute'
 import { formatMoney } from '../lib/currency'
@@ -133,6 +134,8 @@ export function ReportsPage({
     if (preset === 'custom') return { from, to }
     return presetRange(preset)
   }, [preset, from, to])
+
+  const activeFilterCount = preset !== 'thisMonth' ? 1 : 0
 
   const rows = useMemo(() => {
     const fromD = startOfDay(parseIsoDate(resolvedRange.from))
@@ -393,16 +396,11 @@ export function ReportsPage({
         </div>
       </Modal>
 
-      <Card className="p-5">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('reports.filters.title')}</div>
-            <div className="text-xs text-[var(--tf-ink-muted)]">
-              {t('reports.filters.range', { from: resolvedRange.from, to: resolvedRange.to })}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
+      <CollapsibleFilterPanel
+        activeCount={activeFilterCount}
+        summary={t('reports.filters.range', { from: resolvedRange.from, to: resolvedRange.to })}
+      >
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
             <div className="lg:col-span-4">
               <select
                 value={preset}
@@ -457,8 +455,7 @@ export function ReportsPage({
               </label>
             </div>
           </div>
-        </div>
-      </Card>
+      </CollapsibleFilterPanel>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <StatCard label={t('reports.summary.investment')} value={formatMoney(totals.investment, currency)} />
@@ -471,7 +468,7 @@ export function ReportsPage({
       </div>
 
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="max-h-[calc(100vh-14rem)] overflow-auto">
           <table className="w-full min-w-[980px] text-left text-sm">
             <thead className="bg-[var(--tf-surface)]/55">
               <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">
