@@ -1,6 +1,20 @@
 {
   "releases": [
     {
+      "version": "1.8.2",
+      "date": "2026-05-19",
+      "phases": [
+        {
+          "title": "Seamless Updater UX hotfix",
+          "bullets": [
+            "Güncelleme onayında uygulama tray arka planında kalmır — tam çıxış və quraşdırma.",
+            "Açılışda məcburi \"What's New\" popup silindi; sürüm qeydləri yalnız Yardım / Haqqında.",
+            "Premium NSIS quraşdırıcı: sidebar/header BMP və əvəz edilə bilən wizard.gif placeholder."
+          ]
+        }
+      ]
+    },
+    {
       "version": "1.8.1",
       "date": "2026-05-19",
       "phases": [

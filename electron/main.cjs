@@ -1,5 +1,6 @@
 const path = require('node:path')
 const { app, BrowserWindow, Tray, Menu } = require('electron')
+const { registerUpdateInstallHandlers, getIsUpdating } = require('./update-install.cjs')
 const { registerIpc } = require('./ipc.cjs')
 const { startBackgroundService, stopBackgroundService } = require('./background.cjs')
 const {
@@ -18,6 +19,24 @@ const isDev = Boolean(process.env.VITE_DEV_SERVER_URL)
 let tray = null
 let mainWindow = null
 let isQuitting = false
+
+registerUpdateInstallHandlers({
+  onPrepare: () => {
+    isQuitting = true
+    stopBackgroundService()
+    if (tray && !tray.isDestroyed()) {
+      tray.destroy()
+      tray = null
+    }
+    for (const win of BrowserWindow.getAllWindows()) {
+      if (win.isDestroyed()) continue
+      try {
+        win.removeAllListeners('close')
+        win.destroy()
+      } catch {}
+    }
+  },
+})
 
 app.setName('GarageLedger')
 try {
@@ -119,7 +138,7 @@ async function createMainWindow() {
   })
 
   win.on('close', (event) => {
-    if (isQuitting) return
+    if (isQuitting || getIsUpdating()) return
     event.preventDefault()
     win.hide()
     if (tray && !tray.isDestroyed()) {
@@ -168,5 +187,8 @@ app.on('before-quit', () => {
 })
 
 app.on('window-all-closed', () => {
-  // Keep running in tray on Windows/Linux when the window is hidden.
+  if (getIsUpdating()) {
+    app.quit()
+  }
+  // Otherwise keep running in tray on Windows/Linux when the window is hidden.
 })

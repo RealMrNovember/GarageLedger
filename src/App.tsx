@@ -18,7 +18,7 @@ import { InventoryPage } from './pages/InventoryPage'
 import { HelpPage } from './pages/HelpPage'
 import { ReportsPage } from './pages/ReportsPage'
 import { SettingsPage } from './pages/SettingsPage'
-import { compareVersions, parseReleaseHistory, type ReleaseEntry } from './lib/releases'
+import { parseReleaseHistory, type ReleaseEntry } from './lib/releases'
 
 type UpdateStatus =
   | { state: 'idle' }
@@ -208,30 +208,6 @@ export default function App() {
       if (next.state === 'error') setUpdateModalOpen(true)
     })
     return () => off()
-  }, [])
-
-  useEffect(() => {
-    const api = window.GarageLedger
-    if (!api?.app?.getInfo) return
-
-    const key = 'garageledger.lastSeenVersion'
-    const run = async () => {
-      const info = await api.app.getInfo()
-      const currentVersion = info?.version ?? ''
-      if (!currentVersion) return
-      const lastSeen = localStorage.getItem(key) ?? ''
-
-      if (!lastSeen || compareVersions(currentVersion, lastSeen) > 0) {
-        const historyRes = await api.whatsNew?.getHistory?.()
-        if (historyRes?.ok && Array.isArray(historyRes.releases)) {
-          setReleaseHistory(parseReleaseHistory(historyRes.releases))
-        }
-        setWhatsNewVersion(currentVersion)
-        setWhatsNewOpen(true)
-      }
-    }
-
-    void run()
   }, [])
 
   return (

@@ -1,4 +1,5 @@
 const { BrowserWindow, app, ipcMain, net, powerMonitor } = require('electron')
+const { prepareQuitForUpdate } = require('./update-install.cjs')
 const path = require('node:path')
 const fs = require('node:fs/promises')
 const { autoUpdater } = require('electron-updater')
@@ -108,7 +109,14 @@ function registerUpdaterIpc({ isDev }) {
   ipcMain.handle('garageledger:update:install', async () => {
     if (isDev) return { ok: false }
     try {
-      autoUpdater.quitAndInstall()
+      prepareQuitForUpdate()
+      setImmediate(() => {
+        try {
+          autoUpdater.quitAndInstall(false, true)
+        } catch (e) {
+          broadcastUpdateStatus({ state: 'error', message: e?.message ?? String(e) })
+        }
+      })
       return { ok: true }
     } catch (e) {
       broadcastUpdateStatus({ state: 'error', message: e?.message ?? String(e) })

@@ -1,7 +1,7 @@
 {
   "name": "GarageLedger",
   "private": true,
-  "version": "1.8.1",
+  "version": "1.8.2",
   "type": "module",
   "description": "Quiet-luxury, offline-first garage inventory and financial analytics desktop app.",
   "author": "Mikail",
@@ -14,13 +14,14 @@
     "dev": "concurrently -k \"vite\" \"npm:electron:dev\"",
     "electron:dev": "npm run icons && node tools/patch-electron-icon.mjs && wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
     "icons": "node tools/generate-icon.mjs",
+    "installer-assets": "node tools/generate-installer-assets.mjs",
     "build": "tsc -b && vite build",
     "verify:release": "node tools/verify-release.mjs",
     "verify:release:build": "node tools/verify-release.mjs --build",
     "verify:win7": "node tools/verify-win7.mjs",
     "predist": "npm run verify:release",
-    "dist": "npm run icons && npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis",
-    "publish": "npm run icons && npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis --publish always",
+    "dist": "npm run icons && npm run installer-assets && npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis",
+    "publish": "npm run icons && npm run installer-assets && npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis --publish always",
     "release:publish": "npm run publish",
     "release": "npm run verify:release && npm version minor && git push --follow-tags && npm run publish",
     "lint": "eslint .",
@@ -88,6 +89,10 @@
         "from": "build/icon.png",
         "to": "icon.png"
       },
+      {
+        "from": "build/installer/wizard.gif",
+        "to": "installer/wizard.gif"
+      },
       "../prompt.md",
       "README.md"
     ],
@@ -120,7 +125,14 @@
       "menuCategory": "Cicibyte Corp",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
-      "installerHeaderIcon": "build/icon.ico"
+      "installerHeaderIcon": "build/icon.ico",
+      "installerSidebar": "build/installer/sidebar.bmp",
+      "installerHeader": "build/installer/header.bmp",
+      "uninstallerSidebar": "build/installer/sidebar.bmp",
+      "include": "installer/nsis/customInstaller.nsh",
+      "installerLanguages": ["en_US"],
+      "language": "1033",
+      "runAfterFinish": true
     },
     "publish": [
       {
