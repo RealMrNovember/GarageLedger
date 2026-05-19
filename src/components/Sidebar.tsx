@@ -7,6 +7,16 @@ import { i18n } from '../i18n'
 
 export type NavKey = 'dashboard' | 'inventory' | 'reports' | 'customers' | 'help' | 'settings'
 
+function FxRefreshIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M20 5v4h-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 19v-4h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function Sidebar({
   active,
   onNavigate,
@@ -61,8 +71,8 @@ export function Sidebar({
         : t('settings.fx.sidebarUpdated', { time: timeLabel })
 
   const itemBase =
-    'w-full rounded-2xl px-3 py-2 text-left text-sm font-medium transition duration-200 hover:bg-black/5 active:translate-y-[0.5px]'
-  const activeClass = 'bg-black/6 text-[var(--tf-ink)]'
+    'w-full rounded-xl text-sm font-medium transition duration-200 hover:bg-black/5 active:translate-y-[0.5px] dark:hover:bg-white/5'
+  const activeClass = 'bg-black/6 text-[var(--tf-ink)] dark:bg-white/8'
   const idleClass = 'text-[var(--tf-ink-muted)]'
 
   const navItems: Array<{ key: NavKey; icon: ReactNode; label: string }> = [
@@ -126,11 +136,7 @@ export function Sidebar({
       label: t('nav.settings'),
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M12 15.5a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7z"
-            stroke="currentColor"
-            strokeWidth="1.6"
-          />
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7z" stroke="currentColor" strokeWidth="1.6" />
           <path
             d="M19.4 15a8 8 0 0 0 .1-2l2-1.1l-2-3.4l-2.2.7a7.8 7.8 0 0 0-1.7-1L15 5.9h-6L8.4 8.2a7.8 7.8 0 0 0-1.7 1l-2.2-.7l-2 3.4l2 1.1a8 8 0 0 0 .1 2l-2 1.1l2 3.4l2.2-.7a7.8 7.8 0 0 0 1.7 1L9 22.1h6l.6-2.3a7.8 7.8 0 0 0 1.7-1l2.2.7l2-3.4l-2-1.1z"
             stroke="currentColor"
@@ -145,38 +151,38 @@ export function Sidebar({
   return (
     <aside
       className={[
-        'sticky top-0 flex h-screen flex-col gap-4 border-r border-[var(--tf-border)] bg-[var(--tf-bg)] p-5 transition-[width] duration-200',
-        collapsed ? 'w-20' : 'w-72',
+        'sticky top-0 flex h-screen shrink-0 flex-col gap-4 border-r border-[var(--tf-border)]/60 bg-[var(--tf-bg)] p-4 transition-[width] duration-200',
+        collapsed ? 'w-[4.75rem]' : 'w-72',
       ].join(' ')}
     >
       <div className={['flex items-center', collapsed ? 'justify-center' : 'gap-3'].join(' ')}>
         <Logo size={34} />
         {!collapsed ? (
-          <div className="leading-tight">
-            <div className="text-sm font-semibold text-[var(--tf-ink)]">GarageLedger</div>
-            <div className="text-xs text-[var(--tf-ink-muted)]">Cicibyte Corp</div>
+          <div className="min-w-0 leading-tight">
+            <div className="truncate text-sm font-semibold text-[var(--tf-ink)]">GarageLedger</div>
+            <div className="truncate text-xs text-[var(--tf-ink-muted)]">Cicibyte Corp</div>
           </div>
         ) : null}
       </div>
 
-      <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)] p-2 shadow-[var(--tf-shadow)]">
+      <nav className="gl-elevated-card flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto rounded-2xl p-2">
         <button
           type="button"
           className={[
-            'mb-1 w-full rounded-2xl border border-[var(--tf-border)] bg-white/60 px-3 py-2 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:bg-black/5 dark:bg-white/10',
-            collapsed ? 'flex items-center justify-center' : 'flex items-center justify-between',
+            itemBase,
+            'mb-1 border border-[var(--tf-border)]/50 bg-white/40 dark:bg-white/5',
+            collapsed ? 'flex h-10 items-center justify-center px-0' : 'flex items-center justify-between px-3 py-2',
           ].join(' ')}
           onClick={onToggleCollapsed}
+          title={collapsed ? t('nav.expand') : t('nav.collapse')}
+          aria-label={collapsed ? t('nav.expand') : t('nav.collapse')}
         >
-          <span className="inline-flex items-center gap-2">
+          <span className="inline-flex items-center justify-center">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
             </svg>
-            {!collapsed ? <span>Toggle</span> : null}
           </span>
-          {!collapsed ? (
-            <span className="text-xs text-[var(--tf-ink-muted)]">{collapsed ? '' : '⟷'}</span>
-          ) : null}
+          {!collapsed ? <span className="text-xs text-[var(--tf-ink-muted)]">⟷</span> : null}
         </button>
 
         {navItems.map((it) => (
@@ -186,58 +192,67 @@ export function Sidebar({
             className={[
               itemBase,
               active === it.key ? activeClass : idleClass,
-              collapsed ? 'flex items-center justify-center' : 'flex items-center gap-3',
+              collapsed ? 'flex h-10 items-center justify-center px-0' : 'flex items-center gap-3 px-3 py-2.5',
             ].join(' ')}
             onClick={() => onNavigate(it.key)}
             title={collapsed ? it.label : undefined}
+            aria-label={it.label}
           >
-            <span className="inline-flex h-5 w-5 items-center justify-center">{it.icon}</span>
+            <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center">{it.icon}</span>
             {!collapsed ? <span className="min-w-0 truncate">{it.label}</span> : null}
           </button>
         ))}
-      </div>
+      </nav>
 
-      <div className="mt-auto">
-        <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)] p-3 shadow-[var(--tf-shadow)]">
-          {!collapsed ? (
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--tf-ink-muted)]">
-                {t('settings.theme.title')}
-              </span>
-              <span className={`truncate text-[11px] font-medium ${fxStatusClass}`} title={fxStatusText}>
-                {fxStatusText}
-              </span>
+      <div className="gl-elevated-card shrink-0 rounded-2xl p-2">
+        {!collapsed ? (
+          <div className="mb-2 px-2">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--tf-ink-muted)]">
+              {t('settings.theme.title')}
             </div>
-          ) : null}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => void onRefreshFx()}
-              className="inline-flex h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--tf-border)] bg-white/50 px-2 text-[var(--tf-ink)] transition duration-200 hover:bg-black/5 dark:bg-white/5 dark:hover:bg-white/10"
-              aria-label={t('settings.fx.refresh')}
-              title={t('settings.fx.refresh')}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                <path d="M20 5v4h-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M4 19v-4h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              {!collapsed ? <span className="truncate text-xs font-medium">{t('settings.fx.refresh')}</span> : null}
-            </button>
-            <button
-              type="button"
-              onClick={onToggleTheme}
-              className="relative inline-flex h-9 w-14 shrink-0 items-center rounded-full border border-[var(--tf-border)] bg-white/50 px-1 transition duration-200 hover:bg-black/5 dark:bg-white/5 dark:hover:bg-white/10"
-            >
-              <span className="sr-only">{t('settings.theme.toggle')}</span>
-              <span className={['inline-block h-7 w-7 rounded-full bg-[var(--tf-accent)] shadow-sm transition duration-200', theme === 'dark' ? 'translate-x-5' : 'translate-x-0'].join(' ')} />
-            </button>
+            <div className={`mt-1 truncate text-[11px] font-medium ${fxStatusClass}`} title={fxStatusText}>
+              {fxStatusText}
+            </div>
           </div>
-          {collapsed ? (
-            <div className={`mt-2 text-center text-[10px] font-medium ${fxStatusClass}`} title={fxStatusText}>
-              {fxFetchedAt ? timeLabel : '—'}
-            </div>
-          ) : null}
+        ) : null}
+
+        <div
+          className={[
+            'flex gap-2',
+            collapsed ? 'flex-col items-center' : 'flex-row items-center',
+          ].join(' ')}
+        >
+          <button
+            type="button"
+            onClick={() => void onRefreshFx()}
+            className={[
+              'inline-flex items-center justify-center rounded-xl border border-[var(--tf-border)]/60 bg-white/50 text-[var(--tf-ink)] transition duration-200 hover:bg-black/5 dark:bg-white/5 dark:hover:bg-white/10',
+              collapsed ? 'h-10 w-10' : 'h-10 min-w-0 flex-1 gap-1.5 px-3',
+            ].join(' ')}
+            aria-label={t('settings.fx.refresh')}
+            title={collapsed ? `${t('settings.fx.refresh')} · ${fxStatusText}` : t('settings.fx.refresh')}
+          >
+            <FxRefreshIcon />
+            {!collapsed ? <span className="truncate text-xs font-medium">{t('settings.fx.refresh')}</span> : null}
+          </button>
+
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className={[
+              'relative inline-flex shrink-0 items-center rounded-full border border-[var(--tf-border)]/60 bg-white/50 transition duration-200 hover:bg-black/5 dark:bg-white/5 dark:hover:bg-white/10',
+              collapsed ? 'h-10 w-10 justify-center' : 'h-10 w-14 justify-start px-1',
+            ].join(' ')}
+            aria-label={t('settings.theme.toggle')}
+            title={t('settings.theme.toggle')}
+          >
+            <span
+              className={[
+                'inline-block h-7 w-7 rounded-full bg-[var(--tf-accent)] shadow-sm transition duration-200',
+                collapsed ? '' : theme === 'dark' ? 'translate-x-5' : 'translate-x-0',
+              ].join(' ')}
+            />
+          </button>
         </div>
       </div>
     </aside>

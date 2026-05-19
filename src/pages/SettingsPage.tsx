@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/Button'
-import { Card } from '../components/Card'
-import { SettingsDivider, SettingsSectionTitle } from '../components/SettingsSection'
+import { PageShell } from '../components/PageShell'
+import { SettingsPanel, SettingsSectionTitle } from '../components/SettingsSection'
 import { i18n } from '../i18n'
+import { formatNextBackupDue } from '../lib/backupSchedule'
 import { formatFxDisplayTime, refreshFxRates, type CurrencyCode, type FxUpdateMode } from '../lib/currency'
 import { useFxSync } from '../lib/useFxSync'
 import type { GarageLedgerSettings } from '../lib/types'
@@ -152,12 +153,20 @@ export function SettingsPage({
         : undefined
     return version ? ` (v${version})` : ''
   }, [status])
+  const backupSchedule = settings.backupSettings?.schedule ?? 'daily'
   const lastBackupLabel = useMemo(() => {
     if (!lastBackupAt) return t('backups.never')
     const d = new Date(lastBackupAt)
     if (Number.isNaN(d.getTime())) return t('backups.never')
     return d.toLocaleString()
   }, [lastBackupAt, t])
+  const nextBackupDueLabel = useMemo(() => {
+    if (backupSchedule === 'manual') return t('backups.manualOnly')
+    const due = formatNextBackupDue(backupSchedule, lastBackupAt, i18n.language)
+    return due ?? t('backups.dueNow')
+  }, [backupSchedule, lastBackupAt, t])
+  const totalBackupBytes = useMemo(() => backupItems.reduce((sum, item) => sum + (item.size ?? 0), 0), [backupItems])
+  const latestBackup = backupItems[0]
   const lastUpdateCheckLabel = useMemo(() => {
     if (!lastUpdateCheckAt) return t('updates.neverChecked')
     const d = new Date(lastUpdateCheckAt)
@@ -166,13 +175,10 @@ export function SettingsPage({
   }, [lastUpdateCheckAt, t])
 
   return (
-    <div className="mx-auto max-w-6xl space-y-5">
-      <div>
-        <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.title')}</div>
-      </div>
-
+    <PageShell title={t('settings.title')}>
+      <div className="flex flex-col gap-4">
       <SettingsSectionTitle>{t('settings.sections.local')}</SettingsSectionTitle>
-      <Card className="p-5">
+      <SettingsPanel>
         <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.language')}</div>
         <select
           value={current}
@@ -185,12 +191,11 @@ export function SettingsPage({
             </option>
           ))}
         </select>
-      </Card>
+      </SettingsPanel>
 
-      <SettingsDivider />
       <SettingsSectionTitle>{t('settings.sections.company')}</SettingsSectionTitle>
 
-      <Card className="p-5">
+      <SettingsPanel>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.company.title')}</div>
@@ -289,10 +294,9 @@ export function SettingsPage({
             ) : null}
           </div>
         </div>
-      </Card>
-      <SettingsDivider />
+      </SettingsPanel>
       <SettingsSectionTitle>{t('settings.sections.reminders')}</SettingsSectionTitle>
-      <Card className="p-5">
+      <SettingsPanel>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div>
             <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.reminders.title')}</div>
@@ -433,12 +437,11 @@ export function SettingsPage({
             {t('settings.backgroundWarning')}
           </div>
         ) : null}
-      </Card>
+      </SettingsPanel>
 
 
-      <SettingsDivider />
       <SettingsSectionTitle>{t('settings.sections.security')}</SettingsSectionTitle>
-      <Card className="p-5">
+      <SettingsPanel>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.lock.title')}</div>
@@ -563,11 +566,10 @@ export function SettingsPage({
             ) : null}
           </div>
         </div>
-      </Card>
+      </SettingsPanel>
 
-      <SettingsDivider />
       <SettingsSectionTitle>{t('settings.sections.updates')}</SettingsSectionTitle>
-      <Card className="p-5">
+      <SettingsPanel>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('updates.title')}</div>
@@ -633,11 +635,10 @@ export function SettingsPage({
             <div className="text-xs text-[var(--tf-ink-muted)]">{t('updates.idle')}</div>
           )}
         </div>
-      </Card>
+      </SettingsPanel>
 
-      <SettingsDivider />
       <SettingsSectionTitle>{t('settings.sections.backup')}</SettingsSectionTitle>
-      <Card className="p-5">
+      <SettingsPanel>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('backups.title')}</div>
@@ -693,8 +694,25 @@ export function SettingsPage({
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <div className="text-xs text-[var(--tf-ink-muted)]">{t('backups.last', { value: lastBackupLabel })}</div>
-          <div className="text-xs text-[var(--tf-ink-muted)]">{t('backups.count', { count: backupItems.length })}</div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-3 py-1 text-xs font-semibold text-[var(--tf-ink)]">
+              {t(`backups.schedules.${backupSchedule}`)}
+            </span>
+            <span className="text-xs text-[var(--tf-ink-muted)]">{t('backups.count', { count: backupItems.length })}</span>
+          </div>
         </div>
+
+        {backupSchedule !== 'manual' ? (
+          <div className="mt-4 rounded-2xl border border-sky-500/20 bg-gradient-to-br from-sky-500/10 via-[var(--tf-surface)]/80 to-[var(--tf-surface)]/60 px-4 py-3 text-xs leading-relaxed text-[var(--tf-ink-muted)]">
+            <span className="font-semibold text-[var(--tf-ink)]">{t('backups.nextDue')}:</span> {nextBackupDueLabel}
+            <span className="mx-2 text-[var(--tf-border)]">·</span>
+            {t('backups.autoCleanupHint', { count: settings.backupSettings?.keepLast ?? 30 })}
+          </div>
+        ) : (
+          <div className="mt-4 rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3 text-xs text-[var(--tf-ink-muted)]">
+            {t('backups.manualHint')}
+          </div>
+        )}
 
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
           <div>
@@ -754,20 +772,26 @@ export function SettingsPage({
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
             <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('backups.lastSuccessful')}</div>
-            <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{backupItems[0]?.fileName ?? '—'}</div>
+            <div className="mt-1 truncate text-sm font-semibold text-[var(--tf-ink)]" title={latestBackup?.fileName}>
+              {latestBackup?.fileName ?? '—'}
+            </div>
           </div>
           <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
             <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('backups.lastSize')}</div>
-            <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{formatBytes(backupItems[0]?.size ?? 0)}</div>
+            <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{formatBytes(latestBackup?.size ?? 0)}</div>
           </div>
           <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
             <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('backups.lastAt')}</div>
             <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">
-              {backupItems[0]?.mtimeMs ? new Date(backupItems[0].mtimeMs).toLocaleString() : '—'}
+              {latestBackup?.mtimeMs ? new Date(latestBackup.mtimeMs).toLocaleString() : '—'}
             </div>
+          </div>
+          <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/50 px-4 py-3">
+            <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('backups.totalSize')}</div>
+            <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{formatBytes(totalBackupBytes)}</div>
           </div>
         </div>
 
@@ -815,11 +839,10 @@ export function SettingsPage({
             </div>
           )}
         </div>
-      </Card>
+      </SettingsPanel>
 
-      <SettingsDivider />
       <SettingsSectionTitle>{t('settings.sections.fx')}</SettingsSectionTitle>
-      <Card className="p-5">
+      <SettingsPanel>
         <div className="max-w-md">
           <div className="text-xs font-medium text-[var(--tf-ink-muted)]">{t('settings.currency')}</div>
           <select
@@ -844,11 +867,10 @@ export function SettingsPage({
             </Button>
           </div>
         </div>
-      </Card>
+      </SettingsPanel>
 
-      <SettingsDivider />
       <SettingsSectionTitle>{t('settings.sections.feedback')}</SettingsSectionTitle>
-      <Card className="p-5">
+      <SettingsPanel>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('settings.feedback.title')}</div>
@@ -874,7 +896,8 @@ export function SettingsPage({
           className="mt-4 w-full resize-none rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
           placeholder={t('settings.feedback.placeholder')}
         />
-      </Card>
-    </div>
+      </SettingsPanel>
+      </div>
+    </PageShell>
   )
 }

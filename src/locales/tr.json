@@ -21,7 +21,9 @@
     "reports": "Raporlar",
     "customers": "Müşteriler",
     "help": "Yardım",
-    "settings": "Ayarlar"
+    "settings": "Ayarlar",
+    "expand": "Genişlet",
+    "collapse": "Daralt"
   },
   "topbar": {
     "currency": "Para",
@@ -87,13 +89,18 @@
       "saleDate": "Satış Tarihi",
       "purchasePrice": "Alış Fiyatı",
       "salePrice": "Satış Fiyatı",
-      "profit": "Kâr/Zarar"
+      "profit": "Kâr/Zarar",
+      "actions": "İşlemler",
+      "region": "Envanter tablosu",
+      "scrollHint": "Kaydır →"
     },
     "actions": {
       "edit": "Düzenle",
       "delete": "Sil",
       "markSold": "Satıldı",
-      "deleteConfirm": "Bu kaydı kalıcı olarak silmek istiyor musunuz?"
+      "deleteConfirm": "Bu kaydı kalıcı olarak silmek istiyor musunuz?",
+      "deleteTitle": "Kaydı sil",
+      "cancel": "İptal"
     },
     "badge": {
       "inStock": "Stokta",
@@ -216,6 +223,15 @@
     "booklet": {
       "guide": [
         {
+          "title": "Arka plan, yedek ve kur",
+          "body": "Uygulama tray’de çalışmaya devam edebilir; ödeme hatırlatıcıları ve otomatik kur arka planda güncellenir.",
+          "bullets": [
+            "Ayarlar → Hatırlatıcılar ve kur aralığı",
+            "Yedekleme: günlük/haftalık plan ve otomatik temizlik",
+            "Pencereyi kapatmak uygulamayı sonlandırmaz — tepsi simgesine çift tıklayın"
+          ]
+        },
+        {
           "title": "Başlangıç",
           "body": "GarageLedger, galeriniz için offline çalışan bir ERP/CRM sistemidir. Verileriniz bilgisayarınızda saklanır ve uygulama açıldığında günlük otomatik yedekleme alır.",
           "bullets": [
@@ -327,7 +343,8 @@
       "kicker": "SSS",
       "title": "Konular ve yanıtlar",
       "subtitle": "Finans, raporlama, CRM ve sistem referansı."
-    }
+    },
+    "openReleaseNotes": "Yenilikler (sürüm notları)"
   },
   "tradeForm": {
     "createTitle": "Yeni İşlem",
@@ -481,7 +498,8 @@
       "whatsappTitle": "WhatsApp",
       "whatsappDesc": "Hızlı destek için WhatsApp üzerinden yazın.",
       "whatsappCta": "Desteğe Yaz"
-    }
+    },
+    "releaseNotes": "Yenilikler"
   },
   "lock": {
     "title": "Uygulama kilitli",
@@ -493,7 +511,7 @@
   },
   "whatsNew": {
     "title": "Neler Yeni? ({{version}})",
-    "subtitle": "CRM iş akışları, tahsilat takibi ve Quiet Luxury UI odaklı premium bir güncelleme.",
+    "subtitle": "v1.8.0: arka plan servisi, yedekleme, envanter UX, Windows simgesi ve daha fazlası.",
     "cta": "Harika",
     "sections": [
       {
@@ -542,7 +560,9 @@
       "vehicleSchema": "Araç kayıt ekranı Marka, Model, Yıl ve Motor detaylarıyla zenginleştirildi.",
       "analytics": "Gelişmiş finansal analitik ve 6 aylık kâr/zarar grafiği eklendi.",
       "notifications": "Otomatik güncelleme sonrası \"Neler Yeni?\" bildirim sistemi entegre edildi."
-    }
+    },
+    "latestBadge": "En yeni",
+    "emptyHistory": "Sürüm geçmişi yüklenemedi."
   },
   "updateModal": {
     "title": "Yeni bir güncelleme mevcut {{version}}",
@@ -652,7 +672,14 @@
       "cache": "Önbellekte kur",
       "cacheAt": "Önbellek zamanı"
     },
-    "backgroundWarning": "Ödeme hatırlatıcıları ve otomatik kur güncellemeleri uygulama açıkken arka planda çalışabilir."
+    "backgroundWarning": "Ödeme hatırlatıcıları ve otomatik kur güncellemeleri uygulama açıkken arka planda çalışabilir.",
+    "background": {
+      "title": "Arka plan servisi aktif",
+      "subtitle": "Pencereyi kapatsanız bile GarageLedger tepsi simgesinde çalışmaya devam eder.",
+      "bulletReminders": "Ödeme hatırlatıcıları seçilen saatte Windows bildirimi ve uygulama içi toast gönderir.",
+      "bulletFx": "Kurlar aralığa göre otomatik yenilenir; güncelleme için nazik bir bildirim alırsınız.",
+      "bulletTray": "Pencereyi kapatmak uygulamayı sonlandırmaz — tepsi simgesine çift tıklayın."
+    }
   },
   "updates": {
     "title": "Güncellemeler",
@@ -672,7 +699,7 @@
   },
   "backups": {
     "title": "Yedekleme",
-    "subtitle": "Verileriniz otomatik olarak günlük yedeklenir. İsterseniz manuel yedek alabilir ve geri yükleyebilirsiniz.",
+    "subtitle": "Günlük, haftalık, aylık veya yıllık otomatik yedek; eski dosyaların otomatik temizlenmesi.",
     "create": "Yedek Al",
     "refresh": "Yenile",
     "openFolder": "Klasörü Aç",
@@ -681,6 +708,33 @@
     "count": "{{count}} dosya",
     "empty": "Henüz yedek bulunmuyor.",
     "restore": "Geri Yükle",
-    "restoreConfirm": "Seçili yedeği geri yüklemek istiyor musunuz? (Önce güvenlik yedeği alınır)"
+    "restoreConfirm": "Seçili yedeği geri yüklemek istiyor musunuz? (Önce güvenlik yedeği alınır)",
+    "schedule": "Otomatik yedekleme",
+    "schedules": {
+      "daily": "Günlük",
+      "weekly": "Haftalık",
+      "monthly": "Aylık",
+      "yearly": "Yıllık",
+      "manual": "Yalnızca elle"
+    },
+    "keepLast": "Saklanacak son yedek sayısı",
+    "cleanup": "Eskileri temizle",
+    "lastSuccessful": "Son başarılı yedek",
+    "lastSize": "Son yedek boyutu",
+    "lastAt": "Son yedek zamanı",
+    "totalSize": "Toplam yedek boyutu",
+    "nextDue": "Sonraki otomatik yedek",
+    "dueNow": "Yakında",
+    "manualOnly": "Yalnızca elle",
+    "manualHint": "Otomatik yedekleme kapalı. Yedek almak için «Yedek Al» düğmesini kullanın.",
+    "autoCleanupHint": "Her yedekten sonra ve saatlik kontrolde en eski dosyalar silinir (son {{count}} saklanır)."
+  },
+  "backgroundNotice": {
+    "dismiss": "Kapat"
+  },
+  "updateBanner": {
+    "title": "Yeni sürüm hazır",
+    "subtitle": "Güncellemeyi kurmak için yeniden başlatın",
+    "action": "Yeniden başlat ve güncelle"
   }
 }

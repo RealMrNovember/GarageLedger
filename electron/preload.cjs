@@ -48,4 +48,16 @@ contextBridge.exposeInMainWorld('GarageLedger', {
     cleanup: (keepLast) => ipcRenderer.invoke('garageledger:backup:cleanup', keepLast),
     restore: (fileName) => ipcRenderer.invoke('garageledger:backup:restore', fileName),
   },
+  background: {
+    onNotify: (handler) => {
+      const wrapped = (_evt, payload) => handler(payload)
+      ipcRenderer.on('garageledger:background:notify', wrapped)
+      return () => ipcRenderer.removeListener('garageledger:background:notify', wrapped)
+    },
+    onFxUpdated: (handler) => {
+      const wrapped = (_evt, payload) => handler(payload)
+      ipcRenderer.on('garageledger:background:fxUpdated', wrapped)
+      return () => ipcRenderer.removeListener('garageledger:background:fxUpdated', wrapped)
+    },
+  },
 })

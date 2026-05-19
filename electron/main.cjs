@@ -1,9 +1,22 @@
 const path = require('node:path')
-const fs = require('node:fs')
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Tray, Menu } = require('electron')
 const { registerIpc } = require('./ipc.cjs')
+const { startBackgroundService, stopBackgroundService } = require('./background.cjs')
+const {
+  applyWindowsAppIdentity,
+  windowIconOptions,
+  applyWindowIcon,
+  trayIcon,
+  notificationIconPath,
+} = require('./icon.cjs')
+
+applyWindowsAppIdentity()
 
 const isDev = Boolean(process.env.VITE_DEV_SERVER_URL)
+
+let tray = null
+let mainWindow = null
+let isQuitting = false
 
 app.setName('GarageLedger')
 try {
@@ -11,30 +24,39 @@ try {
 } catch {}
 process.title = 'GarageLedger'
 try {
-  app.setAppUserModelId('com.cicibyte.garageledger')
-} catch {}
-try {
   app.setPath('userData', path.join(app.getPath('appData'), 'GarageLedger'))
 } catch {}
 
-function resolveWindowIcon() {
-  const candidates = [
-    path.join(__dirname, '..', 'build', 'icon.ico'),
-    path.join(app.getAppPath(), 'build', 'icon.ico'),
-    path.join(process.resourcesPath, 'build', 'icon.ico'),
-  ]
-  for (const p of candidates) {
-    try {
-      if (fs.existsSync(p)) return p
-    } catch {
-      continue
-    }
-  }
-  return undefined
+function showMainWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return
+  if (mainWindow.isMinimized()) mainWindow.restore()
+  mainWindow.show()
+  mainWindow.focus()
+}
+
+function createTray() {
+  if (tray) return tray
+  const icon = trayIcon()
+  tray = new Tray(icon)
+  tray.setToolTip('GarageLedger')
+  const menu = Menu.buildFromTemplate([
+    { label: 'GarageLedger', enabled: false },
+    { type: 'separator' },
+    { label: 'Show', click: () => showMainWindow() },
+    {
+      label: 'Quit',
+      click: () => {
+        isQuitting = true
+        app.quit()
+      },
+    },
+  ])
+  tray.setContextMenu(menu)
+  tray.on('double-click', () => showMainWindow())
+  return tray
 }
 
 function createSplashWindow() {
-  const icon = resolveWindowIcon()
   const win = new BrowserWindow({
     width: 440,
     height: 220,
@@ -45,7 +67,7 @@ function createSplashWindow() {
     backgroundColor: '#FAFAFA',
     show: true,
     alwaysOnTop: true,
-    ...(icon ? { icon } : {}),
+    ...windowIconOptions(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
@@ -54,11 +76,11 @@ function createSplashWindow() {
   })
 
   win.loadFile(path.join(__dirname, 'splash.html'))
+  applyWindowIcon(win)
   return win
 }
 
 async function createMainWindow() {
-  const icon = resolveWindowIcon()
   const win = new BrowserWindow({
     width: 1240,
     height: 780,
@@ -67,7 +89,7 @@ async function createMainWindow() {
     backgroundColor: '#FAFAFA',
     title: 'GarageLedger',
     autoHideMenuBar: true,
-    ...(icon ? { icon } : {}),
+    ...windowIconOptions(),
     titleBarOverlay: {
       color: '#FAFAFA',
       symbolColor: '#111827',
@@ -81,6 +103,8 @@ async function createMainWindow() {
     show: false,
   })
 
+  applyWindowIcon(win)
+
   if (isDev) {
     await win.loadURL(process.env.VITE_DEV_SERVER_URL)
     win.webContents.openDevTools({ mode: 'detach' })
@@ -89,7 +113,21 @@ async function createMainWindow() {
   }
 
   win.once('ready-to-show', () => {
+    applyWindowIcon(win)
     win.show()
+  })
+
+  win.on('close', (event) => {
+    if (isQuitting) return
+    event.preventDefault()
+    win.hide()
+    if (tray && !tray.isDestroyed()) {
+      tray.displayBalloon({
+        title: 'GarageLedger',
+        content: 'Running in the background. Double-click the tray icon to reopen.',
+        iconType: 'info',
+      })
+    }
   })
 
   return win
@@ -101,9 +139,11 @@ app.whenReady().then(async () => {
   const startedAt = Date.now()
   const splash = createSplashWindow()
 
-  const main = await createMainWindow()
+  mainWindow = await createMainWindow()
+  createTray()
+  startBackgroundService({ icon: notificationIconPath() })
 
-  main.once('ready-to-show', () => {
+  mainWindow.once('ready-to-show', () => {
     const elapsed = Date.now() - startedAt
     const remaining = Math.max(0, 3000 - elapsed)
     setTimeout(() => {
@@ -112,12 +152,19 @@ app.whenReady().then(async () => {
   })
 
   app.on('activate', async () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      await createMainWindow()
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      mainWindow = await createMainWindow()
+    } else {
+      showMainWindow()
     }
   })
 })
 
+app.on('before-quit', () => {
+  isQuitting = true
+  stopBackgroundService()
+})
+
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
+  // Keep running in tray on Windows/Linux when the window is hidden.
 })

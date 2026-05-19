@@ -75,7 +75,10 @@ async function createBackup({ reason } = { reason: 'manual' }) {
   db.data.settings.lastBackupAt = new Date().toISOString()
   await db.write()
 
-  return { fileName, fullPath: dst }
+  const keepLast = db.data.settings.backupSettings?.keepLast ?? 30
+  const cleanup = cleanupBackups(keepLast)
+
+  return { fileName, fullPath: dst, cleanup }
 }
 
 function listBackups() {

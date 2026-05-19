@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
-import { Card } from '../components/Card'
 import { Modal } from '../components/Modal'
+import { PageShell } from '../components/PageShell'
 import { formatMoney } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
 import type { Contact, ContactRole, TradeItem } from '../lib/types'
@@ -145,64 +145,62 @@ export function CustomersPage({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('customers.title')}</div>
-          <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('customers.subtitle')}</div>
-        </div>
-        <Button onClick={openCreate}>{t('customers.actions.new')}</Button>
-      </div>
-
-      <Card className="p-5">
+    <PageShell
+      title={t('customers.title')}
+      subtitle={t('customers.subtitle')}
+      actions={<Button onClick={openCreate}>{t('customers.actions.new')}</Button>}
+    >
+      <div className="mx-auto w-full max-w-3xl">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={t('customers.searchPlaceholder')}
-          className="w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none placeholder:text-[var(--tf-ink-muted)] focus:border-black/20 dark:focus:border-white/20"
+          className="gl-elevated-card w-full rounded-xl px-4 py-2.5 text-sm text-[var(--tf-ink)] outline-none placeholder:text-[var(--tf-ink-muted)] focus:ring-2 focus:ring-[var(--tf-accent)]/20"
         />
-      </Card>
 
-      <Card className="overflow-hidden">
-        <div className="border-b border-[var(--tf-border)] px-5 py-4">
-          <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('customers.listTitle')}</div>
-          <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('customers.listCount', { count: filtered.length })}</div>
+        <div className="mt-4 flex items-center justify-between px-1 text-xs text-[var(--tf-ink-muted)]">
+          <span>{t('customers.listTitle')}</span>
+          <span>{t('customers.listCount', { count: filtered.length })}</span>
         </div>
-        <div className="divide-y divide-[var(--tf-border)]">
+
+        <ul className="mt-2 space-y-2">
           {filtered.length === 0 ? (
-            <div className="px-5 py-6 text-sm text-[var(--tf-ink-muted)]">{t('customers.empty')}</div>
+            <li className="gl-elevated-card rounded-xl px-4 py-6 text-center text-sm text-[var(--tf-ink-muted)]">
+              {t('customers.empty')}
+            </li>
           ) : (
             filtered.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => {
-                  setActiveId(c.id)
-                  setProfileOpen(true)
-                }}
-                className="w-full px-5 py-4 text-left transition duration-200 hover:bg-black/3 dark:hover:bg-white/5"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold text-[var(--tf-ink)]">{c.name || '—'}</div>
-                    <div className="mt-1 truncate text-xs text-[var(--tf-ink-muted)]">
+              <li key={c.id}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveId(c.id)
+                    setProfileOpen(true)
+                  }}
+                  className="gl-elevated-card flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition hover:shadow-md"
+                >
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--tf-accent)]/12 text-xs font-bold text-[var(--tf-accent)]">
+                    {(c.name || '?').slice(0, 1).toUpperCase()}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-[var(--tf-ink)]">{c.name || '—'}</span>
+                    <span className="mt-0.5 block truncate text-xs text-[var(--tf-ink-muted)]">
                       {[c.phone, c.email].filter(Boolean).join(' · ') || '—'}
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-                    <Badge tone="neutral">{roleLabel(c.role, t)}</Badge>
-                  </div>
-                </div>
-              </button>
+                    </span>
+                  </span>
+                  <Badge tone="neutral">{roleLabel(c.role, t)}</Badge>
+                </button>
+              </li>
             ))
           )}
-        </div>
-      </Card>
+        </ul>
+      </div>
 
       <Modal
         title={active ? t('customers.profileTitle', { name: active.name || '—' }) : t('customers.profileTitle', { name: '—' })}
         open={profileOpen}
         onClose={() => setProfileOpen(false)}
+        size="lg"
         footer={
           <div className="flex items-center justify-end gap-2">
             {active ? (
@@ -224,7 +222,7 @@ export function CustomersPage({
           <div className="text-sm text-[var(--tf-ink-muted)]">{t('customers.selectHint')}</div>
         ) : (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 p-4">
+            <div className="gl-elevated-card rounded-xl p-4">
               <div className="text-sm font-semibold text-[var(--tf-ink)]">{active.name}</div>
               <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{[active.phone, active.email].filter(Boolean).join(' · ') || '—'}</div>
               <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">{roleLabel(active.role, t)}</div>
@@ -232,52 +230,48 @@ export function CustomersPage({
             </div>
 
             {summary ? (
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 px-4 py-3">
-                  <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('customers.profile.volume')}</div>
-                  <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{formatMoney(summary.volume, currency)}</div>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="gl-elevated-card rounded-xl px-3 py-2.5">
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-[var(--tf-ink-muted)]">{t('customers.profile.volume')}</div>
+                  <div className="mt-1 text-sm font-semibold tabular-nums text-[var(--tf-ink)]">{formatMoney(summary.volume, currency)}</div>
                 </div>
-                <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 px-4 py-3">
-                  <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('customers.profile.remaining')}</div>
-                  <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{formatMoney(summary.remaining, currency)}</div>
+                <div className="gl-elevated-card rounded-xl px-3 py-2.5">
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-[var(--tf-ink-muted)]">{t('customers.profile.remaining')}</div>
+                  <div className="mt-1 text-sm font-semibold tabular-nums text-[var(--tf-ink)]">{formatMoney(summary.remaining, currency)}</div>
                 </div>
-                <div className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/60 px-4 py-3">
-                  <div className="text-[11px] font-semibold tracking-wide text-[var(--tf-ink-muted)]">{t('customers.profile.dealCount')}</div>
-                  <div className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{String(summary.count)}</div>
+                <div className="gl-elevated-card rounded-xl px-3 py-2.5">
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-[var(--tf-ink-muted)]">{t('customers.profile.dealCount')}</div>
+                  <div className="mt-1 text-sm font-semibold tabular-nums text-[var(--tf-ink)]">{String(summary.count)}</div>
                 </div>
               </div>
             ) : null}
 
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[820px] text-left text-sm">
+            <div className="overflow-x-auto rounded-xl border border-[var(--tf-border)]/50">
+              <table className="w-full min-w-[640px] text-left text-sm">
                 <thead className="bg-[var(--tf-surface)]/55">
                   <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">
-                    <th className="px-5 py-4">{t('customers.table.date')}</th>
-                    <th className="px-5 py-4">{t('customers.table.role')}</th>
-                    <th className="px-5 py-4">{t('customers.table.vehicle')}</th>
-                    <th className="px-5 py-4">{t('customers.table.purchase')}</th>
-                    <th className="px-5 py-4">{t('customers.table.sale')}</th>
-                    <th className="px-5 py-4">{t('customers.table.remaining')}</th>
+                    <th className="px-4 py-3">{t('customers.table.date')}</th>
+                    <th className="px-4 py-3">{t('customers.table.role')}</th>
+                    <th className="px-4 py-3">{t('customers.table.vehicle')}</th>
+                    <th className="px-4 py-3">{t('customers.table.remaining')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--tf-border)]">
+                <tbody className="divide-y divide-[var(--tf-border)]/50">
                   {txs.length === 0 ? (
                     <tr>
-                      <td className="px-5 py-8 text-sm text-[var(--tf-ink-muted)]" colSpan={6}>
+                      <td className="px-4 py-6 text-sm text-[var(--tf-ink-muted)]" colSpan={4}>
                         {t('customers.profile.noDeals')}
                       </td>
                     </tr>
                   ) : (
                     txs.map((x) => (
-                      <tr key={`${x.role}:${x.id}`} className="bg-[var(--tf-surface)]/40">
-                        <td className="px-5 py-4 text-[var(--tf-ink-muted)]">{x.date}</td>
-                        <td className="px-5 py-4 text-[var(--tf-ink-muted)]">
+                      <tr key={`${x.role}:${x.id}`}>
+                        <td className="px-4 py-3 text-[var(--tf-ink-muted)]">{x.date}</td>
+                        <td className="px-4 py-3 text-[var(--tf-ink-muted)]">
                           {x.role === 'seller' ? t('customers.roles.seller') : t('customers.roles.buyer')}
                         </td>
-                        <td className="px-5 py-4 text-[var(--tf-ink)]">{x.vehicle}</td>
-                        <td className="px-5 py-4 text-[var(--tf-ink)]">{formatMoney(x.purchasePrice, currency)}</td>
-                        <td className="px-5 py-4 text-[var(--tf-ink)]">{x.sellPrice == null ? '—' : formatMoney(x.sellPrice, currency)}</td>
-                        <td className="px-5 py-4 text-[var(--tf-ink)]">
+                        <td className="px-4 py-3 text-[var(--tf-ink)]">{x.vehicle}</td>
+                        <td className="px-4 py-3 text-[var(--tf-ink)]">
                           {x.remainingBalance > 0 ? formatMoney(x.remainingBalance, currency) : '—'}
                         </td>
                       </tr>
@@ -311,7 +305,7 @@ export function CustomersPage({
             <input
               value={form.name}
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none focus:border-black/20 dark:focus:border-white/20"
+              className="mt-2 w-full rounded-xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2.5 text-sm text-[var(--tf-ink)] outline-none focus:border-[var(--tf-accent)]/40"
             />
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -320,7 +314,7 @@ export function CustomersPage({
               <input
                 value={form.phone}
                 onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none focus:border-black/20 dark:focus:border-white/20"
+                className="mt-2 w-full rounded-xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2.5 text-sm text-[var(--tf-ink)] outline-none focus:border-[var(--tf-accent)]/40"
               />
             </div>
             <div>
@@ -328,7 +322,7 @@ export function CustomersPage({
               <input
                 value={form.email}
                 onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none focus:border-black/20 dark:focus:border-white/20"
+                className="mt-2 w-full rounded-xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2.5 text-sm text-[var(--tf-ink)] outline-none focus:border-[var(--tf-accent)]/40"
               />
             </div>
           </div>
@@ -340,7 +334,7 @@ export function CustomersPage({
                 const v = e.target.value
                 if (v === 'buyer' || v === 'seller' || v === 'both') setForm((p) => ({ ...p, role: v }))
               }}
-              className="mt-2 w-full rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none"
+              className="mt-2 w-full rounded-xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2.5 text-sm text-[var(--tf-ink)] outline-none"
             >
               <option value="buyer">{t('customers.roles.buyer')}</option>
               <option value="seller">{t('customers.roles.seller')}</option>
@@ -352,12 +346,12 @@ export function CustomersPage({
             <textarea
               value={form.notes}
               onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
-              rows={5}
-              className="mt-2 w-full resize-none rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-3 text-sm text-[var(--tf-ink)] outline-none focus:border-black/20 dark:focus:border-white/20"
+              rows={4}
+              className="mt-2 w-full resize-none rounded-xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 px-4 py-2.5 text-sm text-[var(--tf-ink)] outline-none focus:border-[var(--tf-accent)]/40"
             />
           </div>
         </div>
       </Modal>
-    </div>
+    </PageShell>
   )
 }

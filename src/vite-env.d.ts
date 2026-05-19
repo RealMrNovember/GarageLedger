@@ -158,6 +158,10 @@ type GarageLedgerApi = {
     cleanup: (keepLast?: number) => Promise<{ ok: boolean; result?: { deleted: number; kept: number }; message?: string }>
     restore: (fileName: string) => Promise<{ ok: boolean; result?: unknown; message?: string }>
   }
+  background: {
+    onNotify: (handler: (payload: { kind?: 'payment' | 'fx'; title?: string; body?: string; count?: number }) => void) => () => void
+    onFxUpdated: (handler: (payload: { base: 'AZN'; fetchedAt: string; rates: Record<string, number> }) => void) => () => void
+  }
 }
 
 interface Window {

@@ -9,17 +9,29 @@ const outDir = path.resolve(projectDir, 'build')
 const outPng = path.resolve(outDir, 'icon.png')
 const outIco = path.resolve(outDir, 'icon.ico')
 
+const sizes = [16, 24, 32, 48, 64, 128, 256]
+
+if (!fs.existsSync(svgPath)) {
+  console.error(`Missing source SVG: ${svgPath}`)
+  process.exit(1)
+}
+
 fs.mkdirSync(outDir, { recursive: true })
 
 const svg = fs.readFileSync(svgPath)
 
-await sharp(svg)
-  .resize(256, 256, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-  .png()
-  .toFile(outPng)
+const pngBuffers = await Promise.all(
+  sizes.map((size) =>
+    sharp(svg)
+      .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toBuffer(),
+  ),
+)
 
-const icoBuffer = await pngToIco(outPng)
+await sharp(pngBuffers[pngBuffers.length - 1]).toFile(outPng)
+
+const icoBuffer = await pngToIco(pngBuffers)
 fs.writeFileSync(outIco, icoBuffer)
 
-process.stdout.write(`Generated ${outPng}\nGenerated ${outIco}\n`)
-
+process.stdout.write(`Generated ${outPng}\nGenerated ${outIco} (${sizes.join(', ')}px)\n`)

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
+import { PageShell } from '../components/PageShell'
 import { CollapsibleFilterPanel } from '../components/CollapsibleFilterPanel'
 import { StatCard } from '../components/StatCard'
 import { itemProfit, totalExpenses } from '../lib/compute'
@@ -254,12 +255,10 @@ export function ReportsPage({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('reports.title')}</div>
-          <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('reports.subtitle')}</div>
-        </div>
+    <PageShell
+      title={t('reports.title')}
+      subtitle={t('reports.subtitle')}
+      actions={
         <Button
           onClick={() => {
             setExportOpts((prev) => ({ ...prev, currency }))
@@ -268,8 +267,8 @@ export function ReportsPage({
         >
           {t('reports.export')}
         </Button>
-      </div>
-
+      }
+    >
       <Modal
         title={t('reports.exportOptions.title')}
         open={exportOptionsOpen}
@@ -467,8 +466,8 @@ export function ReportsPage({
         />
       </div>
 
-      <Card className="overflow-hidden">
-        <div className="max-h-[calc(100vh-14rem)] overflow-auto">
+      <Card className="relative z-0 overflow-hidden">
+        <div className="max-h-[min(32rem,calc(100vh-20rem))] overflow-auto">
           <table className="w-full min-w-[980px] text-left text-sm">
             <thead className="bg-[var(--tf-surface)]/55">
               <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">
@@ -524,6 +523,6 @@ export function ReportsPage({
           </table>
         </div>
       </Card>
-    </div>
+    </PageShell>
   )
 }

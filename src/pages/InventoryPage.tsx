@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
+import { PageShell } from '../components/PageShell'
+import { InventoryTable } from '../components/InventoryTable'
 import { CollapsibleFilterPanel } from '../components/CollapsibleFilterPanel'
 import { Modal } from '../components/Modal'
-import { formatMoney } from '../lib/currency'
 import type { CurrencyCode } from '../lib/currency'
-import { itemProfit, isInStock, reservedRemainingBalance } from '../lib/compute'
-import { parseIsoDate, startOfDay, toIsoDateInputValue } from '../lib/dates'
+import { itemProfit, isInStock } from '../lib/compute'
+import { parseIsoDate, startOfDay } from '../lib/dates'
 import type { Contact } from '../lib/types'
 import type { TradeItem } from '../lib/types'
 import { TradeFormModal } from './TradeFormModal'
@@ -117,12 +117,10 @@ export function InventoryPage({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('inventory.title')}</div>
-          <div className="mt-1 text-xs text-[var(--tf-ink-muted)]">{t('inventory.subtitle')}</div>
-        </div>
+    <PageShell
+      title={t('inventory.title')}
+      subtitle={t('inventory.subtitle')}
+      actions={
         <Button
           onClick={() => {
             setEditing(undefined)
@@ -131,8 +129,9 @@ export function InventoryPage({
         >
           {t('inventory.new')}
         </Button>
-      </div>
-
+      }
+    >
+      <div className="relative z-10 shrink-0">
       <CollapsibleFilterPanel
         activeCount={activeFilterCount}
         summary={t('inventory.filters.results', { count: filtered.length })}
@@ -224,148 +223,22 @@ export function InventoryPage({
             </div>
           </div>
       </CollapsibleFilterPanel>
+      </div>
 
-      <Card className="overflow-hidden">
-        <div className="max-h-[calc(100vh-12rem)] overflow-auto">
-          <table className="w-full min-w-[980px] text-left text-sm">
-            <thead className="sticky top-0 z-10 bg-[var(--tf-bg)]/95 backdrop-blur">
-              <tr className="text-xs font-semibold tracking-wide text-[var(--tf-ink-muted)]">
-                <th className="px-5 py-4">{t('inventory.table.vehicle')}</th>
-                <th className="px-5 py-4">{t('inventory.table.category')}</th>
-                <th className="px-5 py-4">{t('inventory.table.purchaseDate')}</th>
-                <th className="px-5 py-4">{t('inventory.table.saleDate')}</th>
-                <th className="px-5 py-4">{t('inventory.table.purchasePrice')}</th>
-                <th className="px-5 py-4">{t('inventory.table.salePrice')}</th>
-                <th className="px-5 py-4">{t('inventory.table.profit')}</th>
-                <th className="px-5 py-4"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--tf-border)]">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td className="px-5 py-8 text-sm text-[var(--tf-ink-muted)]" colSpan={8}>
-                    {t('inventory.empty')}
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((item) => {
-                  const inStock = isInStock(item)
-                  const profit = itemProfit(item)
-                  const profitTone: 'neutral' | 'good' | 'bad' | 'info' =
-                    profit == null ? 'info' : profit > 0 ? 'good' : profit < 0 ? 'bad' : 'neutral'
-                  const remaining = reservedRemainingBalance(item)
-
-                  return (
-                    <tr
-                      key={item.id}
-                      className="bg-[var(--tf-surface)]/40 transition duration-200 hover:bg-black/4 dark:hover:bg-white/5"
-                    >
-                      <td className="px-5 py-4">
-                        <div className="font-medium text-[var(--tf-ink)]">{formatVehicle(item)}</div>
-                        {item.status === 'reserved' ? (
-                          <div className="mt-2">
-                            <Badge tone="neutral">{t('inventory.badge.reserved')}</Badge>
-                          </div>
-                        ) : inStock ? (
-                          <div className="mt-2">
-                            <Badge tone="info">{t('inventory.badge.inStock')}</Badge>
-                          </div>
-                        ) : (
-                          <div className="mt-2">
-                            <Badge tone="good">{t('inventory.badge.sold')}</Badge>
-                          </div>
-                        )}
-                        {item.status === 'reserved' ? (
-                          <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">
-                            {t('inventory.reserved.line', {
-                              deposit: formatMoney(item.deposit ?? 0, currency),
-                              remaining: remaining == null ? '—' : formatMoney(remaining, currency),
-                            })}
-                          </div>
-                        ) : null}
-                      </td>
-                      <td className="px-5 py-4 text-[var(--tf-ink-muted)]">{item.category}</td>
-                      <td className="px-5 py-4 text-[var(--tf-ink-muted)]">{item.purchaseDate}</td>
-                      <td className="px-5 py-4 text-[var(--tf-ink-muted)]">{item.sellDate ?? '—'}</td>
-                      <td className="px-5 py-4 text-[var(--tf-ink)]">{formatMoney(item.purchasePrice, currency)}</td>
-                      <td className="px-5 py-4 text-[var(--tf-ink)]">
-                        {item.sellPrice == null ? '—' : formatMoney(item.sellPrice, currency)}
-                      </td>
-                      <td className="px-5 py-4">
-                        {profit == null ? (
-                          <Badge tone="info">—</Badge>
-                        ) : (
-                          <Badge tone={profitTone}>{formatMoney(profit, currency)}</Badge>
-                        )}
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            type="button"
-                            aria-label={t('inventory.actions.edit')}
-                            title={t('inventory.actions.edit')}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
-                            onClick={() => {
-                              setEditing(item)
-                              setOpen(true)
-                            }}
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path
-                                d="M4 20h4l10.6-10.6a1.5 1.5 0 0 0 0-2.1L16.7 4.4a1.5 1.5 0 0 0-2.1 0L4 15v5z"
-                                stroke="currentColor"
-                                strokeWidth="1.6"
-                                strokeLinejoin="round"
-                              />
-                              <path d="M13.5 5.5l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                            </svg>
-                          </button>
-                          {inStock ? (
-                            <button
-                              type="button"
-                              aria-label={t('inventory.actions.markSold')}
-                              title={t('inventory.actions.markSold')}
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 text-[var(--tf-ink)] transition duration-200 hover:-translate-y-[0.5px] hover:bg-black/5 dark:hover:bg-white/5"
-                              onClick={() => {
-                                setEditing({
-                                  ...item,
-                                  status: 'sold',
-                                  reserveDate: null,
-                                  deposit: null,
-                                  sellDate: item.sellDate ?? toIsoDateInputValue(new Date()),
-                                  sellPrice: item.sellPrice ?? 0,
-                                })
-                                setOpen(true)
-                              }}
-                            >
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <path d="M20 7L10 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              aria-label={t('inventory.actions.delete')}
-                              title={t('inventory.actions.delete')}
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/70 text-rose-700 transition duration-200 hover:-translate-y-[0.5px] hover:bg-rose-600/10 dark:text-rose-300 dark:hover:bg-rose-400/10"
-                              onClick={() => setDeleteTarget({ id: item.id, label: formatVehicle(item) })}
-                            >
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <path d="M6 7h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                                <path d="M10 7V5h4v2" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-                                <path d="M8 7l1 14h6l1-14" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-                              </svg>
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+      <Card className="relative z-0 overflow-hidden p-0">
+        <InventoryTable
+          items={filtered}
+          currency={currency}
+          onEdit={(item) => {
+            setEditing(item)
+            setOpen(true)
+          }}
+          onMarkSold={(item) => {
+            setEditing(item)
+            setOpen(true)
+          }}
+          onDeleteRequest={(item) => setDeleteTarget({ id: item.id, label: formatVehicle(item) })}
+        />
       </Card>
 
       <TradeFormModal
@@ -380,7 +253,7 @@ export function InventoryPage({
       />
 
       <Modal
-        title={t('inventory.actions.delete')}
+        title={t('inventory.actions.deleteTitle')}
         open={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         size="sm"
@@ -391,7 +264,7 @@ export function InventoryPage({
               className="rounded-2xl border border-[var(--tf-border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--tf-ink)] transition duration-200 hover:bg-black/5 dark:bg-gray-950 dark:hover:bg-white/5"
               onClick={() => setDeleteTarget(null)}
             >
-              {t('common.close')}
+              {t('inventory.actions.cancel')}
             </button>
             <button
               type="button"
@@ -412,6 +285,6 @@ export function InventoryPage({
           {deleteTarget?.label ? <div className="text-xs text-[var(--tf-ink-muted)]">{deleteTarget.label}</div> : null}
         </div>
       </Modal>
-    </div>
+    </PageShell>
   )
 }

@@ -39,7 +39,7 @@ export function CollapsibleFilterPanel({
   const [open, setOpen] = useState(defaultOpen)
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="relative z-0 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <button
           type="button"

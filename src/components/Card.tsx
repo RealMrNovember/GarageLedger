@@ -9,7 +9,7 @@ export function Card({
   return (
     <div
       className={[
-        'rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)] shadow-[var(--tf-shadow)] transition duration-200',
+        'gl-elevated-card rounded-2xl transition duration-200',
         className,
       ]
         .filter(Boolean)

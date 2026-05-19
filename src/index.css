@@ -9,6 +9,7 @@
   --tf-accent: #111827;
   --tf-border: rgba(15, 23, 42, 0.08);
   --tf-shadow: 0 18px 40px -30px rgba(15, 23, 42, 0.35);
+  --tf-elevate: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px -14px rgba(15, 23, 42, 0.14);
   --tf-modal-overlay: rgba(15, 23, 42, 0.42);
   --tf-modal-surface: #ffffff;
   --tf-modal-surface-raised: #fafafa;
@@ -30,6 +31,7 @@
   --tf-accent: #c8a45a;
   --tf-border: rgba(55, 65, 81, 0.9);
   --tf-shadow: 0 22px 60px -42px rgba(0, 0, 0, 0.75);
+  --tf-elevate: 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 32px -18px rgba(0, 0, 0, 0.55);
   --tf-modal-overlay: rgba(2, 6, 14, 0.88);
   --tf-modal-surface: #0f1419;
   --tf-modal-surface-raised: #151b24;
@@ -60,6 +62,17 @@ textarea {
 .dark textarea {
   background-color: rgba(255, 255, 255, 0.06) !important;
   color: var(--tf-ink);
+}
+
+.gl-elevated-card {
+  background: color-mix(in srgb, var(--tf-surface) 92%, white);
+  border: 1px solid color-mix(in srgb, var(--tf-border) 70%, transparent);
+  box-shadow: var(--tf-elevate);
+}
+
+.dark .gl-elevated-card {
+  background: color-mix(in srgb, var(--tf-surface) 94%, #0b0f14);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .gl-modal-overlay {
@@ -190,6 +203,15 @@ textarea {
   background: rgba(229, 231, 235, 0.16);
   border: 3px solid transparent;
   background-clip: content-box;
+}
+
+.gl-inventory-scroll {
+  scrollbar-gutter: stable both-edges;
+}
+
+.gl-inventory-scroll:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--tf-accent) 55%, transparent);
+  outline-offset: -2px;
 }
 
 @media (prefers-reduced-motion: no-preference) {

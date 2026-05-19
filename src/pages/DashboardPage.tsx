@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
 import { Card } from '../components/Card'
 import { Button } from '../components/Button'
+import { PageShell } from '../components/PageShell'
 import { StatCard } from '../components/StatCard'
 import { formatMoney } from '../lib/currency'
 import { sixMonthSalesSeries, thisMonthInvestment, thisMonthNetProfit, thisMonthPurchasedCount, thisMonthRevenue, weeklyProfitSeries } from '../lib/compute'
@@ -54,19 +55,15 @@ export function DashboardPage({
   }, [items])
 
   return (
-    <div className="space-y-6">
+    <PageShell>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard label={t('dashboard.stats.purchasedCount')} value={String(purchasedCount)} tone="count" />
         <StatCard label={t('dashboard.stats.monthInvestment')} value={formatMoney(investment, currency)} />
         <StatCard label={t('dashboard.stats.monthRevenue')} value={formatMoney(revenue, currency)} />
-        <StatCard
-          label={t('dashboard.stats.monthNetProfit')}
-          value={formatMoney(netProfit, currency)}
-          tone="profit"
-        />
+        <StatCard label={t('dashboard.stats.monthNetProfit')} value={formatMoney(netProfit, currency)} tone="profit" />
       </div>
 
-      <Card className="p-5">
+      <Card className="p-5 md:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('reminders.title')}</div>
@@ -85,7 +82,7 @@ export function DashboardPage({
               return (
                 <div
                   key={item.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-[var(--tf-border)] bg-white/60 p-4 md:flex-row md:items-center md:justify-between dark:bg-white/5"
+                  className="flex flex-col gap-3 rounded-xl border border-[var(--tf-border)]/50 bg-white/50 p-4 md:flex-row md:items-center md:justify-between dark:bg-white/[0.03]"
                 >
                   <div className="min-w-0">
                     <div className="truncate text-sm font-semibold text-[var(--tf-ink)]">{formatVehicle(item)}</div>
@@ -116,7 +113,6 @@ export function DashboardPage({
                     >
                       {t('reminders.collect')}
                     </Button>
-
                     <Button
                       variant="ghost"
                       onClick={() => {
@@ -152,11 +148,11 @@ export function DashboardPage({
         )}
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card className="p-5">
+      <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card className="flex min-h-[18rem] flex-col p-5 md:p-6">
           <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('dashboard.charts.weekly')}</div>
-          <div className="mt-4 h-56">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="relative mt-4 min-h-[14rem] w-full min-w-0 flex-1">
+            <ResponsiveContainer width="100%" height="100%" minHeight={224}>
               <AreaChart data={weekly} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="profit" x1="0" y1="0" x2="0" y2="1">
@@ -168,12 +164,7 @@ export function DashboardPage({
                 <XAxis dataKey="label" tick={{ fill: axis, fontSize: 12 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: axis, fontSize: 12 }} axisLine={false} tickLine={false} width={40} />
                 <Tooltip
-                  contentStyle={{
-                    borderRadius: 16,
-                    border: tooltipBorder,
-                    background: tooltipBg,
-                    color: ink,
-                  }}
+                  contentStyle={{ borderRadius: 16, border: tooltipBorder, background: tooltipBg, color: ink }}
                   formatter={(v) => formatMoney(Number(v), currency)}
                 />
                 <Area type="monotone" dataKey="value" stroke={series} strokeWidth={2} fill="url(#profit)" />
@@ -182,54 +173,26 @@ export function DashboardPage({
           </div>
         </Card>
 
-        <Card className="p-5">
+        <Card className="flex min-h-[18rem] flex-col p-5 md:p-6">
           <div className="text-sm font-semibold text-[var(--tf-ink)]">{t('dashboard.charts.sixMonth')}</div>
-          <div className="mt-4 h-56">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="relative mt-4 min-h-[14rem] w-full min-w-0 flex-1">
+            <ResponsiveContainer width="100%" height="100%" minHeight={224}>
               <ComposedChart data={sixMonths} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
                 <CartesianGrid stroke={grid} strokeDasharray="3 3" />
                 <XAxis dataKey="label" tick={{ fill: axis, fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis
-                  yAxisId="left"
-                  tick={{ fill: axis, fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={40}
-                  allowDecimals={false}
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  tick={{ fill: axis, fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={56}
-                />
+                <YAxis yAxisId="left" tick={{ fill: axis, fontSize: 12 }} axisLine={false} tickLine={false} width={40} allowDecimals={false} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: axis, fontSize: 12 }} axisLine={false} tickLine={false} width={56} />
                 <Tooltip
-                  contentStyle={{
-                    borderRadius: 16,
-                    border: tooltipBorder,
-                    background: tooltipBg,
-                    color: ink,
-                  }}
-                  formatter={(v, name) => {
-                    if (name === 'profit') return formatMoney(Number(v), currency)
-                    return String(v)
-                  }}
+                  contentStyle={{ borderRadius: 16, border: tooltipBorder, background: tooltipBg, color: ink }}
+                  formatter={(v, name) => (name === 'profit' ? formatMoney(Number(v), currency) : String(v))}
                 />
-                <Bar
-                  yAxisId="left"
-                  dataKey="soldCount"
-                  barSize={18}
-                  radius={[10, 10, 10, 10]}
-                  fill={isDark ? 'rgba(209,213,219,0.18)' : 'rgba(17, 24, 39, 0.18)'}
-                />
+                <Bar yAxisId="left" dataKey="soldCount" barSize={18} radius={[10, 10, 10, 10]} fill={isDark ? 'rgba(209,213,219,0.18)' : 'rgba(17, 24, 39, 0.18)'} />
                 <Line yAxisId="right" type="monotone" dataKey="profit" stroke={series} strokeWidth={2} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
         </Card>
       </div>
-    </div>
+    </PageShell>
   )
 }

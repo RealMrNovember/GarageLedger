@@ -2,105 +2,182 @@
 
 ![GarageLedger](./GarageLedger.svg)
 
-GarageLedger, **Cicibyte Corp** tarafından geliştirilen; galeriler ve araç alım-satım ekipleri için tasarlanmış **offline çalışan masaüstü ERP/CRM** uygulamasıdır. Envanterinizi, alım-satım akışlarınızı ve finansal görünümünüzü tek yerde yönetmenizi sağlar.
+**GarageLedger** is an offline-first desktop ERP for small vehicle dealerships and garage trading teams. Built by **Mikail | Cicibyte Corp**, it unifies inventory, deals, CRM, finance, and reporting in one quiet, premium Windows application.
 
-“Garage” günlük envanter gerçeğini, “Ledger” ise her işlem arkasındaki finansal muhasebe gerçeğini temsil eder.
+> **Garage** = your stock on the lot · **Ledger** = the financial truth behind every deal.
 
-## Tasarım Dili (Quiet Luxury)
+---
 
-GarageLedger, “Quiet Luxury / Digital Boutique” tasarım yaklaşımını hedefler:
+## Highlights
 
-- “Deep Whites / Soft Beiges” ile sakin, güven veren arayüz
-- Minimal çizgiler, yumuşak gölgeler, cam efekti (glassmorphism)
-- Odak: netlik ve güven; “numbers first, noise last”
+| Area | What you get |
+|------|----------------|
+| **Platform** | Windows 7 SP1 → 11 (x64 + ia32), Electron 22 LTS |
+| **Data** | 100% local JSON — no cloud upload |
+| **Languages** | AZ (default), TR, EN, RU |
+| **Currencies** | AZN, USD, EUR, TRY + live/cached FX |
+| **Design** | Quiet Luxury / Digital Boutique UI |
 
-## Teknik Stack
+---
 
-- Electron + electron-builder (Windows NSIS installer)
-- React + TypeScript + Vite
-- Tailwind CSS v4
-- **Local JSON DB** (offline, Windows `%APPDATA%/GarageLedger/db.json`)
-- Recharts (analitik grafikler)
-- i18next / react-i18next (**AZ varsayılan** + TR/EN/RU)
-- jsPDF + jspdf-autotable (profesyonel PDF raporlama + export seçenekleri)
+## Feature overview
 
-## Ana Modüller & Özellikler
+### Inventory & vehicles
 
-- **Envanter (Inventory)**: araç kayıtları, durumlar (stok / rezerve / satıldı), filtreleme ve hızlı düzenleme
-- **VIN Decoder (NHTSA)**: şasi no (VIN) ile araç bilgilerini otomatik doldurma (Marka/Model/Yıl/Motor)
-- **Finans & Analitik**: yatırım, ciro, net kâr; dashboard özetleri ve grafikler
-- **Cari CRM (Müşteriler/Rehber)**: kişi kaydı, rol (alıcı/satıcı), cari profil ve işlem geçmişi
-- **Şirket Profili (White‑Label)**: şirket adı/logo/adres/iletişim bilgileri ile kişiselleştirilmiş raporlar
-- **PDF Raporlama**: antet + tablo + özet + sabit footer; dil/para birimi/tarih formatı/A4-Letter/tema seçenekleriyle premium PDF export
-- **Uygulama Kilidi**: parola ile giriş kilidi (unutma durumunda destek yönlendirmesi)
-- **Otomatik Güncelleme**: GitHub Releases üzerinden auto-update + uygulama içi güncelleme bildirimi
-- **Dark Mode**: yüksek kontrast, okunabilirlik odaklı “Midnight Onyx”
-- **Çoklu Dil**: AZ (default), TR, EN, RU
-- **Çoklu Para Birimi**: AZN, USD, EUR, TRY (+ online/offline kur cache)
-- **Yedekleme**: günlük otomatik yedek + Ayarlar’dan manuel yedek/geri yükleme
+- Full vehicle records: brand, model, year, engine, plate, VIN, category, status (in stock / reserved / sold)
+- **NHTSA VIN decoder** — auto-fill vehicle details from VIN
+- Collapsible filter panel (search, category, status, profit/loss, purchase date range)
+- Premium **inventory table**: sticky headers, icon actions, delete confirmation, horizontal scroll hints
+- **Trade form** workspace layout: multi-column grid, optional fields accordion, live estimated net profit
 
-## Kurulum (Windows)
+### Finance & analytics
 
-1) Open the GitHub Releases page and download the latest Windows installer:
-   - `GarageLedger.Setup.x.y.z.exe`
-2) Run the installer wizard.
-3) If Windows asks for admin permission, allow it (per-machine install).
-4) Launch GarageLedger from Start Menu.
+- Purchase price, sale price, expenses, tax, commission — **true net profit** per vehicle
+- Dashboard KPI cards (monthly investment, revenue, net profit, purchase count)
+- Weekly profit chart + 6-month sales/profit composed chart
+- **Payment reminders** on dashboard: collect balance, snooze 1d / 3d / 1w
 
-Important:
+### Reports & PDF
 
-- Your data is stored locally on the same Windows user profile and is not uploaded anywhere.
-- Updates do not wipe your data. Daily automatic backups add extra safety.
+- Date presets: today, this week, this month, last 30 days, custom range
+- Movement table: purchases, reservations, sales with parties and profit
+- **Professional PDF export** (`pdfReport` engine): company letterhead, multi-page tables, summary, footer
+- Export options: language, currency, date format, A4/Letter, light/dark PDF theme
 
-## Veri Depolama & Yedekler
+### CRM (customers)
 
-GarageLedger veriyi offline olarak Windows kullanıcı profilinde saklar:
+- Contact book: buyer / seller / both roles
+- Compact list UI with profile modal and deal history per contact
+- Linked to inventory trades (seller/buyer contact IDs)
 
-- Main DB file: `%APPDATA%/GarageLedger/db.json`
-- Backups folder: `%APPDATA%/GarageLedger/backups/` (date-stamped JSON backups)
+### Settings & operations
 
-You can manage backups inside the app:
+- **Language** — instant UI switch (AZ/TR/EN/RU)
+- **Company profile** — white-label name, logo, address, phone, email, website for PDFs
+- **Payment reminders** — enable, notification hour, days-before alert
+- **App lock** — optional password (PBKDF2), unlock screen
+- **FX updates** — provider interval (15m / 30m / 1h / manual), sidebar last-update timestamp
+- **Backups** — daily / weekly / monthly / yearly / manual; auto-cleanup; restore from list; open backup folder
+- **Updates** — GitHub Releases via `electron-updater`; silent background download; **persistent restart banner** when ready
+- **Feedback** — send notes from settings
+- **Background service** — system tray, hide-on-close, payment + FX notifications, in-app toasts
 
-- Settings → Backups: Create / Refresh / Open Folder / Restore
+### Help & about
 
-## Geliştirme
+- Help center with accordion guide + FAQ + contact cards
+- Release notes (“What’s New”) from `releases.json`
+- About modal with email, GitHub, WhatsApp
+
+### Desktop integration
+
+- Custom **taskbar icon** (`AppUserModelID`, window icon, NSIS installer icons, dev `electron.exe` patch)
+- System tray with show/quit
+- Auto-update from GitHub (no code signature required for private builds)
+
+---
+
+## Tech stack
+
+- **Runtime:** Electron 22.3.27, React 19, TypeScript, Vite 8
+- **UI:** Tailwind CSS v4, Framer Motion
+- **Data:** lowdb → `%APPDATA%/GarageLedger/db.json`
+- **Charts:** Recharts
+- **PDF:** jsPDF + jspdf-autotable
+- **i18n:** i18next / react-i18next
+- **Updates:** electron-updater + electron-builder (NSIS)
+
+---
+
+## Windows compatibility
+
+| OS | Installer |
+|----|-----------|
+| Windows 7/8/10/11 **64-bit** | `GarageLedger.Setup.<version>.x64.exe` |
+| Windows 7 **32-bit** | `GarageLedger.Setup.<version>.ia32.exe` |
+
+Requirements for Win7: SP1 + updates; TLS 1.2 for auto-update and live FX. Offline data and backups work without internet.
+
+```bash
+npm run verify:win7
+```
+
+---
+
+## Install (end users)
+
+1. Open [GitHub Releases](https://github.com/RealMrNovember/GarageLedger/releases)
+2. Download the installer for your architecture (`x64` or `ia32`)
+3. Run the wizard (per-machine install may require admin)
+4. Launch **GarageLedger** from the Start Menu
+
+Your data stays on your PC under:
+
+- Database: `%APPDATA%/GarageLedger/db.json`
+- Backups: `%APPDATA%/GarageLedger/backups/`
+
+---
+
+## Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Build (Installer)
+`npm run dev` starts Vite + Electron. On Windows dev builds, `tools/patch-electron-icon.mjs` applies the GarageLedger icon to `electron.exe` for correct taskbar branding.
+
+---
+
+## Build & release
 
 ```bash
-npm run dist
+npm run verify:release:build   # version sync + icon + production build
+npm run dist                   # NSIS installers → release-build/
 ```
 
-## Release (Auto GitHub Release / Auto-Update)
-
-Yayın akışı otomatikleştirilmiştir:
-
-1) Ensure the working tree is clean (commit your changes first).
-2) Ensure a GitHub token is available for electron-builder publishing:
+Publish to GitHub (requires `GH_TOKEN`):
 
 ```powershell
-$env:GH_TOKEN="YOUR_GITHUB_TOKEN"
+$env:GH_TOKEN="your_token"
+npm run publish
 ```
 
-3) Run:
+Version **must** match between `package.json` and `releases.json[0].version`.
 
-```bash
-npm run release
+---
+
+## Auto-update behavior
+
+1. App checks GitHub Releases hourly (and on resume)
+2. When an update is available, it **downloads silently** in the background
+3. When download completes, a **non-dismissible amber banner** appears on every screen until the user clicks **Restart and update**
+4. Settings → Updates still offers manual check / restart
+
+---
+
+## Project structure
+
+```
+GarageLedger/
+├── electron/          # Main process (IPC, DB, backups, updater, tray, background)
+├── src/               # React UI
+├── tools/             # Icon generator, release/win7 verify, dev icon patch
+├── build/             # Generated icon.ico / icon.png (npm run icons)
+├── releases.json      # Changelog for What's New + verify:release
+└── release-build/     # Installer output (gitignored)
 ```
 
-Bu komut:
+---
 
-- minor sürüm artırır (`npm version minor`)
-- push commits and tags (`git push --follow-tags`)
-- build and publish NSIS installer to GitHub Releases (`electron-builder --publish always`)
+## Contact
 
-## İletişim
+- **Developer:** Mikail | Cicibyte Corp
+- **Email:** [mozkarci1991@gmail.com](mailto:mozkarci1991@gmail.com)
+- **WhatsApp:** [+90 535 489 50 50](https://wa.me/905354895050)
+- **GitHub:** [RealMrNovember/GarageLedger](https://github.com/RealMrNovember/GarageLedger)
 
-- Mikail | Cicibyte Corp
-- E-posta: mozkarci1991@gmail.com
-- WhatsApp: +90 535 489 50 50
+---
+
+## License
+
+Private / proprietary — Cicibyte Corp. All rights reserved unless otherwise stated in the repository.

@@ -21,7 +21,9 @@
     "reports": "Hesabatlar",
     "customers": "Müştərilər",
     "help": "Yardım",
-    "settings": "Tənzimləmələr"
+    "settings": "Tənzimləmələr",
+    "expand": "Genişlət",
+    "collapse": "Daralt"
   },
   "topbar": {
     "currency": "Valyuta",
@@ -75,13 +77,18 @@
       "saleDate": "Satış Tarixi",
       "purchasePrice": "Alış Qiyməti",
       "salePrice": "Satış Qiyməti",
-      "profit": "Mənfəət/Zərər"
+      "profit": "Mənfəət/Zərər",
+      "actions": "Əməliyyatlar",
+      "region": "İnventar cədvəli",
+      "scrollHint": "Sürüşdür →"
     },
     "actions": {
       "edit": "Dəyiş",
       "delete": "Sil",
       "markSold": "Satıldı",
-      "deleteConfirm": "Bu qeydi qalıcı silmək istəyirsiniz?"
+      "deleteConfirm": "Bu qeydi qalıcı silmək istəyirsiniz?",
+      "deleteTitle": "Qeydi sil",
+      "cancel": "İmtina"
     },
     "badge": {
       "inStock": "Anbarda",
@@ -216,6 +223,15 @@
     "booklet": {
       "guide": [
         {
+          "title": "Arxa plan, yedək və məzənnə",
+          "body": "Tətbiq tray-də işləyə bilər; ödəniş xatırladıcıları və avtomatik məzənnə arxa fonda yenilənir.",
+          "bullets": [
+            "Tənzimləmələr → Xatırladıcılar və məzənnə intervalı",
+            "Yedəkləmə: gündəlik/həftəlik plan və avtomatik təmizlik",
+            "Pəncərəni bağlamaq tətbiqi sonlandırmır — tray ikonuna iki dəfə klikləyin"
+          ]
+        },
+        {
           "title": "Başlanğıc",
           "body": "GarageLedger, qalereya üçün offline işləyən ERP/CRM sistemidir. Məlumatlarınız kompüterinizdə saxlanır və tətbiq açıldıqda gündəlik avtomatik yedək yaradılır.",
           "bullets": [
@@ -327,7 +343,8 @@
       "kicker": "SSS",
       "title": "Mövzular və cavablar",
       "subtitle": "Maliyyə, hesabat, CRM və sistem istinadı."
-    }
+    },
+    "openReleaseNotes": "Yeniliklər (sürüm qeydləri)"
   },
   "tradeForm": {
     "createTitle": "Yeni Əməliyyat",
@@ -481,7 +498,8 @@
       "whatsappTitle": "WhatsApp",
       "whatsappDesc": "WhatsApp ilə dəstəkə yazın.",
       "whatsappCta": "Dəstəyə Yaz"
-    }
+    },
+    "releaseNotes": "Yeniliklər"
   },
   "lock": {
     "title": "Tətbiq kilidlidir",
@@ -493,7 +511,7 @@
   },
   "whatsNew": {
     "title": "Nə Yenilik Var? ({{version}})",
-    "subtitle": "CRM axınları, ödəniş/tahsilat izləmə və Quiet Luxury UI yönümlü premium yeniləmə.",
+    "subtitle": "v1.8.0: arxa plan xidməti, yedəkləmə, inventar UX, Windows ikonu və daha çoxu.",
     "cta": "Başa düşdüm",
     "sections": [
       {
@@ -542,7 +560,9 @@
       "vehicleSchema": "Avtomobil qeyd ekranı marka, model, il və mühərrik detallarına görə zənginləşdirildi.",
       "analytics": "Təkmilləşdirilmiş maliyyə analitikası və son 6 ay mənfəət/zərər qrafiki əlavə olundu.",
       "notifications": "Avtomatik yeniləmədən sonra “Nə yenilik var?” bildiriş sistemi inteqrasiya edildi."
-    }
+    },
+    "latestBadge": "Ən son",
+    "emptyHistory": "Buraxış qeydləri yüklənə bilmədi."
   },
   "updateModal": {
     "title": "Yeni yeniləmə mövcuddur {{version}}",
@@ -652,7 +672,14 @@
       "cache": "Keşdə məzənnə",
       "cacheAt": "Keş vaxtı"
     },
-    "backgroundWarning": "Ödəniş xatırladıcıları və avtomatik məzənnə yeniləmələri tətbiq açıq olanda arxa fonda işləyə bilər."
+    "backgroundWarning": "Ödəniş xatırladıcıları və avtomatik məzənnə yeniləmələri tətbiq açıq olanda arxa fonda işləyə bilər.",
+    "background": {
+      "title": "Arxa plan xidməti aktivdir",
+      "subtitle": "Pəncərəni bağlasanız belə GarageLedger tray ikonunda işləməyə davam edir.",
+      "bulletReminders": "Ödəniş xatırladıcıları seçilmiş saatda Windows bildirişi və tətbiq içi toast göndərir.",
+      "bulletFx": "Məzənnələr interval üzrə avtomatik yenilənir; yeniləmə haqqında xəbərdarlıq alırsınız.",
+      "bulletTray": "Pəncərəni bağlamaq tətbiqi bağlamır — tray ikonuna iki dəfə klikləyin."
+    }
   },
   "updates": {
     "title": "Yeniləmələr",
@@ -672,7 +699,7 @@
   },
   "backups": {
     "title": "Yedəkləmə",
-    "subtitle": "Məlumatlarınız gündəlik avtomatik yedəklənir. İstəsəniz manual yedək alıb geri yükləyə bilərsiniz.",
+    "subtitle": "Gündəlik, həftəlik, aylıq və ya illik avtomatik yedək; köhnə faylların avtomatik təmizlənməsi.",
     "create": "Yedək Al",
     "refresh": "Yenilə",
     "openFolder": "Qovluğu Aç",
@@ -681,6 +708,33 @@
     "count": "{{count}} fayl",
     "empty": "Hələ yedək yoxdur.",
     "restore": "Geri Yüklə",
-    "restoreConfirm": "Seçilmiş yedeği geri yükləmək istəyirsiniz? (Əvvəl təhlükəsizlik yedeği alınacaq)"
+    "restoreConfirm": "Seçilmiş yedeği geri yükləmək istəyirsiniz? (Əvvəl təhlükəsizlik yedeği alınacaq)",
+    "schedule": "Avtomatik yedəkləmə",
+    "schedules": {
+      "daily": "Gündəlik",
+      "weekly": "Həftəlik",
+      "monthly": "Aylıq",
+      "yearly": "İllik",
+      "manual": "Yalnız əl ilə"
+    },
+    "keepLast": "Saxlanacaq son yedək sayı",
+    "cleanup": "Köhnələri təmizlə",
+    "lastSuccessful": "Son uğurlu yedək",
+    "lastSize": "Son yedək ölçüsü",
+    "lastAt": "Son yedək vaxtı",
+    "totalSize": "Ümumi yedək həcmi",
+    "nextDue": "Növbəti avtomatik yedək",
+    "dueNow": "Tezliklə",
+    "manualOnly": "Yalnız əl ilə",
+    "manualHint": "Avtomatik yedəkləmə söndürülüb. Yedək almaq üçün «Yedək Al» düyməsini istifadə edin.",
+    "autoCleanupHint": "Hər yedəkdən sonra və saatlıq yoxlamada ən köhnə fayllar silinir (son {{count}} saxlanır)."
+  },
+  "backgroundNotice": {
+    "dismiss": "Bağla"
+  },
+  "updateBanner": {
+    "title": "Yeni sürüm hazırdır",
+    "subtitle": "Yenidən başladın və quraşdırın",
+    "action": "Yenidən başlat və yenilə"
   }
 }

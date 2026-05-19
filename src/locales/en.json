@@ -21,7 +21,9 @@
     "reports": "Reports",
     "customers": "Customers",
     "help": "Help",
-    "settings": "Settings"
+    "settings": "Settings",
+    "expand": "Expand menu",
+    "collapse": "Collapse menu"
   },
   "topbar": {
     "currency": "Currency",
@@ -87,13 +89,18 @@
       "saleDate": "Sale Date",
       "purchasePrice": "Purchase Price",
       "salePrice": "Sale Price",
-      "profit": "Profit/Loss"
+      "profit": "Profit/Loss",
+      "actions": "Actions",
+      "region": "Inventory table",
+      "scrollHint": "Scroll →"
     },
     "actions": {
       "edit": "Edit",
       "delete": "Delete",
       "markSold": "Mark Sold",
-      "deleteConfirm": "Do you want to permanently delete this record?"
+      "deleteConfirm": "Do you want to permanently delete this record?",
+      "deleteTitle": "Delete record",
+      "cancel": "Cancel"
     },
     "badge": {
       "inStock": "In stock",
@@ -216,6 +223,15 @@
     "booklet": {
       "guide": [
         {
+          "title": "Background, backups & FX",
+          "body": "The app can keep running in the tray; payment reminders and FX refresh run in the background.",
+          "bullets": [
+            "Settings → Reminders and FX interval",
+            "Backups: daily/weekly schedule and automatic cleanup",
+            "Closing the window does not quit — double-click the tray icon"
+          ]
+        },
+        {
           "title": "Getting started",
           "body": "GarageLedger is an offline-first garage/auto trading system. Your data is stored locally on your PC and is backed up automatically (daily) when the app is opened.",
           "bullets": [
@@ -327,7 +343,8 @@
       "kicker": "FAQ",
       "title": "Topics & answers",
       "subtitle": "Finance, reporting, CRM and system reference."
-    }
+    },
+    "openReleaseNotes": "What's new (release notes)"
   },
   "tradeForm": {
     "createTitle": "New Trade",
@@ -481,7 +498,8 @@
       "whatsappTitle": "WhatsApp",
       "whatsappDesc": "Contact support via WhatsApp.",
       "whatsappCta": "Contact Support"
-    }
+    },
+    "releaseNotes": "Release notes"
   },
   "lock": {
     "title": "App locked",
@@ -493,7 +511,7 @@
   },
   "whatsNew": {
     "title": "What's New? ({{version}})",
-    "subtitle": "A premium update focused on CRM workflows, payments, and a quieter luxury UI.",
+    "subtitle": "v1.8.0: background service, backups, inventory UX, Windows icon, and more.",
     "cta": "Got it",
     "sections": [
       {
@@ -542,7 +560,9 @@
       "vehicleSchema": "Vehicle entry form is enriched with Brand, Model, Year, and Engine details.",
       "analytics": "Advanced financial analytics and the 6-month profit/loss chart are added.",
       "notifications": "\"What's New\" notification system is integrated after auto-updates."
-    }
+    },
+    "latestBadge": "Latest",
+    "emptyHistory": "Could not load release history."
   },
   "updateModal": {
     "title": "New update available {{version}}",
@@ -652,7 +672,14 @@
       "cache": "Cached rates",
       "cacheAt": "Cache time"
     },
-    "backgroundWarning": "Payment reminders and automatic FX updates may run in the background while the app is open."
+    "backgroundWarning": "Payment reminders and automatic FX updates may run in the background while the app is open.",
+    "background": {
+      "title": "Background service is active",
+      "subtitle": "GarageLedger keeps running in the tray even when you close the window.",
+      "bulletReminders": "Payment reminders send a Windows notification and in-app toast at your chosen hour.",
+      "bulletFx": "FX rates refresh on your interval; you get a gentle update notification.",
+      "bulletTray": "Closing the window does not quit the app — double-click the tray icon to return."
+    }
   },
   "updates": {
     "title": "Updates",
@@ -672,7 +699,7 @@
   },
   "backups": {
     "title": "Backups",
-    "subtitle": "Your data is backed up automatically daily. You can also create and restore backups manually.",
+    "subtitle": "Daily, weekly, monthly, or yearly automatic backups with automatic cleanup of old files.",
     "create": "Create Backup",
     "refresh": "Refresh",
     "openFolder": "Open Folder",
@@ -681,6 +708,33 @@
     "count": "{{count}} files",
     "empty": "No backups yet.",
     "restore": "Restore",
-    "restoreConfirm": "Restore the selected backup? (A safety backup will be created first)"
+    "restoreConfirm": "Restore the selected backup? (A safety backup will be created first)",
+    "schedule": "Automatic backup",
+    "schedules": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "manual": "Manual only"
+    },
+    "keepLast": "Backups to keep",
+    "cleanup": "Clean up old",
+    "lastSuccessful": "Last successful backup",
+    "lastSize": "Last backup size",
+    "lastAt": "Last backup time",
+    "totalSize": "Total backup size",
+    "nextDue": "Next automatic backup",
+    "dueNow": "Soon",
+    "manualOnly": "Manual only",
+    "manualHint": "Automatic backups are off. Use «Create Backup» when you need a snapshot.",
+    "autoCleanupHint": "After each backup and hourly checks, older files are removed (keeping the last {{count}})."
+  },
+  "backgroundNotice": {
+    "dismiss": "Dismiss"
+  },
+  "updateBanner": {
+    "title": "New version ready",
+    "subtitle": "Restart to install the update",
+    "action": "Restart and update"
   }
 }

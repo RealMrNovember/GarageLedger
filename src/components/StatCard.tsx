@@ -13,7 +13,7 @@ export function StatCard({
     tone === 'profit' ? 'text-[var(--tf-accent)]' : 'text-[var(--tf-ink)]'
 
   return (
-    <Card className="flex min-h-[4.5rem] flex-col justify-center px-4 py-3.5">
+    <Card className="flex h-full min-h-[4.75rem] flex-col justify-center p-5">
       <div className="truncate text-[11px] font-medium uppercase tracking-[0.06em] text-[var(--tf-ink-muted)]">
         {label}
       </div>

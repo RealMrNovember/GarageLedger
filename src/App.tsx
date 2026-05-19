@@ -1,33 +1,24 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
+import { BackgroundNotice, type BackgroundNoticeItem } from './components/BackgroundNotice'
 import { Footer } from './components/Footer'
 import { Logo } from './components/Logo'
 import { AboutModal } from './components/AboutModal'
 import { Modal } from './components/Modal'
 import { Sidebar, type NavKey } from './components/Sidebar'
 import { Topbar } from './components/Topbar'
+import { UpdateReadyBanner } from './components/UpdateReadyBanner'
 import { uniqueCategories } from './lib/compute'
 import { useGarageLedger } from './lib/useGarageLedger'
-import { fxModeToMs, refreshFxRates, type FxUpdateMode } from './lib/currency'
+import { FX_UPDATED_EVENT, fxModeToMs, refreshFxRates, type FxUpdateMode } from './lib/currency'
 import { DashboardPage } from './pages/DashboardPage'
 import { CustomersPage } from './pages/CustomersPage'
 import { InventoryPage } from './pages/InventoryPage'
 import { HelpPage } from './pages/HelpPage'
 import { ReportsPage } from './pages/ReportsPage'
 import { SettingsPage } from './pages/SettingsPage'
-
-function compareVersions(a: string, b: string): number {
-  const pa = a.split('.').map((x) => Number(x))
-  const pb = b.split('.').map((x) => Number(x))
-  for (let i = 0; i < Math.max(pa.length, pb.length); i += 1) {
-    const av = pa[i] ?? 0
-    const bv = pb[i] ?? 0
-    if (av > bv) return 1
-    if (av < bv) return -1
-  }
-  return 0
-}
+import { compareVersions, parseReleaseHistory, type ReleaseEntry } from './lib/releases'
 
 type UpdateStatus =
   | { state: 'idle' }
@@ -45,14 +36,14 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
   const [whatsNewVersion, setWhatsNewVersion] = useState<string>('')
-  const [releaseHistory, setReleaseHistory] = useState<
-    Array<{ version: string; date: string; phases: Array<{ title: string; bullets: string[] }> }>
-  >([])
+  const [releaseHistory, setReleaseHistory] = useState<ReleaseEntry[]>([])
   const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('garageledger.theme') === 'dark' ? 'dark' : 'light'))
   const [fxTick, setFxTick] = useState(0)
+  const [backgroundNotices, setBackgroundNotices] = useState<BackgroundNoticeItem[]>([])
   const [updateModalOpen, setUpdateModalOpen] = useState(false)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>({ state: 'idle' })
   const updateVersion = 'version' in updateStatus ? updateStatus.version : ''
+  const updateReady = updateStatus.state === 'downloaded'
   const [lockOpen, setLockOpen] = useState(false)
   const [lockUnlocked, setLockUnlocked] = useState(false)
   const [lockPassword, setLockPassword] = useState('')
@@ -64,29 +55,25 @@ export default function App() {
 
   const fxMode = (settings.fxUpdates?.mode ?? '30m') as FxUpdateMode
 
+  const openReleaseNotes = useCallback(async () => {
+    const api = window.GarageLedger
+    const info = await api?.app?.getInfo?.()
+    const version = info?.version ?? ''
+    const historyRes = await api?.whatsNew?.getHistory?.()
+    if (historyRes?.ok && Array.isArray(historyRes.releases)) {
+      setReleaseHistory(parseReleaseHistory(historyRes.releases))
+    }
+    setWhatsNewVersion(version)
+    setWhatsNewOpen(true)
+    setAboutOpen(false)
+  }, [])
+
   useEffect(() => {
     if (!whatsNewOpen) return
     const load = async () => {
       const res = await window.GarageLedger?.whatsNew?.getHistory?.()
       if (res?.ok && Array.isArray(res.releases)) {
-        setReleaseHistory(
-          res.releases
-            .map((r) => {
-              const version = String(r?.version ?? '').trim()
-              if (!version) return null
-              const date = String(r?.date ?? '').trim()
-              const phases = Array.isArray(r?.phases)
-                ? r.phases
-                    .map((p) => ({
-                      title: String(p?.title ?? '').trim(),
-                      bullets: Array.isArray(p?.bullets) ? p.bullets.map((b) => String(b)) : [],
-                    }))
-                    .filter((p) => p.title)
-                : []
-              return { version, date, phases }
-            })
-            .filter((x): x is { version: string; date: string; phases: Array<{ title: string; bullets: string[] }> } => Boolean(x)),
-        )
+        setReleaseHistory(parseReleaseHistory(res.releases))
         return
       }
       setReleaseHistory([])
@@ -120,6 +107,35 @@ export default function App() {
     }, intervalMs)
     return () => window.clearInterval(id)
   }, [fxMode])
+
+  useEffect(() => {
+    const api = window.GarageLedger
+    if (!api?.background?.onNotify) return
+    const off = api.background.onNotify((payload) => {
+      const kind = payload?.kind === 'fx' ? 'fx' : 'payment'
+      const title = String(payload?.title ?? '').trim()
+      const body = String(payload?.body ?? '').trim()
+      if (!title && !body) return
+      const id = `${kind}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`
+      setBackgroundNotices((prev) => [...prev.slice(-2), { id, kind, title, body }])
+      window.setTimeout(() => {
+        setBackgroundNotices((prev) => prev.filter((n) => n.id !== id))
+      }, 9000)
+    })
+    return () => off()
+  }, [])
+
+  useEffect(() => {
+    const api = window.GarageLedger
+    const bumpFx = () => setFxTick(Date.now())
+    const offIpc = api?.background?.onFxUpdated?.(() => bumpFx())
+    const onDom = () => bumpFx()
+    window.addEventListener(FX_UPDATED_EVENT, onDom)
+    return () => {
+      offIpc?.()
+      window.removeEventListener(FX_UPDATED_EVENT, onDom)
+    }
+  }, [])
 
   useEffect(() => {
     if (!ready) return
@@ -175,18 +191,21 @@ export default function App() {
 
   useEffect(() => {
     const api = window.GarageLedger
+    if (!api?.updates?.getStatus) return
+    void api.updates.getStatus().then((payload) => {
+      if (payload && typeof payload === 'object' && 'state' in payload) {
+        setUpdateStatus(payload as UpdateStatus)
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    const api = window.GarageLedger
     if (!api?.updates?.onStatus) return
-    const dismissedKey = 'garageledger.updateDismissedVersion'
     const off = api.updates.onStatus((payload) => {
       const next = payload as UpdateStatus
       setUpdateStatus(next)
-      const state = next.state
-      const version = 'version' in next ? String(next.version ?? '') : ''
-      if (state === 'available' && version) {
-        const dismissed = localStorage.getItem(dismissedKey) ?? ''
-        if (dismissed !== version) setUpdateModalOpen(true)
-      }
-      if (state === 'downloading' || state === 'downloaded' || state === 'error') setUpdateModalOpen(true)
+      if (next.state === 'error') setUpdateModalOpen(true)
     })
     return () => off()
   }, [])
@@ -203,6 +222,10 @@ export default function App() {
       const lastSeen = localStorage.getItem(key) ?? ''
 
       if (!lastSeen || compareVersions(currentVersion, lastSeen) > 0) {
+        const historyRes = await api.whatsNew?.getHistory?.()
+        if (historyRes?.ok && Array.isArray(historyRes.releases)) {
+          setReleaseHistory(parseReleaseHistory(historyRes.releases))
+        }
         setWhatsNewVersion(currentVersion)
         setWhatsNewOpen(true)
       }
@@ -229,14 +252,25 @@ export default function App() {
         }
       />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative flex min-w-0 flex-1 flex-col">
+        {updateReady ? (
+          <UpdateReadyBanner
+            version={updateVersion}
+            onRestart={() => void window.GarageLedger?.updates?.install?.()}
+          />
+        ) : null}
         <Topbar
           currency={currency}
           onCurrencyChange={(c) => void setCurrency(c)}
           onOpenAbout={() => setAboutOpen(true)}
         />
 
-        <main className="min-w-0 flex-1 overflow-y-auto bg-[var(--tf-bg)] p-6">
+        <main
+          className={[
+            'min-w-0 flex-1 overflow-y-auto bg-[var(--tf-bg)] p-6',
+            updateReady ? 'pb-24' : '',
+          ].join(' ')}
+        >
           {!ready ? (
             <div className="rounded-2xl border border-[var(--tf-border)] bg-white/60 p-6 text-sm text-slate-600 shadow-sm">
               {t('app.loading')}
@@ -273,7 +307,7 @@ export default function App() {
                     onUpsertContact={(contact) => void upsertContact(contact)}
                   />
                 ) : nav === 'help' ? (
-                  <HelpPage />
+                  <HelpPage onOpenReleaseNotes={() => void openReleaseNotes()} />
                 ) : (
                   <SettingsPage settings={settings} onUpdateSettings={(patch) => updateSettings(patch)} />
                 )}
@@ -285,7 +319,11 @@ export default function App() {
         <Footer />
       </div>
 
-      <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
+      <AboutModal
+        open={aboutOpen}
+        onClose={() => setAboutOpen(false)}
+        onOpenReleaseNotes={() => void openReleaseNotes()}
+      />
 
       {lockOpen ? (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -372,47 +410,69 @@ export default function App() {
           <div className="relative">
             <div className="absolute left-[11px] top-0 h-full w-px bg-[var(--tf-border)]" />
             <div className="max-h-[60vh] space-y-4 overflow-y-auto pr-2">
-              {(releaseHistory.length ? releaseHistory : []).map((r) => (
-                <div key={r.version} className="relative pl-10">
-                  <div className="absolute left-[6px] top-[6px] h-3 w-3 rounded-full border border-[var(--tf-border)] bg-[var(--tf-accent)]" />
-                  <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="text-sm font-semibold text-[var(--tf-ink)]">v{r.version}</div>
-                      {r.date ? <div className="text-xs font-semibold text-[var(--tf-ink-muted)]">{r.date}</div> : null}
-                    </div>
-
-                    {r.phases.length ? (
-                      <div className="mt-4 space-y-4">
-                        {r.phases.map((p) => (
-                          <div
-                            key={`${r.version}:${p.title}`}
-                            className="rounded-2xl border border-[var(--tf-border)] bg-white p-4 dark:bg-gray-900"
-                          >
-                            <div className="text-xs font-semibold text-[var(--tf-ink)]">{p.title}</div>
-                            {p.bullets.length ? (
-                              <ul className="mt-3 space-y-2 text-sm text-[var(--tf-ink-muted)]">
-                                {p.bullets.map((b) => (
-                                  <li key={`${r.version}:${p.title}:${b}`} className="flex items-start gap-2">
-                                    <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--tf-accent)]/70" />
-                                    <span className="min-w-0">{b}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">â€”</div>
-                            )}
-                          </div>
-                        ))}
+              {(releaseHistory.length ? releaseHistory : []).map((r, index) => {
+                const isLatest = index === 0 || r.version === whatsNewVersion
+                return (
+                  <div key={r.version} className="relative pl-10">
+                    <div
+                      className={[
+                        'absolute left-[6px] top-[6px] h-3 w-3 rounded-full border bg-[var(--tf-accent)]',
+                        isLatest ? 'border-[var(--tf-accent)] ring-4 ring-[var(--tf-accent)]/20' : 'border-[var(--tf-border)]',
+                      ].join(' ')}
+                    />
+                    <div
+                      className={[
+                        'rounded-3xl border bg-white p-5 shadow-[var(--tf-shadow)] dark:bg-gray-950',
+                        isLatest
+                          ? 'border-[var(--tf-accent)]/35 ring-1 ring-[var(--tf-accent)]/15'
+                          : 'border-[var(--tf-border)]',
+                      ].join(' ')}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="text-sm font-semibold text-[var(--tf-ink)]">v{r.version}</div>
+                          {isLatest ? (
+                            <span className="rounded-full bg-[var(--tf-accent)]/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--tf-ink)]">
+                              {t('whatsNew.latestBadge')}
+                            </span>
+                          ) : null}
+                        </div>
+                        {r.date ? <div className="text-xs font-semibold text-[var(--tf-ink-muted)]">{r.date}</div> : null}
                       </div>
-                    ) : (
-                      <div className="mt-3 text-sm text-[var(--tf-ink-muted)]">â€”</div>
-                    )}
+
+                      {r.phases.length ? (
+                        <div className="mt-4 space-y-4">
+                          {r.phases.map((p) => (
+                            <div
+                              key={`${r.version}:${p.title}`}
+                              className="rounded-2xl border border-[var(--tf-border)] bg-white p-4 dark:bg-gray-900"
+                            >
+                              <div className="text-xs font-semibold text-[var(--tf-ink)]">{p.title}</div>
+                              {p.bullets.length ? (
+                                <ul className="mt-3 space-y-2 text-sm text-[var(--tf-ink-muted)]">
+                                  {p.bullets.map((b) => (
+                                    <li key={`${r.version}:${p.title}:${b}`} className="flex items-start gap-2">
+                                      <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--tf-accent)]/70" />
+                                      <span className="min-w-0">{b}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <div className="mt-2 text-xs text-[var(--tf-ink-muted)]">—</div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="mt-3 text-sm text-[var(--tf-ink-muted)]">—</div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
               {!releaseHistory.length ? (
                 <div className="rounded-3xl border border-[var(--tf-border)] bg-white p-5 text-sm text-[var(--tf-ink-muted)] dark:bg-gray-950">
-                  SÃ¼rÃ¼m geÃ§miÅŸi alÄ±namadÄ±.
+                  {t('whatsNew.emptyHistory')}
                 </div>
               ) : null}
             </div>
@@ -513,6 +573,12 @@ export default function App() {
           )}
         </div>
       </Modal>
+
+      <BackgroundNotice
+        items={backgroundNotices}
+        dismissLabel={t('backgroundNotice.dismiss')}
+        onDismiss={(id) => setBackgroundNotices((prev) => prev.filter((n) => n.id !== id))}
+      />
     </div>
   )
 }

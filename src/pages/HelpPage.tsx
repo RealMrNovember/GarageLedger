@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { HelpTopicCard } from '../components/HelpTopicCard'
+import { AccordionItem } from '../components/Accordion'
+import { PageShell } from '../components/PageShell'
 
 type HelpSection = {
   title: string
@@ -37,21 +38,34 @@ function FaqIcon() {
   )
 }
 
-function ContactLink({ label, href, children }: { label: string; href: string; children: string }) {
+function GuideIcon() {
   return (
-    <a
-      href={href}
-      target={href.startsWith('http') ? '_blank' : undefined}
-      rel={href.startsWith('http') ? 'noreferrer' : undefined}
-      className="mt-2 inline-block text-sm font-semibold text-[var(--tf-ink)] underline decoration-[var(--tf-border)] underline-offset-4 transition duration-200 group-hover:decoration-[var(--tf-accent)]"
-    >
-      <span className="sr-only">{label}: </span>
-      {children}
-    </a>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M7 3h7l3 3v15H7V3z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M10 11h7M10 15h7M10 7h3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
   )
 }
 
-export function HelpPage() {
+function SectionBody({ body, bullets }: { body: string; bullets?: string[] }) {
+  return (
+    <div className="space-y-3">
+      {body ? <p>{body}</p> : null}
+      {bullets && bullets.length > 0 ? (
+        <ul className="space-y-1.5">
+          {bullets.map((b) => (
+            <li key={b} className="flex gap-2">
+              <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[var(--tf-accent)]" aria-hidden="true" />
+              <span>{b}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  )
+}
+
+export function HelpPage({ onOpenReleaseNotes }: { onOpenReleaseNotes?: () => void }) {
   const { t } = useTranslation()
 
   const { guide, faq } = useMemo(() => {
@@ -68,84 +82,87 @@ export function HelpPage() {
   }, [t])
 
   const contacts = [
-    { key: 'developer', href: '', value: 'Mikail | Cicibyte Corp', external: false },
-    { key: 'github', href: 'https://github.com/RealMrNovember', value: 'RealMrNovember', external: true },
-    { key: 'email', href: 'mailto:mozkarci1991@gmail.com', value: 'mozkarci1991@gmail.com', external: false },
-    { key: 'whatsapp', href: 'https://wa.me/905354895050', value: '+90 535 489 50 50', external: true },
+    { key: 'developer', href: '', value: 'Mikail | Cicibyte Corp' },
+    { key: 'github', href: 'https://github.com/RealMrNovember', value: 'RealMrNovember' },
+    { key: 'email', href: 'mailto:mozkarci1991@gmail.com', value: 'mozkarci1991@gmail.com' },
+    { key: 'whatsapp', href: 'https://wa.me/905354895050', value: '+90 535 489 50 50' },
   ] as const
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
-      <header className="rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)]/80 px-6 py-5 shadow-[var(--tf-shadow)]">
-        <div className="text-lg font-semibold tracking-tight text-[var(--tf-ink)]">{t('help.title')}</div>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[var(--tf-ink-muted)]">{t('help.subtitle')}</p>
-      </header>
-
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-2 xl:items-start">
-        <section className="space-y-4" aria-labelledby="help-guide-heading">
-          <div id="help-guide-heading">
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--tf-accent)]">
-              {t('help.guide.kicker')}
-            </div>
-            <h2 className="mt-1 text-base font-semibold text-[var(--tf-ink)]">{t('help.guide.title')}</h2>
-            <p className="mt-1 text-sm text-[var(--tf-ink-muted)]">{t('help.guide.subtitle')}</p>
+    <PageShell
+      title={t('help.title')}
+      subtitle={t('help.subtitle')}
+      actions={
+        onOpenReleaseNotes ? (
+          <button
+            type="button"
+            onClick={onOpenReleaseNotes}
+            className="rounded-xl border border-[var(--tf-border)]/60 bg-white/80 px-3 py-2 text-xs font-semibold text-[var(--tf-ink)] shadow-sm transition hover:border-[var(--tf-accent)]/40 dark:bg-gray-950"
+          >
+            {t('help.openReleaseNotes')}
+          </button>
+        ) : null
+      }
+    >
+      <div className="mx-auto grid w-full max-w-3xl gap-8">
+        <section className="space-y-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--tf-accent)]">{t('help.guide.kicker')}</p>
+            <h2 className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{t('help.guide.title')}</h2>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {guide.map((s, index) => (
-              <HelpTopicCard key={s.title} step={index + 1} title={s.title} body={s.body} bullets={s.bullets} />
+              <AccordionItem
+                key={s.title}
+                title={s.title}
+                icon={<GuideIcon />}
+                defaultOpen={index === 0}
+              >
+                <SectionBody body={s.body} bullets={s.bullets} />
+              </AccordionItem>
             ))}
           </div>
         </section>
 
-        <section className="space-y-4" aria-labelledby="help-faq-heading">
-          <div id="help-faq-heading">
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--tf-accent)]">
-              {t('help.faq.kicker')}
-            </div>
-            <h2 className="mt-1 text-base font-semibold text-[var(--tf-ink)]">{t('help.faq.title')}</h2>
-            <p className="mt-1 text-sm text-[var(--tf-ink-muted)]">{t('help.faq.subtitle')}</p>
+        <section className="space-y-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--tf-accent)]">{t('help.faq.kicker')}</p>
+            <h2 className="mt-1 text-sm font-semibold text-[var(--tf-ink)]">{t('help.faq.title')}</h2>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {faq.map((s) => (
-              <HelpTopicCard
-                key={s.title}
-                icon={<FaqIcon />}
-                title={s.title}
-                body={s.body}
-                bullets={s.bullets}
-              />
+              <AccordionItem key={s.title} title={s.title} icon={<FaqIcon />}>
+                <SectionBody body={s.body} bullets={s.bullets} />
+              </AccordionItem>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--tf-ink-muted)]">{t('help.contact.title')}</p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {contacts.map((c) => (
+              <div key={c.key} className="gl-elevated-card rounded-xl px-4 py-3">
+                <div className="text-[10px] font-semibold uppercase tracking-wide text-[var(--tf-ink-muted)]">
+                  {t(`help.contact.${c.key}`)}
+                </div>
+                {c.href ? (
+                  <a
+                    href={c.href}
+                    target={c.href.startsWith('http') ? '_blank' : undefined}
+                    rel={c.href.startsWith('http') ? 'noreferrer' : undefined}
+                    className="mt-1 block truncate text-sm font-medium text-[var(--tf-ink)] underline decoration-[var(--tf-border)] underline-offset-4 hover:decoration-[var(--tf-accent)]"
+                  >
+                    {c.value}
+                  </a>
+                ) : (
+                  <div className="mt-1 text-sm font-medium text-[var(--tf-ink)]">{c.value}</div>
+                )}
+              </div>
             ))}
           </div>
         </section>
       </div>
-
-      <section className="space-y-4" aria-labelledby="help-contact-heading">
-        <div id="help-contact-heading">
-          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--tf-ink-muted)]">
-            {t('help.contact.kicker')}
-          </div>
-          <h2 className="mt-1 text-base font-semibold text-[var(--tf-ink)]">{t('help.contact.title')}</h2>
-        </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {contacts.map((c) => (
-            <article
-              key={c.key}
-              className="group rounded-2xl border border-[var(--tf-border)] bg-[var(--tf-surface)] p-5 shadow-[var(--tf-shadow)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--tf-accent)]/35 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/25"
-            >
-              <div className="text-xs font-semibold uppercase tracking-wide text-[var(--tf-ink-muted)]">
-                {t(`help.contact.${c.key}`)}
-              </div>
-              {c.href ? (
-                <ContactLink label={t(`help.contact.${c.key}`)} href={c.href}>
-                  {c.value}
-                </ContactLink>
-              ) : (
-                <div className="mt-2 text-sm font-semibold text-[var(--tf-ink)]">{c.value}</div>
-              )}
-            </article>
-          ))}
-        </div>
-      </section>
-    </div>
+    </PageShell>
   )
 }

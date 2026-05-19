@@ -35,8 +35,9 @@ async function isOnlineForUpdateCheck() {
 }
 
 function registerUpdaterIpc({ isDev }) {
-  autoUpdater.autoDownload = false
-  autoUpdater.requestHeaders = { 'Cache-Control': 'no-cache', Pragma: 'no-cache' }
+  autoUpdater.autoDownload = true
+  autoUpdater.autoInstallOnAppQuit = false
+  autoUpdater.requestHeaders = { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
 
   const safeCheckForUpdates = async () => {
     if (isDev) {
@@ -60,6 +61,11 @@ function registerUpdaterIpc({ isDev }) {
   })
   autoUpdater.on('update-available', (info) => {
     broadcastUpdateStatus({ state: 'available', version: info?.version })
+    if (!isDev) {
+      void autoUpdater.downloadUpdate().catch((e) => {
+        broadcastUpdateStatus({ state: 'error', message: e?.message ?? String(e) })
+      })
+    }
   })
   autoUpdater.on('update-not-available', (info) => {
     broadcastUpdateStatus({ state: 'upToDate', version: info?.version })
@@ -170,6 +176,22 @@ function extractCompletedPhases(markdown) {
   return phases
 }
 
+function compareVersions(a, b) {
+  const pa = String(a).split('.').map((x) => Number(x))
+  const pb = String(b).split('.').map((x) => Number(x))
+  for (let i = 0; i < Math.max(pa.length, pb.length); i += 1) {
+    const av = pa[i] ?? 0
+    const bv = pb[i] ?? 0
+    if (av > bv) return 1
+    if (av < bv) return -1
+  }
+  return 0
+}
+
+function sortReleasesByVersion(releases) {
+  return [...releases].sort((a, b) => compareVersions(b.version, a.version))
+}
+
 function normalizeRelease(raw) {
   if (!raw || typeof raw !== 'object') return null
   const version = String(raw.version ?? '').trim()
@@ -190,6 +212,7 @@ function normalizeRelease(raw) {
 
 async function readReleasesJson() {
   const candidates = [
+    path.join(__dirname, '..', 'releases.json'),
     path.join(process.resourcesPath, 'releases.json'),
     path.join(app.getAppPath(), 'releases.json'),
     path.join(app.getAppPath(), '..', 'releases.json'),
@@ -202,7 +225,7 @@ async function readReleasesJson() {
       const parsed = JSON.parse(txt)
       const releasesRaw = parsed && typeof parsed === 'object' ? parsed.releases : null
       const releases = Array.isArray(releasesRaw) ? releasesRaw.map(normalizeRelease).filter(Boolean) : []
-      if (releases.length) return releases
+      if (releases.length) return sortReleasesByVersion(releases)
     } catch {
       continue
     }
@@ -267,12 +290,12 @@ function registerIpc({ isDev } = { isDev: false }) {
 
   ipcMain.handle('garageledger:whatsnew:getHistory', async () => {
     const releases = await readReleasesJson()
-    return { ok: true, releases: releases.slice(0, 5) }
+    return { ok: true, releases: releases.slice(0, 8) }
   })
 
   ipcMain.handle('garageledger:backup:ensureDaily', async () => {
     try {
-      const out = await backups.ensureDailyBackup()
+      const out = await backups.ensureScheduledBackup()
       return { ok: true, created: out }
     } catch (e) {
       return { ok: false, message: e?.message ?? String(e) }
@@ -281,7 +304,7 @@ function registerIpc({ isDev } = { isDev: false }) {
   ipcMain.handle('garageledger:backup:create', async () => {
     try {
       const out = await backups.createBackup({ reason: 'manual' })
-      return { ok: true, created: out }
+      return { ok: true, created: out, cleanup: out?.cleanup }
     } catch (e) {
       return { ok: false, message: e?.message ?? String(e) }
     }
