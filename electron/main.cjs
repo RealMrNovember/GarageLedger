@@ -9,6 +9,7 @@ const {
   trayIcon,
   notificationIconPath,
 } = require('./icon.cjs')
+const { repairWindowsBrandingIfNeeded } = require('./win-shortcuts.cjs')
 
 applyWindowsAppIdentity()
 
@@ -135,6 +136,7 @@ async function createMainWindow() {
 
 app.whenReady().then(async () => {
   registerIpc({ isDev })
+  repairWindowsBrandingIfNeeded()
 
   const startedAt = Date.now()
   const splash = createSplashWindow()

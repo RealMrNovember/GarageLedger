@@ -1,6 +1,20 @@
 {
   "releases": [
     {
+      "version": "1.8.1",
+      "date": "2026-05-19",
+      "phases": [
+        {
+          "title": "Windows simge düzeltmesi",
+          "bullets": [
+            "Kurulum dosyasına GarageLedger ikonu zorla gömülür (Electron simgesi kaldırılır).",
+            "Güncelleme veya ilk açılışta masaüstü ve Başlat kısayolları doğru simgeyle yenilenir.",
+            "Görev çubuğu ve tray için AppUserModelID + gömülü .exe ikonu."
+          ]
+        }
+      ]
+    },
+    {
       "version": "1.8.0",
       "date": "2026-05-19",
       "phases": [

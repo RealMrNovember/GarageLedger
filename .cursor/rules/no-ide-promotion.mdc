@@ -1,0 +1,23 @@
+---
+description: No IDE or AI tool branding in commits, PRs, docs, or code
+alwaysApply: true
+---
+
+# No IDE / AI tool promotion
+
+Never add attribution, advertising, or branding for any IDE or AI product.
+
+## Forbidden
+
+- Git trailers: `Co-authored-by: Cursor`, `Made-with: Cursor`, Copilot, Windsurf, Codeium, etc.
+- PR bodies, release notes, README, comments, or footers that credit tools
+- Commit messages that promote or name the IDE/agent used
+
+## Required
+
+- Commits and PRs list only the human author unless the user explicitly names another person
+- Neutral change descriptions without tool marketing
+
+## Scope
+
+Applies to Cursor, VS Code, GitHub Copilot, Windsurf, Trae, JetBrains AI, and any similar product.
