@@ -1,6 +1,6 @@
 # GarageLedger
 
-![GarageLedger](./GarageLedger.svg)
+<img src="./GarageLedger.svg" alt="GarageLedger" width="48" height="48" />
 
 **GarageLedger** is an offline-first desktop ERP for small vehicle dealerships and garage trading teams. Built by **Mikail | Cicibyte Corp**, it unifies inventory, deals, CRM, finance, and reporting in one quiet, premium Windows application.
 
