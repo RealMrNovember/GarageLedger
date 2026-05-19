@@ -475,9 +475,12 @@
     }
   },
   "vinDecoder": {
+    "heroTitle": "Smart VIN Assistant",
+    "heroHint": "Fill brand, model, and engine details in seconds from a 17-character VIN.",
+    "manualDivider": "or enter vehicle details manually",
     "vinLabel": "VIN (Chassis No)",
-    "vinPlaceholder": "Enter VIN",
-    "fetch": "Fetch details",
+    "vinPlaceholder": "Enter VIN (11–17 characters)",
+    "fetch": "Decode details",
     "loading": "Fetching…",
     "notFound": "No info found, please enter manually.",
     "success": "{{count}} fields filled from VIN",

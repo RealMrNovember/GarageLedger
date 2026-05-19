@@ -1,6 +1,20 @@
 {
   "releases": [
     {
+      "version": "1.8.4",
+      "date": "2026-05-19",
+      "phases": [
+        {
+          "title": "VIN-First envanter formu",
+          "bullets": [
+            "Formun en üstünde Akıllı Şasi (VIN) Asistanı — tek tıkla marka, model, motor dolumu.",
+            "Manuel giriş için ayırıcı; yakıt ve şanzıman temel grid'e taşındı.",
+            "Başarılı VIN sorgusunda yeşil Magic Fill parlama efekti; paket/donanım opsiyonel alana otomatik yazılır."
+          ]
+        }
+      ]
+    },
+    {
       "version": "1.8.3",
       "date": "2026-05-19",
       "phases": [

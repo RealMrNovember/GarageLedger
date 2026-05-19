@@ -475,9 +475,12 @@
     }
   },
   "vinDecoder": {
+    "heroTitle": "Akıllı Şasi (VIN) Asistanı",
+    "heroHint": "17 haneli şasi numarası ile marka, model ve motor bilgilerini saniyeler içinde doldurun.",
+    "manualDivider": "veya araç bilgilerini manuel girin",
     "vinLabel": "Şasi No (VIN)",
-    "vinPlaceholder": "VIN girin",
-    "fetch": "Bilgileri Getir",
+    "vinPlaceholder": "VIN girin (11–17 karakter)",
+    "fetch": "Bilgileri Çözümle",
     "loading": "Getiriliyor…",
     "notFound": "Bilgi bulunamadı, lütfen manuel giriniz.",
     "success": "VIN ile {{count}} alan dolduruldu",

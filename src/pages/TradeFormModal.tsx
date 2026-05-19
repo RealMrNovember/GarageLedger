@@ -14,6 +14,18 @@ import { decodeVinFromNhtsa, type PowertrainType } from '../lib/vinDecoder'
 
 const fieldClass = modalFieldClass
 
+type VinFlashKey = 'brand' | 'model' | 'year' | 'engine' | 'fuel' | 'powertrain' | 'transmission' | 'vehiclePackage'
+
+function fieldWithVinFlash(base: string, key: VinFlashKey, flash: Set<VinFlashKey>): string {
+  return [
+    base,
+    'mt-2',
+    flash.has(key) ? 'ring-2 ring-emerald-500/50 bg-emerald-500/10 transition-all duration-500 dark:bg-emerald-500/15' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
 const POWERTRAIN_OPTIONS: PowertrainType[] = ['petrol', 'diesel', 'hybrid', 'phev', 'electric', 'lpg', 'other']
 
 function inferPowertrainFromFuel(fuelText: string): PowertrainType {
@@ -79,6 +91,7 @@ export function TradeFormModal({
   const [vinLoading, setVinLoading] = useState(false)
   const [vinToast, setVinToast] = useState<string | null>(null)
   const [vinToastOk, setVinToastOk] = useState(false)
+  const [vinFlashFields, setVinFlashFields] = useState<Set<VinFlashKey>>(() => new Set())
   const [sellerContactId, setSellerContactId] = useState<string | null>(null)
   const [sellerName, setSellerName] = useState('')
   const [sellerPhone, setSellerPhone] = useState('')
@@ -145,6 +158,7 @@ export function TradeFormModal({
       setVinLoading(false)
       setVinToast(null)
       setVinToastOk(false)
+      setVinFlashFields(new Set())
       setSellerContactId(null)
       setSellerName('')
       setSellerPhone('')
@@ -388,14 +402,42 @@ export function TradeFormModal({
         return
       }
 
-      if (decoded.brand) setBrand(decoded.brand)
-      if (decoded.model) setModel(decoded.model)
-      if (decoded.year != null) setYear(decoded.year)
-      if (decoded.engine) setEngine(decoded.engine)
-      if (decoded.fuel) setFuel(decoded.fuel)
-      if (decoded.powertrain) setPowertrain(decoded.powertrain)
-      if (decoded.transmission) setTransmission(decoded.transmission)
-      if (decoded.vehiclePackage) setVehiclePackage(decoded.vehiclePackage)
+      const flash = new Set<VinFlashKey>()
+      if (decoded.brand) {
+        setBrand(decoded.brand)
+        flash.add('brand')
+      }
+      if (decoded.model) {
+        setModel(decoded.model)
+        flash.add('model')
+      }
+      if (decoded.year != null) {
+        setYear(decoded.year)
+        flash.add('year')
+      }
+      if (decoded.engine) {
+        setEngine(decoded.engine)
+        flash.add('engine')
+      }
+      if (decoded.fuel) {
+        setFuel(decoded.fuel)
+        flash.add('fuel')
+      }
+      if (decoded.powertrain) {
+        setPowertrain(decoded.powertrain)
+        flash.add('powertrain')
+      }
+      if (decoded.transmission) {
+        setTransmission(decoded.transmission)
+        flash.add('transmission')
+      }
+      if (decoded.vehiclePackage) {
+        setVehiclePackage(decoded.vehiclePackage)
+        flash.add('vehiclePackage')
+      }
+
+      setVinFlashFields(flash)
+      window.setTimeout(() => setVinFlashFields(new Set()), 1600)
 
       if (decoded.powertrain || decoded.fuel || decoded.transmission || decoded.vehiclePackage) {
         setOptionalOpen(true)
@@ -553,97 +595,15 @@ export function TradeFormModal({
       >
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-12 xl:items-start">
         <div className="space-y-5 xl:col-span-8">
-        <ModalSection title={t('tradeForm.sections.basic')}>
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 sm:col-span-6">
-            <div className={modalLabelClass}>{t('tradeForm.fields.brand')}</div>
-            <input
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              placeholder={t('tradeForm.fields.brandPlaceholder')}
-              className={`${fieldClass} mt-2`}
-            />
-          </div>
-
-          <div className="col-span-12 sm:col-span-6">
-            <div className={modalLabelClass}>{t('tradeForm.fields.model')}</div>
-            <input
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              placeholder={t('tradeForm.fields.modelPlaceholder')}
-              className={`${fieldClass} mt-2`}
-            />
-          </div>
-
-          <div className="col-span-12 sm:col-span-4">
-            <div className={modalLabelClass}>{t('tradeForm.fields.year')}</div>
-            <input
-              type="number"
-              value={year}
-              onChange={(e) => setYear(e.target.value === '' ? '' : Number(e.target.value))}
-              placeholder={t('tradeForm.fields.yearPlaceholder')}
-              className={`${fieldClass} mt-2`}
-            />
-          </div>
-          <div className="col-span-12 sm:col-span-4">
-            <div className={modalLabelClass}>{t('tradeForm.fields.engine')}</div>
-            <input
-              value={engine}
-              onChange={(e) => setEngine(e.target.value)}
-              placeholder={t('tradeForm.fields.enginePlaceholder')}
-              className={`${fieldClass} mt-2`}
-            />
-          </div>
-          <div className="col-span-12 sm:col-span-4">
-            <div className={modalLabelClass}>{t('tradeForm.fields.plate')}</div>
-            <input
-              value={plate}
-              onChange={(e) => setPlate(e.target.value)}
-              placeholder={t('tradeForm.fields.platePlaceholder')}
-              className={`${fieldClass} mt-2`}
-            />
-          </div>
-
-          <div className="col-span-12 lg:col-span-10">
-            <div className="flex items-center justify-between gap-3">
-              <div className={modalLabelClass}>{t('vinDecoder.vinLabel')}</div>
-              {vinToast ? (
-                <div
-                  className={[
-                    'text-xs font-medium',
-                    vinToastOk ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
-                  ].join(' ')}
-                >
-                  {vinToast}
-                </div>
-              ) : null}
-            </div>
-            <input
-              value={vin}
-              onChange={(e) => setVin(e.target.value)}
-              placeholder={t('vinDecoder.vinPlaceholder')}
-              className={`${fieldClass} mt-2`}
-            />
-          </div>
-          <div className="col-span-12 flex items-end lg:col-span-2">
-            <button
-              type="button"
-              onClick={() => void decodeVin()}
-              disabled={vinLoading || vin.trim().length < 11}
-              className={[
-                'inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-2xl border text-sm font-semibold transition duration-200',
-                'border-[var(--tf-border)] bg-[var(--tf-surface)]/60 text-[var(--tf-ink)] hover:bg-black/5 dark:hover:bg-white/5',
-                'disabled:cursor-not-allowed disabled:opacity-60',
-              ].join(' ')}
-            >
-              {vinLoading ? (
-                <span className="inline-flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/20 border-t-black/60 dark:border-white/20 dark:border-t-white/60" />
-                  {t('vinDecoder.loading')}
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-2">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="opacity-80">
+        <section
+          aria-label={t('vinDecoder.heroTitle')}
+          className="rounded-2xl border border-blue-500/20 bg-slate-900/[0.03] p-4 ring-1 ring-blue-500/30 dark:border-blue-400/25 dark:bg-neutral-800/50 sm:p-5"
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/15 text-blue-600 ring-1 ring-blue-500/25 dark:text-blue-300">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path
                       d="M9 3l1.2 5.4L16 10l-5.4 1.2L9 17l-1.2-5.8L2 10l5.8-1.6L9 3z"
                       stroke="currentColor"
@@ -657,10 +617,154 @@ export function TradeFormModal({
                       strokeLinejoin="round"
                     />
                   </svg>
-                  {t('vinDecoder.fetch')}
                 </span>
+                <div>
+                  <h3 className="text-sm font-semibold tracking-tight text-[var(--tf-ink)]">{t('vinDecoder.heroTitle')}</h3>
+                  <p className="mt-0.5 text-xs text-[var(--tf-ink-muted)]">{t('vinDecoder.heroHint')}</p>
+                </div>
+              </div>
+              {vinToast ? (
+                <p
+                  className={[
+                    'text-xs font-medium',
+                    vinToastOk ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
+                  ].join(' ')}
+                  role="status"
+                >
+                  {vinToast}
+                </p>
+              ) : null}
+              <label htmlFor="trade-vin-hero" className="sr-only">
+                {t('vinDecoder.vinLabel')}
+              </label>
+              <input
+                id="trade-vin-hero"
+                value={vin}
+                onChange={(e) => setVin(e.target.value.toUpperCase())}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    void decodeVin()
+                  }
+                }}
+                placeholder={t('vinDecoder.vinPlaceholder')}
+                autoComplete="off"
+                spellCheck={false}
+                className={[
+                  fieldClass,
+                  'mt-0 h-12 font-mono text-base tracking-wider uppercase',
+                  'border-blue-500/25 bg-white/80 dark:bg-neutral-900/60',
+                  'focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/25',
+                ].join(' ')}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => void decodeVin()}
+              disabled={vinLoading || vin.trim().length < 11}
+              className={[
+                'inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold text-white transition-all duration-200',
+                'bg-blue-600 shadow-lg shadow-blue-600/25 hover:bg-blue-500',
+                'disabled:cursor-not-allowed disabled:opacity-55 disabled:shadow-none',
+                'lg:min-w-[200px]',
+              ].join(' ')}
+            >
+              {vinLoading ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  {t('vinDecoder.loading')}
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M4 14v4h4M20 10V6h-4M5 19l4-4M19 5l-4 4"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  {t('vinDecoder.fetch')}
+                </>
               )}
             </button>
+          </div>
+        </section>
+        <div className="relative flex items-center gap-3 py-1">
+          <div className="h-px flex-1 bg-[var(--tf-border)]" />
+          <span className="shrink-0 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--tf-ink-muted)]">
+            {t('vinDecoder.manualDivider')}
+          </span>
+          <div className="h-px flex-1 bg-[var(--tf-border)]" />
+        </div>
+        <ModalSection title={t('tradeForm.sections.basic')}>
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-12 sm:col-span-6">
+            <div className={modalLabelClass}>{t('tradeForm.fields.brand')}</div>
+            <input
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              placeholder={t('tradeForm.fields.brandPlaceholder')}
+              className={fieldWithVinFlash(fieldClass, 'brand', vinFlashFields)}
+            />
+          </div>
+
+          <div className="col-span-12 sm:col-span-6">
+            <div className={modalLabelClass}>{t('tradeForm.fields.model')}</div>
+            <input
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder={t('tradeForm.fields.modelPlaceholder')}
+              className={fieldWithVinFlash(fieldClass, 'model', vinFlashFields)}
+            />
+          </div>
+
+          <div className="col-span-12 sm:col-span-4">
+            <div className={modalLabelClass}>{t('tradeForm.fields.year')}</div>
+            <input
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder={t('tradeForm.fields.yearPlaceholder')}
+              className={fieldWithVinFlash(fieldClass, 'year', vinFlashFields)}
+            />
+          </div>
+          <div className="col-span-12 sm:col-span-4">
+            <div className={modalLabelClass}>{t('tradeForm.fields.engine')}</div>
+            <input
+              value={engine}
+              onChange={(e) => setEngine(e.target.value)}
+              placeholder={t('tradeForm.fields.enginePlaceholder')}
+              className={fieldWithVinFlash(fieldClass, 'engine', vinFlashFields)}
+            />
+          </div>
+          <div className="col-span-12 sm:col-span-4">
+            <div className={modalLabelClass}>{t('tradeForm.fields.plate')}</div>
+            <input
+              value={plate}
+              onChange={(e) => setPlate(e.target.value)}
+              placeholder={t('tradeForm.fields.platePlaceholder')}
+              className={`${fieldClass} mt-2`}
+            />
+          </div>
+
+          <div className="col-span-12 sm:col-span-6">
+            <div className={modalLabelClass}>{t('tradeForm.fields.fuel')}</div>
+            <input
+              value={fuel}
+              onChange={(e) => setFuel(e.target.value)}
+              placeholder={t('tradeForm.fields.fuelDetail')}
+              className={fieldWithVinFlash(fieldClass, 'fuel', vinFlashFields)}
+            />
+          </div>
+          <div className="col-span-12 sm:col-span-6">
+            <div className={modalLabelClass}>{t('tradeForm.fields.transmission')}</div>
+            <input
+              value={transmission}
+              onChange={(e) => setTransmission(e.target.value)}
+              className={fieldWithVinFlash(fieldClass, 'transmission', vinFlashFields)}
+            />
           </div>
         </div>
         </ModalSection>
@@ -1144,14 +1248,14 @@ export function TradeFormModal({
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 sm:col-span-6">
               <div className={modalLabelClass}>{t('tradeForm.fields.package')}</div>
-              <input value={vehiclePackage} onChange={(e) => setVehiclePackage(e.target.value)} className={`${fieldClass} mt-2`} />
+              <input value={vehiclePackage} onChange={(e) => setVehiclePackage(e.target.value)} className={fieldWithVinFlash(fieldClass, 'vehiclePackage', vinFlashFields)} />
             </div>
             <div className="col-span-12 sm:col-span-6">
               <div className={modalLabelClass}>{t('tradeForm.fields.powertrain')}</div>
               <select
                 value={powertrain}
                 onChange={(e) => setPowertrain(e.target.value as PowertrainType)}
-                className={`${fieldClass} mt-2`}
+                className={fieldWithVinFlash(fieldClass, 'powertrain', vinFlashFields)}
               >
                 <option value="">—</option>
                 {POWERTRAIN_OPTIONS.map((pt) => (
@@ -1161,15 +1265,7 @@ export function TradeFormModal({
                 ))}
               </select>
             </div>
-            <div className="col-span-12 sm:col-span-6">
-              <div className={modalLabelClass}>{t('tradeForm.fields.fuelDetail')}</div>
-              <input value={fuel} onChange={(e) => setFuel(e.target.value)} className={`${fieldClass} mt-2`} />
-            </div>
-            <div className="col-span-12 sm:col-span-6">
-              <div className={modalLabelClass}>{t('tradeForm.fields.transmission')}</div>
-              <input value={transmission} onChange={(e) => setTransmission(e.target.value)} className={`${fieldClass} mt-2`} />
-            </div>
-            <div className="col-span-12 sm:col-span-6">
+<div className="col-span-12 sm:col-span-6">
               <div className={modalLabelClass}>{t('tradeForm.fields.mileage')}</div>
               <input
                 type="number"

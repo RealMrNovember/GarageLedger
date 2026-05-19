@@ -475,9 +475,12 @@
     }
   },
   "vinDecoder": {
+    "heroTitle": "Ağıllı Şassi (VIN) Köməkçisi",
+    "heroHint": "17 simvollu şassi nömrəsi ilə marka, model və mühərrik məlumatlarını saniyələr içində doldurun.",
+    "manualDivider": "və ya avtomobil məlumatlarını əl ilə daxil edin",
     "vinLabel": "Şassi No (VIN)",
-    "vinPlaceholder": "VIN daxil edin",
-    "fetch": "Məlumatları Gətir",
+    "vinPlaceholder": "VIN daxil edin (11–17 simvol)",
+    "fetch": "Məlumatları Çöz",
     "loading": "Gətirilir…",
     "notFound": "Məlumat tapılmadı, zəhmət olmasa manual daxil edin.",
     "success": "VIN ilə {{count}} sahə dolduruldu",
