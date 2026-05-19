@@ -30,6 +30,12 @@ exports.default = async function afterPack(context) {
     'file-description': 'GarageLedger',
     'original-filename': exeName,
     'internal-name': 'GarageLedger',
+    'version-string': {
+      CompanyName: 'Cicibyte Corp',
+      FileDescription: 'GarageLedger',
+      ProductName: 'GarageLedger',
+      LegalCopyright: 'Cicibyte Corp',
+    },
   })
 
   console.log(`[afterPack] embedded icon → ${exePath}`)

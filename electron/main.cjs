@@ -15,6 +15,8 @@ const { repairWindowsBrandingIfNeeded } = require('./win-shortcuts.cjs')
 applyWindowsAppIdentity()
 
 const isDev = Boolean(process.env.VITE_DEV_SERVER_URL)
+const SPLASH_MIN_MS = 2800
+const SPLASH_FADE_MS = 420
 
 let tray = null
 let mainWindow = null
@@ -78,15 +80,16 @@ function createTray() {
 
 function createSplashWindow() {
   const win = new BrowserWindow({
-    width: 440,
-    height: 220,
+    width: 420,
+    height: 480,
     resizable: false,
     movable: true,
     frame: false,
     transparent: false,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#111111',
     show: true,
     alwaysOnTop: true,
+    center: true,
     ...windowIconOptions(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
@@ -98,6 +101,20 @@ function createSplashWindow() {
   win.loadFile(path.join(__dirname, 'splash.html'))
   applyWindowIcon(win)
   return win
+}
+
+function fadeOutAndCloseSplash(splash, onDone) {
+  if (!splash || splash.isDestroyed()) {
+    onDone()
+    return
+  }
+  try {
+    void splash.webContents.executeJavaScript('document.body.classList.add("fade-out")', true)
+  } catch {}
+  setTimeout(() => {
+    if (!splash.isDestroyed()) splash.close()
+    onDone()
+  }, SPLASH_FADE_MS)
 }
 
 async function createMainWindow() {
@@ -134,7 +151,6 @@ async function createMainWindow() {
 
   win.once('ready-to-show', () => {
     applyWindowIcon(win)
-    win.show()
   })
 
   win.on('close', (event) => {
@@ -164,12 +180,28 @@ app.whenReady().then(async () => {
   createTray()
   startBackgroundService({ icon: notificationIconPath() })
 
-  mainWindow.once('ready-to-show', () => {
+  let mainReady = false
+  let splashClosed = false
+
+  const tryFinishSplash = () => {
+    if (splashClosed || !mainReady) return
     const elapsed = Date.now() - startedAt
-    const remaining = Math.max(0, 3000 - elapsed)
+    const remaining = Math.max(0, SPLASH_MIN_MS - elapsed)
     setTimeout(() => {
-      if (!splash.isDestroyed()) splash.close()
+      if (splashClosed) return
+      splashClosed = true
+      fadeOutAndCloseSplash(splash, () => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.show()
+          mainWindow.focus()
+        }
+      })
     }, remaining)
+  }
+
+  mainWindow.once('ready-to-show', () => {
+    mainReady = true
+    tryFinishSplash()
   })
 
   app.on('activate', async () => {
@@ -190,5 +222,4 @@ app.on('window-all-closed', () => {
   if (getIsUpdating()) {
     app.quit()
   }
-  // Otherwise keep running in tray on Windows/Linux when the window is hidden.
 })

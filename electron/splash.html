@@ -1,111 +1,110 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GarageLedger</title>
     <style>
-      :root {
-        --bg: #fafafa;
-        --surface: #f5f0e8;
-        --ink: #0f172a;
-        --muted: #64748b;
-        --border: rgba(15, 23, 42, 0.08);
-        --shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      * {
+        box-sizing: border-box;
       }
+      html,
       body {
         margin: 0;
-        background: var(--bg);
-        color: var(--ink);
-        height: 100vh;
-        display: grid;
-        place-items: center;
+        height: 100%;
+        overflow: hidden;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        background: #111111;
+        color: #f5f0e6;
       }
-      .card {
-        width: 360px;
-        border-radius: 18px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow);
-        padding: 24px;
+      body {
+        opacity: 1;
+        transition: opacity 420ms ease;
+      }
+      body.fade-out {
+        opacity: 0;
+      }
+      .shell {
+        height: 100%;
         display: flex;
-        gap: 14px;
+        flex-direction: column;
         align-items: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 32px 28px 28px;
       }
       .logo {
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-        opacity: 0.9;
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 24px rgba(201, 162, 39, 0.18));
+      }
+      .media {
+        width: min(320px, 88vw);
+        aspect-ratio: 16 / 9;
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(201, 162, 39, 0.22);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      }
+      .media video,
+      .media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
       }
       .title {
-        font-size: 14px;
-        font-weight: 650;
-      }
-      .sub {
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 2px;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
       }
       .status {
         font-size: 12px;
-        color: var(--muted);
-        margin-top: 10px;
+        color: #9ca3af;
+        min-height: 1.2em;
       }
-      .pbar {
-        height: 6px;
-        margin-top: 10px;
+      .track {
+        width: min(280px, 80vw);
+        height: 3px;
         border-radius: 999px;
-        background: rgba(15, 23, 42, 0.08);
+        background: rgba(255, 255, 255, 0.08);
         overflow: hidden;
       }
-      .pbar > div {
+      .track > div {
         height: 100%;
         width: 0%;
-        background: rgba(17, 24, 39, 0.6);
+        background: linear-gradient(90deg, #c9a227, #e8d5a3);
         border-radius: 999px;
-        transition: width 160ms ease;
-      }
-      .bar {
-        height: 3px;
-        margin-top: 16px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.08);
-        overflow: hidden;
-      }
-      .bar > div {
-        height: 100%;
-        width: 40%;
-        background: rgba(17, 24, 39, 0.55);
-        border-radius: 999px;
-        animation: move 1s ease-in-out infinite alternate;
-      }
-      @keyframes move {
-        from {
-          transform: translateX(-30%);
-        }
-        to {
-          transform: translateX(140%);
-        }
+        transition: width 200ms ease;
       }
     </style>
   </head>
   <body>
-    <div>
-      <div class="card">
-        <img class="logo" src="../GarageLedger.svg" alt="GarageLedger" />
-        <div>
-          <div class="title">GarageLedger</div>
-          <div class="sub">Cicibyte Corp</div>
-          <div id="status" class="status">Başlatılıyor…</div>
-          <div class="pbar"><div id="pbar"></div></div>
-        </div>
+    <div class="shell">
+      <img class="logo" src="./splash/garageledger.svg" alt="GarageLedger" onerror="this.src='./splash/logo.png'" />
+      <div class="media">
+        <video id="carVideo" autoplay muted loop playsinline poster="./splash/car.gif">
+          <source src="./splash/car.webm" type="video/webm" />
+        </video>
       </div>
+      <div class="title">GarageLedger</div>
+      <div id="status" class="status">Starting…</div>
+      <div class="track"><div id="pbar"></div></div>
     </div>
     <script>
       const statusEl = document.getElementById('status')
       const pbarEl = document.getElementById('pbar')
+      const video = document.getElementById('carVideo')
+
+      video?.addEventListener('error', () => {
+        const img = document.createElement('img')
+        img.src = './splash/car.gif'
+        img.alt = ''
+        video.replaceWith(img)
+      })
 
       function setStatus(text) {
         statusEl.textContent = text
@@ -119,32 +118,32 @@
         if (!payload || !payload.state) return
         switch (payload.state) {
           case 'checking':
-            setStatus('Güncelleme kontrol ediliyor…')
-            setProgress(8)
-            break
-          case 'available':
-            setStatus('Güncelleme bulundu. İndiriliyor…')
+            setStatus('Checking for updates…')
             setProgress(12)
             break
+          case 'available':
+            setStatus('Update found. Downloading…')
+            setProgress(18)
+            break
           case 'downloading':
-            setStatus(`Güncelleme indiriliyor… %${payload.percent ?? 0}`)
+            setStatus(`Downloading update… ${payload.percent ?? 0}%`)
             setProgress(payload.percent ?? 0)
             break
           case 'downloaded':
-            setStatus('Güncelleme hazır. Uygulama açılıyor…')
-            setProgress(100)
+            setStatus('Update ready. Loading workspace…')
+            setProgress(92)
             break
           case 'upToDate':
-            setStatus('Uygulama güncel. Açılıyor…')
-            setProgress(100)
+            setStatus('Loading workspace…')
+            setProgress(88)
             break
           case 'dev':
-            setStatus('Geliştirme modu. Açılıyor…')
-            setProgress(100)
+            setStatus('Development mode…')
+            setProgress(70)
             break
           case 'error':
-            setStatus('Güncelleme hatası. Açılıyor…')
-            setProgress(100)
+            setStatus('Loading workspace…')
+            setProgress(80)
             break
           default:
             break
@@ -154,17 +153,19 @@
       async function boot() {
         try {
           const api = window.GarageLedger
-          if (api?.updates?.getStatus) {
-            const s = await api.updates.getStatus()
-            render(s)
-          }
+          if (api?.updates?.getStatus) render(await api.updates.getStatus())
           api?.updates?.onStatus?.((p) => render(p))
           api?.updates?.check?.()
           api?.backups?.ensureDaily?.()
+          setProgress(40)
         } catch {
-          setStatus('Açılıyor…')
+          setStatus('Loading…')
         }
       }
+
+      window.addEventListener('garageledger:splash-fade', () => {
+        document.body.classList.add('fade-out')
+      })
 
       boot()
     </script>

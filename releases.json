@@ -1,6 +1,20 @@
 {
   "releases": [
     {
+      "version": "1.8.3",
+      "date": "2026-05-19",
+      "phases": [
+        {
+          "title": "Premium branding — logo + car animation",
+          "bullets": [
+            "Kurulum: GarageLedger logosu + animation/car.gif birlikte (sidebar, header, welcome).",
+            "Splash: #111111 frameless ekran, logo + car.webm, yumuşak fade-out.",
+            "Windows ikon: exe gömme, yeni NSIS GUID, kısayol onarımı v2."
+          ]
+        }
+      ]
+    },
+    {
       "version": "1.8.2",
       "date": "2026-05-19",
       "phases": [

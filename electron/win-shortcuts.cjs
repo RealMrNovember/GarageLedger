@@ -6,7 +6,7 @@ const { APP_USER_MODEL_ID } = require('./icon.cjs')
 const SHORTCUT_FILE = 'GarageLedger.lnk'
 const START_MENU_FOLDER = 'Cicibyte Corp'
 /** Bump when shortcut repair logic changes (forces re-run on customer machines). */
-const BRANDING_REPAIR_GENERATION = 1
+const BRANDING_REPAIR_GENERATION = 2
 
 function shortcutPaths() {
   const paths = []

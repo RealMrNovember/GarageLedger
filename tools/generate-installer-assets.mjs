@@ -1,6 +1,5 @@
 /**
- * NSIS installer branding placeholders (sidebar/header BMP + optional wizard GIF).
- * Replace build/installer/wizard.gif with your own animation when ready.
+ * Premium NSIS installer visuals: official logo + car animation (logo never removed).
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -9,37 +8,43 @@ import sharp from 'sharp'
 
 const root = process.cwd()
 const outDir = path.join(root, 'build', 'installer')
+const logoPath = path.join(outDir, 'logo.png')
+const carGif = path.join(outDir, 'wizard.gif')
+const animCarGif = path.join(root, '..', 'animation', 'car.gif')
+
 fs.mkdirSync(outDir, { recursive: true })
 
-const sidebarSvg = `
-<svg width="164" height="314" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0f1419"/>
-      <stop offset="100%" stop-color="#1a2332"/>
-    </linearGradient>
-  </defs>
-  <rect width="164" height="314" fill="url(#bg)"/>
-  <rect x="0" y="0" width="4" height="314" fill="#c9a227"/>
-  <text x="22" y="48" fill="#f5f0e6" font-family="Segoe UI, Arial" font-size="15" font-weight="600">GarageLedger</text>
-  <text x="22" y="72" fill="#9ca3af" font-family="Segoe UI, Arial" font-size="10">Premium ERP</text>
-  <text x="22" y="260" fill="#6b7280" font-family="Segoe UI, Arial" font-size="9">Cicibyte Corp</text>
-</svg>`
+if (fs.existsSync(animCarGif)) {
+  fs.copyFileSync(animCarGif, carGif)
+} else if (!fs.existsSync(carGif)) {
+  console.warn('[installer-assets] animation/car.gif not found — run npm run sync-assets')
+}
 
-const headerSvg = `
-<svg width="150" height="57" xmlns="http://www.w3.org/2000/svg">
-  <rect width="150" height="57" fill="#fafafa"/>
-  <rect x="0" y="54" width="150" height="3" fill="#c9a227"/>
-  <text x="12" y="34" fill="#111827" font-family="Segoe UI, Arial" font-size="14" font-weight="600">GarageLedger</text>
-</svg>`
+if (!fs.existsSync(logoPath) && fs.existsSync(path.join(root, 'build', 'icon.png'))) {
+  fs.copyFileSync(path.join(root, 'build', 'icon.png'), logoPath)
+}
 
-const sidebarPng = path.join(outDir, 'sidebar.png')
-const headerPng = path.join(outDir, 'header.png')
-const sidebarBmp = path.join(outDir, 'sidebar.bmp')
-const headerBmp = path.join(outDir, 'header.bmp')
+const logoBuf = fs.existsSync(logoPath) ? await sharp(logoPath).resize(96, 96, { fit: 'contain' }).png().toBuffer() : null
+const logoHeaderBuf = logoBuf ? await sharp(logoBuf).resize(36, 36).png().toBuffer() : null
+const logoHeroBuf = logoBuf ? await sharp(logoBuf).resize(88, 88).png().toBuffer() : null
+const carFrameBuf = fs.existsSync(carGif)
+  ? await sharp(carGif, { animated: true, page: 0 }).resize(220, 120, { fit: 'contain' }).png().toBuffer()
+  : null
+const carSidebarBuf = carFrameBuf
+  ? await sharp(carFrameBuf).resize(140, 80, { fit: 'inside' }).png().toBuffer()
+  : null
+const carHeroBuf = carFrameBuf
+  ? await sharp(carFrameBuf).resize(200, 110, { fit: 'inside' }).png().toBuffer()
+  : null
 
-await sharp(Buffer.from(sidebarSvg)).resize(164, 314).png().toFile(sidebarPng)
-await sharp(Buffer.from(headerSvg)).resize(150, 57).png().toFile(headerPng)
+async function composePng(width, height, draw) {
+  const base = sharp({
+    create: { width, height, channels: 4, background: { r: 17, g: 17, b: 17, alpha: 1 } },
+  })
+  const layers = draw()
+  if (!layers.length) return base.png().toBuffer()
+  return base.composite(layers).png().toBuffer()
+}
 
 function pngToBmp(pngPath, bmpPath) {
   const ps = [
@@ -51,35 +56,64 @@ function pngToBmp(pngPath, bmpPath) {
   execSync(`powershell -NoProfile -Command "${ps}"`, { stdio: 'pipe' })
 }
 
-if (process.platform === 'win32') {
-  pngToBmp(sidebarPng, sidebarBmp)
-  pngToBmp(headerPng, headerBmp)
-  fs.unlinkSync(sidebarPng)
-  fs.unlinkSync(headerPng)
-} else {
-  fs.copyFileSync(sidebarPng, sidebarBmp)
-  fs.copyFileSync(headerPng, headerBmp)
-  console.warn('Non-Windows: copied PNG as BMP placeholder — regenerate on Windows before release.')
+async function writeBmp(pngBuffer, bmpPath) {
+  const pngPath = `${bmpPath}.png`
+  await sharp(pngBuffer).png().toFile(pngPath)
+  if (process.platform === 'win32') {
+    pngToBmp(pngPath, bmpPath)
+    fs.unlinkSync(pngPath)
+  } else {
+    fs.copyFileSync(pngPath, bmpPath)
+  }
 }
 
-const frameCount = 8
-const frames = []
-for (let i = 0; i < frameCount; i += 1) {
-  const x = 40 + i * 14
-  const carSvg = `
-  <svg width="200" height="120" xmlns="http://www.w3.org/2000/svg">
-    <rect width="200" height="120" fill="#0f1419"/>
-    <rect x="0" y="100" width="200" height="20" fill="#1f2937"/>
-    <rect x="${x}" y="52" width="48" height="22" rx="4" fill="#c9a227"/>
-    <circle cx="${x + 10}" cy="78" r="7" fill="#374151"/>
-    <circle cx="${x + 38}" cy="78" r="7" fill="#374151"/>
-    <text x="12" y="28" fill="#9ca3af" font-family="Segoe UI, Arial" font-size="11">GarageLedger Setup</text>
-  </svg>`
-  frames.push(await sharp(Buffer.from(carSvg)).png().toBuffer())
-}
+const sidebarPng = await composePng(164, 314, () => {
+  const layers = [{ input: Buffer.from('<svg width="164" height="314"><rect width="164" height="314" fill="#111111"/><rect x="0" y="0" width="3" height="314" fill="#c9a227"/></svg>'), top: 0, left: 0 }]
+  if (logoBuf) layers.push({ input: logoBuf, top: 28, left: 34 })
+  if (carSidebarBuf) layers.push({ input: carSidebarBuf, top: 150, left: 12 })
+  layers.push({
+    input: Buffer.from(
+      '<svg width="164" height="314"><text x="22" y="290" fill="#6b7280" font-family="Segoe UI" font-size="9">Cicibyte Corp</text></svg>',
+    ),
+    top: 0,
+    left: 0,
+  })
+  return layers
+})
 
-await sharp(frames, { animated: true }).gif({ loop: 0, delay: 120 }).toFile(path.join(outDir, 'wizard.gif'))
+const headerPng = await composePng(150, 57, () => {
+  const layers = [{ input: Buffer.from('<svg width="150" height="57"><rect width="150" height="57" fill="#fafafa"/><rect x="0" y="54" width="150" height="3" fill="#c9a227"/></svg>'), top: 0, left: 0 }]
+  if (logoHeaderBuf) layers.push({ input: logoHeaderBuf, top: 10, left: 10 })
+  layers.push({
+    input: Buffer.from(
+      '<svg width="150" height="57"><text x="54" y="34" fill="#111827" font-family="Segoe UI" font-size="13" font-weight="600">GarageLedger</text></svg>',
+    ),
+    top: 0,
+    left: 0,
+  })
+  return layers
+})
 
-process.stdout.write(`Generated ${path.join(outDir, 'sidebar.bmp')}\n`)
-process.stdout.write(`Generated ${path.join(outDir, 'header.bmp')}\n`)
-process.stdout.write(`Generated ${path.join(outDir, 'wizard.gif')} (placeholder — replace with your animation)\n`)
+const heroPng = await composePng(500, 300, () => {
+  const layers = [{ input: Buffer.from('<svg width="500" height="300"><rect width="500" height="300" fill="#111111"/></svg>'), top: 0, left: 0 }]
+  if (logoHeroBuf) layers.push({ input: logoHeroBuf, top: 36, left: 48 })
+  if (carHeroBuf) layers.push({ input: carHeroBuf, top: 58, left: 248 })
+  layers.push({
+    input: Buffer.from(
+      '<svg width="500" height="300"><text x="48" y="150" fill="#f5f0e6" font-family="Segoe UI" font-size="18" font-weight="600">GarageLedger</text><text x="48" y="175" fill="#9ca3af" font-family="Segoe UI" font-size="11">Premium garage ERP</text></svg>',
+    ),
+    top: 0,
+    left: 0,
+  })
+  return layers
+})
+
+await writeBmp(sidebarPng, path.join(outDir, 'sidebar.bmp'))
+await writeBmp(headerPng, path.join(outDir, 'header.bmp'))
+await writeBmp(heroPng, path.join(outDir, 'welcome-hero.bmp'))
+
+process.stdout.write(`Generated installer assets in ${outDir}\n`)
+process.stdout.write('- sidebar.bmp (logo + car preview + brand)\n')
+process.stdout.write('- header.bmp (logo + title)\n')
+process.stdout.write('- welcome-hero.bmp (logo + car for welcome page)\n')
+process.stdout.write(`- wizard.gif (${fs.existsSync(carGif) ? 'from animation/car.gif' : 'missing'})\n`)
